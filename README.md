@@ -1,37 +1,119 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+
+# Unec Sports Hub
+
+## Project Description
+
+UNEC Sports Hub is a modern tournament management platform built with Next.js and Firebase. It is designed to simplify the process of organizing, managing, and tracking sports competitions.
+
+The platform provides an intuitive admin experience for creating matches, updating scores, and tracking match events such as goals, cards, and commentary in real time.
+
+---
+
+## Features
+
+* Match Management
+  Create and manage fixtures, update match scores, and track match status (Live, Finished, Upcoming).
+
+* Event Tracking System
+  Record goals, yellow/red cards, and commentary. Scores update automatically when goals are added, with a structured event timeline.
+
+* Admin Dashboard
+  Modal-based editing system with smooth interactions, giving full control over matches and events.
+
+* Modern UI/UX
+  Clean and responsive interface with smooth animations powered by Framer Motion and styled using Tailwind CSS.
+
+* Real-time Backend
+  Powered by Firebase for fast and scalable data handling.
+
+---
+
+## Tech Stack
+
+* Frontend: Next.js (App Router)
+* Styling: Tailwind CSS
+* Animations: Framer Motion
+* Backend/Database: Firebase
+* Icons: Material UI
+
+---
 
 ## Getting Started
 
-First, run the development server:
+Clone the repository and install dependencies:
+
+```bash
+git clone https://github.com/your-username/unec-sportshub.git
+cd unec-sportshub
+npm install
+```
+
+Run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open in your browser:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+http://localhost:3000
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## Project Structure
 
-To learn more about Next.js, take a look at the following resources:
+```
+/app
+/components
+  /match
+  /table
+  /ui
+/firebase
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Future Improvements
 
-## Deploy on Vercel
+* Live match indicators
+* Team logos and player profiles
+* Standings and leaderboard system
+* Public match viewing pages
+* Notifications for match updates
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-# unec-sportshub
+## Deployment
+
+You can deploy the project easily using Vercel:
+
+```bash
+npm run build
+```
+
+Or connect the repository directly to Vercel for automatic deployments.
+
+---
+
+## Contributing
+
+Contributions are welcome.
+
+* Fork the repository
+* Create a new branch
+* Submit a pull request
+
+---
+
+## Author
+
+Built by Eche
+Frontend Developer and Medical Student
+
+---
+
+## Support
+
+If you find this project useful, consider starring the repository.
