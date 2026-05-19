@@ -6,17 +6,80 @@ import GroupsIcon from "@mui/icons-material/Groups";
 import SportsEsportsIcon from "@mui/icons-material/SportsEsports";
 import PaidIcon from "@mui/icons-material/Paid";
 import Link from "next/link";
+import { handleSignOut, useUserInfo } from "@/utils/logics/userinfo";
+import { useRouter } from 'next/navigation';
 
 export default function Page() {
+    const userInfo = useUserInfo()
+    const router = useRouter()
     return (
         <div className="min-h-screen bg-[#0A0F1C] text-white flex flex-col gap-8">
-            {/* CTA */}
-            <Link href='/admin/Tournaments' className="flex items-center gap-2 w-fit px-5 py-2 rounded-xl font-medium 
-                bg-linear-to-r from-cyan-400 to-purple-500 text-black 
-                hover:scale-105 transition shadow-lg cursor-pointer">
-                <AddIcon fontSize="small" />
-                New Tournament
-            </Link>
+            <section className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
+
+                {/* LEFT SIDE */}
+                <div className="flex items-center gap-4 bg-white/[0.04] border border-white/10 
+        rounded-2xl px-5 py-4 backdrop-blur-xl shadow-[0_0_30px_rgba(0,255,255,0.05)]">
+
+                    {/* Avatar */}
+                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br 
+            from-cyan-400 to-purple-500 flex items-center justify-center 
+            text-black font-bold text-lg shadow-lg">
+                        {userInfo?.fullName?.charAt(0)}
+                    </div>
+
+                    {/* User Info */}
+                    <div className="flex flex-col">
+                        <div className="flex items-center gap-2 mb-1">
+                            <span className="text-gray-400 text-xs uppercase tracking-wider">
+                                Admin Panel
+                            </span>
+
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold 
+                    uppercase tracking-wide bg-cyan-500/10 text-cyan-300 
+                    border border-cyan-500/20">
+                                {userInfo?.role}
+                            </span>
+                        </div>
+
+                        <h2 className="text-xl font-semibold text-white leading-none">
+                            Welcome back, {userInfo?.fullName}
+                        </h2>
+
+                        <p className="text-sm text-gray-400 mt-1">
+                            Manage tournaments, teams and live matches
+                        </p>
+                    </div>
+                </div>
+
+                {/* RIGHT SIDE ACTIONS */}
+                <div className="flex items-center gap-3">
+
+                    {/* New Tournament */}
+                    <Link
+                        href="/admin/Tournaments"
+                        className="group flex items-center gap-2 px-5 py-3 rounded-xl 
+            font-medium bg-gradient-to-r from-cyan-400 to-purple-500 
+            text-black hover:scale-[1.03] active:scale-[0.98] 
+            transition-all duration-300 shadow-lg shadow-cyan-500/10"
+                    >
+                        <AddIcon
+                            fontSize="small"
+                            className="group-hover:rotate-90 transition-transform duration-300"
+                        />
+                        New Tournament
+                    </Link>
+
+                    {/* Sign Out */}
+                    <button
+                        onClick={() => handleSignOut(router)}
+                        className="px-4 py-3 rounded-xl border border-red-500/20 
+            bg-red-500/10 text-red-400 hover:bg-red-500/20 
+            hover:text-red-300 transition-all duration-300"
+                    >
+                        Sign Out
+                    </button>
+                </div>
+            </section>
 
             {/* Stats */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

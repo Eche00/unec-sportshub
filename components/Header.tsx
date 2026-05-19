@@ -50,7 +50,7 @@ function Header() {
                 {/* Auth Button  */}
                 <div className="md:flex hidden flex-1 items-center justify-end gap-5  ">
                     <Link
-                        href="/auth/sign-in"
+                        href="/auth"
                         className=" text-white bg-[#3B82F6] hover:bg-[#3B82F6]/90 font-bold  md:py-2 py-1.5 md:px-7 px-3 rounded-full cursor-pointer w-fit"
                     >
                         Get Started
@@ -98,7 +98,7 @@ function Header() {
                             <hr className=" w-full h-[0.1px] bg-gray-600 border-none" />
                             <div className="flex items-center justify-end gap-5  ">
                                 <Link
-                                    href="/auth/sign-in"
+                                    href="/auth"
                                     className=" text-white bg-[#3B82F6] hover:bg-[#3B82F6]/90 font-bold  md:py-2 py-1.5 md:px-7 px-3 rounded-full cursor-pointer w-fit"
                                 >
                                     Get Started

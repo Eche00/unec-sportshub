@@ -1,8 +1,11 @@
+'use client'
 import React from 'react'
 import Sidebar from './Sidebar';
 import DashHeader from './Dashheader';
+import { UseAdminGuard } from '@/hooks/UseAdminGuard';
 
 function Publiclayout({ children }: { children: React.ReactNode; }) {
+    UseAdminGuard();
     return (
         <section className="flex flex-col w-full max-w-full overflow-x-hidden ">
             <aside className="md:flex hidden">

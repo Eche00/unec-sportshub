@@ -7,8 +7,8 @@ import { usePathname } from 'next/navigation';
 import HomeIcon from "@mui/icons-material/OtherHouses";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
-import AddCircleIcon from "@mui/icons-material/AddCircle";
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
+
 
 // Sidebar type
 type SideBarItem = {
@@ -51,7 +51,7 @@ function Sidebar() {
     return (
         <div className="bg-[#020C17] text-white fixed top-0 left-0 w-67.5 h-screen flex flex-col  py-2 gap-10 z-10">
             {/* Sidebar Container */}
-            <section className="w-[80%] mx-auto flex flex-col gap-2">
+            <section className="w-[80%] mx-auto flex flex-col gap-2 relative">
                 {/* Logo Section  */}
                 <div className="flex items-center relative pb-6">
                     <span className="flex items-center w-full rounded-lg px-4 text-2xl font-extrabold text-[#3B82F6] tracking-wide">
@@ -59,6 +59,7 @@ function Sidebar() {
                         <p className="text-white md:flex hidden ">S.</p>Hub
                     </span>
                 </div>
+
 
                 {/* Link Section  */}
                 {adminSidebar.map((item) =>
@@ -71,6 +72,7 @@ function Sidebar() {
 
 
             </section>
+
         </div>
     )
 }
