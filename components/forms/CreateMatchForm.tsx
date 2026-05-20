@@ -5,44 +5,48 @@ import Input from "../ui/Input";
 import Button from "../ui/Button";
 import { motion } from "framer-motion";
 import { Close } from "@mui/icons-material";
+import useMatchesInfo from "@/utils/logics/usematchesinfo";
+
 
 type CreateMatchFormProps = {
     onClose: () => void;
 };
 
 function CreateMatchForm({ onClose }: CreateMatchFormProps) {
-    const [teamA, setTeamA] = useState("");
-    const [teamB, setTeamB] = useState("");
-    const [location, setLocation] = useState("");
-    const [date, setDate] = useState("");
-    const [time, setTime] = useState("");
-    const [status, setStatus] = useState<"live" | "finished" | "upcoming">("upcoming");
-    const [scoreA, setScoreA] = useState(0);
-    const [scoreB, setScoreB] = useState(0);
+    const {
+        loading,
+        // form states
+        teamA,
+        setTeamA,
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
+        teamB,
+        setTeamB,
 
-        const matchData = {
-            teamA,
-            teamB,
-            location,
-            date: `${date} ${time}`,
-            status,
-            scoreA,
-            scoreB,
-        };
+        location,
+        setLocation,
 
-        console.log("New Match:", matchData);
+        date,
+        setDate,
 
-        onClose();
-    };
+        time,
+        setTime,
 
+        status,
+        setStatus,
+
+        // submit handler
+        handleSubmit,
+
+    } = useMatchesInfo(onClose);
     return (
         <form
             onSubmit={handleSubmit}
             className="fixed inset-0 top-16.5 bg-black/60 z-50 flex justify-end"
-            onClick={onClose}
+            onClick={() => {
+                if (!loading) {
+                    onClose();
+                }
+            }}
         >
             <motion.aside
                 initial={{ x: 200, opacity: 0 }}
@@ -133,35 +137,19 @@ function CreateMatchForm({ onClose }: CreateMatchFormProps) {
                     </select>
                 </div>
 
-                {/* SCORES */}
-                <div className="grid grid-cols-2 gap-4 mb-6">
-                    <Input
-                        label={`${teamA || "Team A"} Score`}
-                        type="number"
-                        value={scoreA}
-                        onChange={(e) => setScoreA(Number(e.target.value))}
-                    />
-
-                    <Input
-                        label={`${teamB || "Team B"} Score`}
-                        type="number"
-                        value={scoreB}
-                        onChange={(e) => setScoreB(Number(e.target.value))}
-                    />
-                </div>
-
                 {/* FOOTER */}
                 <div className="mt-auto flex gap-3 pt-4 border-t border-gray-800">
-                    <Button
-                        type="button"
-                        variant="secondary"
-                        onClick={onClose}
-                    >
+                    <Button type="button" variant="secondary" onClick={onClose}
+                        disabled={loading}>
                         Cancel
                     </Button>
 
-                    <Button type="submit" variant="primary">
-                        Create Match
+                    <Button type="submit" variant="primary" disabled={loading}>
+                        {
+                            loading
+                                ? "Creating..."
+                                : "Create Match"
+                        }
                     </Button>
                 </div>
             </motion.aside>

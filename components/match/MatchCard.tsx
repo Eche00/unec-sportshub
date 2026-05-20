@@ -1,58 +1,110 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
+
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import RoomIcon from "@mui/icons-material/Room";
+
 import { AnimatePresence } from "framer-motion";
+
 import ManageMatches from "../table/ManageMatches";
 
-type MatchCardProps = {
-    id: string; // ✅ needed for routing
-    teamA: string;
-    teamB: string;
-    scoreA: number;
-    scoreB: number;
-    status?: "live" | "finished" | "upcoming";
-    date?: string;
-    location?: string;
-    onAdminClick?: (matchId: string) => void; // optional modal trigger
+import { Matches } from "@/utils/logics/usematchesinfo";
+
+type MatchCardProps = Matches & {
+    onAdminClick?: (id: string) => void;
 };
 
 const MatchCard: React.FC<MatchCardProps> = ({
+
     id,
+
     teamA,
     teamB,
+
     scoreA,
     scoreB,
-    status = "upcoming",
-    date,
-    location = "Unknown Venue",
-    onAdminClick,
-}) => {
-    const router = useRouter();
-    const pathname = usePathname();
-    const [manageMatches, setManageMatches] = useState(false)
-    const isAdminRoute = pathname.startsWith("/admin/Match");
 
+    status,
+
+    date,
+    location,
+
+    currentHalf,
+
+    isHalftime,
+
+}) => {
+
+    const router = useRouter();
+
+    const pathname = usePathname();
+
+    const [manageMatches, setManageMatches] =
+        useState(false);
+
+    const isAdmin =
+        pathname?.startsWith("/admin");
+
+    /* STATUS LABEL */
+    const statusLabel = useMemo(() => {
+
+        if (status === "live") {
+
+            return (
+                <span className="text-green-400">
+                    LIVE
+                </span>
+            );
+        }
+
+        if (
+            status === "halftime" ||
+            isHalftime
+        ) {
+
+            return (
+                <span className="text-yellow-400">
+                    HALFTIME
+                </span>
+            );
+        }
+
+        if (status === "finished") {
+
+            return (
+                <span className="text-red-400">
+                    FULL TIME
+                </span>
+            );
+        }
+
+        return (
+            <span className="text-gray-400">
+                UPCOMING
+            </span>
+        );
+
+    }, [
+        status,
+        isHalftime,
+    ]);
     const statusStyles = {
         live: "bg-green-500/10 text-green-400 border-green-500/30",
         finished: "bg-gray-500/10 text-gray-300 border-gray-500/30",
         upcoming: "bg-blue-500/10 text-blue-400 border-blue-500/30",
+        halftime: "bg-yellow-500/10 text-yellow-400 border-yellow-500/30",
     };
+    /* CARD CLICK */
     const handleClick = () => {
-        console.log("Clicked match:", id);
 
-        if (isAdminRoute) {
-            console.log("Admin route detected");
+        if (isAdmin) {
 
-            if (onAdminClick) {
-                onAdminClick(id);
-            }
             setManageMatches(true);
 
         } else {
-            console.log("Navigating to match page");
+
             router.push(`/Matches/${id}`);
         }
     };
@@ -61,77 +113,96 @@ const MatchCard: React.FC<MatchCardProps> = ({
         <>
             <div
                 onClick={handleClick}
-                className="cursor-pointer rounded-2xl border border-gray-800 bg-gradient-to-b from-[#111827] to-[#0B0F19] p-5 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.01]"
+                className="cursor-pointer rounded-2xl border border-gray-800 bg-gradient-to-b from-[#111827] to-[#0B0F19] p-5 transition-all duration-300 hover:border-gray-700"
             >
-                <div className="flex justify-between items-center mb-3">
-                    <span className="text-xs uppercase tracking-wider text-gray-400">
-                        Match Status
-                    </span>
+
+                {/* TOP */}
+                <div className="flex justify-between mb-3 text-xs text-gray-400">
 
                     <span
                         className={`text-xs px-3 py-1 rounded-full border ${statusStyles[status]} flex items-center gap-2`}
                     >
+                        {status === "live" && (
+                            <span className="relative flex h-2 w-2">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                            </span>
+                        )}
                         {status.toUpperCase()}
+                    </span>
+
+                    {/* HALF INFO */}
+                    {(status === "live" ||
+                        status === "halftime") && (
+                            <div className=" text-[11px] text-gray-500">
+
+                                {currentHalf === 1 &&
+                                    "First Half"}
+
+                                {currentHalf === 2 &&
+                                    "Second Half"}
+
+                                {status === "halftime" &&
+                                    " • Waiting for restart"}
+                            </div>
+                        )}
+                </div>
+
+                {/* SCORE */}
+                <div className="flex justify-between items-center">
+
+                    <span className="font-medium">
+                        {teamA}
+                    </span>
+
+                    <div className="text-xl font-bold">
+
+                        {scoreA} : {scoreB}
+                    </div>
+
+                    <span className="font-medium">
+                        {teamB}
                     </span>
                 </div>
 
-                <div className="flex items-center justify-between gap-4">
-                    <div className="flex-1 text-left">
-                        <p className="font-semibold text-gray-200 truncate">
-                            {teamA}
-                        </p>
-                    </div>
+                {/* DIVIDER */}
+                <div className="mt-4 h-px w-full bg-gradient-to-r from-transparent via-gray-700 to-transparent opacity-40" />
 
-                    <div className="flex flex-col items-center px-4 text-center">
-                        <div className="text-2xl font-bold tracking-wider text-white">
-                            {scoreA} : {scoreB}
-                        </div>
+                {/* FOOTER */}
+                <div className="flex justify-between mt-3 text-xs text-gray-500 gap-4">
 
-                        <div className="text-xs text-gray-500 mt-1">
-                            {status === "finished"
-                                ? "FT"
-                                : status === "live"
-                                    ? "LIVE"
-                                    : "VS"}
-                        </div>
-                    </div>
+                    <span className="flex items-center gap-1">
 
-                    <div className="flex-1 text-right">
-                        <p className="font-semibold text-gray-200 truncate">
-                            {teamB}
-                        </p>
-                    </div>
-                </div>
+                        <CalendarMonthIcon
+                            fontSize="small"
+                        />
 
-                <div className="mt-4 h-[2px] w-full bg-gradient-to-r from-transparent via-gray-700 to-transparent opacity-50" />
+                        {date}
+                    </span>
 
-                <section className="flex items-center justify-between gap-2 pt-2">
-                    {date && (
-                        <div className="flex items-center gap-1 text-[11px] text-gray-400 mt-2">
-                            <CalendarMonthIcon sx={{ fontSize: 14 }} />
-                            {date}
-                        </div>
-                    )}
+                    <span className="flex items-center gap-1 text-right">
 
-                    <div className="flex items-center gap-1 text-[11px] text-gray-500 mt-1">
-                        <RoomIcon sx={{ fontSize: 14 }} />
+                        <RoomIcon
+                            fontSize="small"
+                        />
+
                         {location}
-                    </div>
-                </section>
+                    </span>
+                </div>
 
 
             </div>
-            {/* Open MODAL */}
+
             <AnimatePresence>
+
                 {manageMatches && (
-                    <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center">
-                        <div className="w-full max-w-lg">
-                            <ManageMatches
-                                matchId={id}
-                                onClose={() => setManageMatches(false)}
-                            />
-                        </div>
-                    </div>
+
+                    <ManageMatches
+                        matchId={id}
+                        onClose={() =>
+                            setManageMatches(false)
+                        }
+                    />
                 )}
             </AnimatePresence>
         </>

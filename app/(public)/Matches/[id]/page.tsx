@@ -1,31 +1,48 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { useParams } from "next/navigation";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import RoomIcon from "@mui/icons-material/Room";
 
+import useMatchesInfo from "@/utils/logics/usematchesinfo";
+import { Comment, SportsSoccer } from "@mui/icons-material";
+
 export default function Page() {
+
     const params = useParams();
     const id = params?.id as string;
 
-    // Mock data (replace later with API)
-    const match = {
-        id,
-        teamA: "Team A",
-        teamB: "Team B",
-        scoreA: 2,
-        scoreB: 1,
-        status: "live" as "live" | "finished" | "upcoming",
-        date: "2026-03-30 18:00",
-        location: "Main Arena",
-    };
+    const {
+        match,
+        loading,
+        getMatchById
+    } = useMatchesInfo();
+
+    /* FETCH MATCH ON LOAD */
+    useEffect(() => {
+        if (id) {
+            getMatchById(id);
+        }
+    }, [id]);
 
     const statusStyles = {
         live: "bg-green-500/10 text-green-400 border-green-500/30",
         finished: "bg-gray-500/10 text-gray-300 border-gray-500/30",
         upcoming: "bg-blue-500/10 text-blue-400 border-blue-500/30",
+        halftime: "bg-yellow-500/10 text-yellow-400 border-yellow-500/30",
     };
+
+    /* LOADING STATE */
+    if (loading || !match) {
+        return (
+            <main className="min-h-screen text-white px-4 py-8 mt-22">
+                <div className="max-w-3xl mx-auto text-center text-gray-400">
+                    Loading match...
+                </div>
+            </main>
+        );
+    }
 
     return (
         <main className="min-h-screen text-white px-4 py-8 mt-22">
@@ -56,14 +73,12 @@ export default function Page() {
                     {/* TEAMS + SCORE */}
                     <div className="flex items-center justify-between gap-6">
 
-                        {/* Team A */}
                         <div className="flex-1 text-left">
                             <p className="text-lg font-semibold text-gray-200">
                                 {match.teamA}
                             </p>
                         </div>
 
-                        {/* SCORE */}
                         <div className="flex flex-col items-center">
                             <div className="text-4xl font-bold tracking-wider">
                                 {match.scoreA} : {match.scoreB}
@@ -74,11 +89,12 @@ export default function Page() {
                                     ? "FULL TIME"
                                     : match.status === "live"
                                         ? "LIVE NOW"
-                                        : "UPCOMING"}
+                                        : match.status === "halftime"
+                                            ? "HALFTIME"
+                                            : "UPCOMING"}
                             </div>
                         </div>
 
-                        {/* Team B */}
                         <div className="flex-1 text-right">
                             <p className="text-lg font-semibold text-gray-200">
                                 {match.teamB}
@@ -94,7 +110,7 @@ export default function Page() {
 
                         <div className="flex items-center gap-2">
                             <CalendarMonthIcon sx={{ fontSize: 18 }} />
-                            {match.date}
+                            {match.date} {match.time}
                         </div>
 
                         <div className="flex items-center gap-2">
@@ -104,15 +120,57 @@ export default function Page() {
                     </div>
                 </div>
 
-                {/* ⚡ EXTRA SECTION (Future-ready) */}
+                {/* EVENTS SECTION */}
                 <div className="rounded-2xl border border-gray-800 bg-[#0B0F19] p-6">
                     <h2 className="text-sm uppercase tracking-wider text-gray-400 mb-3">
                         Match Events
                     </h2>
 
-                    <p className="text-gray-500 text-sm">
-                        No events yet (goals, cards, substitutions will appear here)
-                    </p>
+                    {match.events && match.events.length > 0 ? (
+                        <div className="space-y-2">
+                            {match.events
+                                .slice()
+                                .reverse()
+                                .map((e: any) => (
+                                    <div
+                                        key={e.id}
+                                        className="text-sm bg-[#0B0F19] p-3 rounded border border-gray-700"
+                                    >
+                                        {e.minute && (
+                                            <strong className="text-gray-300">
+                                                {e.minute}'
+                                            </strong>
+                                        )}{" "}
+
+                                        {e.type === "goal" && (
+                                            <span>
+                                                <SportsSoccer fontSize="small" /> {e.player} (
+                                                {e.team === "A"
+                                                    ? match.teamA
+                                                    : match.teamB}
+                                                )
+                                            </span>
+                                        )}
+
+                                        {e.type === "yellow" && (
+                                            <span>🟨 {e.player}</span>
+                                        )}
+
+                                        {e.type === "red" && (
+                                            <span>🟥 {e.player}</span>
+                                        )}
+
+                                        {e.type === "commentary" && (
+                                            <span><Comment /> {e.text}</span>
+                                        )}
+                                    </div>
+                                ))}
+                        </div>
+                    ) : (
+                        <p className="text-gray-500 text-sm">
+                            No events yet (goals, cards, substitutions will appear here)
+                        </p>
+                    )}
                 </div>
 
             </div>

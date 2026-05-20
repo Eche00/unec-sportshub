@@ -1,55 +1,31 @@
 "use client";
 
 import React, { useState } from "react";
-import { useRouter } from "next/navigation";
-import MatchCard from "@/components/match/MatchCard";
 import { AnimatePresence } from "framer-motion";
+
+import MatchCard from "@/components/match/MatchCard";
 import CreateMatchForm from "@/components/forms/CreateMatchForm";
 import Button from "@/components/ui/Button";
 
-type Match = {
-    id: string;
-    teamA: string;
-    teamB: string;
-    scoreA: number;
-    scoreB: number;
-    status: "live" | "finished" | "upcoming";
-    date: string;
-    location: string;
-};
+import useMatchesInfo from "@/utils/logics/usematchesinfo";
 
 export default function Page() {
-    const router = useRouter();
     const [createMatch, setCreateMatch] = useState(false);
-    const matches: Match[] = [
-        {
-            id: "1",
-            teamA: "Team A",
-            teamB: "Team B",
-            scoreA: 2,
-            scoreB: 1,
-            status: "finished",
-            date: "2026-03-28 16:00",
-            location: "Stadium A",
-        },
-        {
-            id: "2",
-            teamA: "Team C",
-            teamB: "Team D",
-            scoreA: 0,
-            scoreB: 0,
-            status: "live",
-            date: "2026-03-30 18:00",
-            location: "Main Arena",
-        },
-    ];
+
+    const { matches, loading } = useMatchesInfo();
+
+    const isEmpty = !loading && matches.length === 0;
+    const hasMatches = matches.length > 0;
 
     return (
         <div className="space-y-6">
+
             {/* HEADER */}
-            <div className="flex items-center justify-between gap-2">
-                <h1 className="text-2xl font-semibold  flex items-center gap-2">
-                    Match Control</h1>
+            <div className="flex items-center justify-between">
+                <h1 className="text-2xl font-semibold">
+                    Match Control
+                </h1>
+
                 <Button
                     variant="primary"
                     onClick={() => setCreateMatch(true)}
@@ -58,32 +34,62 @@ export default function Page() {
                 </Button>
             </div>
 
-
             <hr className="border-gray-800" />
 
-            <div className="grid gap-4 lg:grid-cols-2">
-                {matches.map((match) => (
-                    <MatchCard
-                        key={match.id}
-                        id={match.id}
-                        teamA={match.teamA}
-                        teamB={match.teamB}
-                        scoreA={match.scoreA}
-                        scoreB={match.scoreB}
-                        status={match.status}
-                        date={match.date}
-                        location={match.location}
-                    // onClick={() =>
-                    //     router.push(`/matches/${match.id}`)
-                    // }
-                    />
-                ))}
-            </div>
+            {/* LOADING */}
+            {loading && (
+                <div className="border border-gray-800 rounded-2xl p-10 text-center bg-[#0F172A]">
+                    <p className="text-sm text-gray-400">
+                        Loading matches...
+                    </p>
+                </div>
+            )}
 
-            {/* Open MODAL */}
+            {/* EMPTY STATE */}
+            {isEmpty && (
+                <div className="border border-gray-800 rounded-2xl p-10 text-center bg-[#0F172A]">
+                    <h2 className="text-lg font-semibold mb-2">
+                        No Matches Yet
+                    </h2>
+
+                    <p className="text-sm text-gray-400 mb-5">
+                        Create your first match to get started.
+                    </p>
+
+                    <Button
+                        variant="primary"
+                        onClick={() => setCreateMatch(true)}
+                    >
+                        Create Match
+                    </Button>
+                </div>
+            )}
+
+            {/* MATCHES GRID */}
+            {hasMatches && (
+                <div className="grid gap-4 lg:grid-cols-2">
+                    {matches.map((match) => (
+                        <MatchCard
+                            key={match.id}
+                            id={match.id}
+                            name={match.name}
+                            teamA={match.teamA}
+                            teamB={match.teamB}
+                            scoreA={match.scoreA}
+                            scoreB={match.scoreB}
+                            status={match.status}
+                            date={match.date}
+                            time={match.time}
+                            location={match.location}
+                        />
+                    ))}
+                </div>
+            )}
+
+            {/* CREATE MODAL */}
             <AnimatePresence>
                 {createMatch && (
-                    <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center">
+                    <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
                         <div className="w-full max-w-lg">
                             <CreateMatchForm
                                 onClose={() => setCreateMatch(false)}
@@ -92,6 +98,7 @@ export default function Page() {
                     </div>
                 )}
             </AnimatePresence>
+
         </div>
     );
 }
