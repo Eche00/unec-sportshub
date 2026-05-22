@@ -10,11 +10,9 @@ import Button from "@/components/ui/Button";
 import useMatchesInfo from "@/utils/logics/usematchesinfo";
 
 export default function Page() {
-    const [createMatch, setCreateMatch] = useState(false);
 
-    const { matches, loading } = useMatchesInfo();
+    const { matches, loading, createMatch, setCreateMatch, isEmpty } = useMatchesInfo();
 
-    const isEmpty = !loading && matches.length === 0;
     const hasMatches = matches.length > 0;
 
     return (

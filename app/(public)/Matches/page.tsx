@@ -10,25 +10,17 @@ import useMatchesInfo from "@/utils/logics/usematchesinfo";
 import SearchIcon from "@mui/icons-material/Search";
 
 export default function Page() {
-    const [search, setSearch] = useState("");
-    const [createMatch, setCreateMatch] = useState(false);
+    const {
+        loading,
 
-    const { matches, loading } = useMatchesInfo();
+        search,
+        setSearch,
 
-    const isEmpty = !loading && matches.length === 0;
-    const hasMatches = matches.length > 0;
+        isEmpty,
+        hasMatches,
 
-    /* FILTERED MATCHES */
-    const filteredMatches = useMemo(() => {
-        return matches.filter((match) => {
-            const query = search.toLowerCase();
-
-            return (
-                match.teamA.toLowerCase().includes(query) ||
-                match.teamB.toLowerCase().includes(query)
-            );
-        });
-    }, [search, matches]);
+        filteredMatches,
+    } = useMatchesInfo();
 
     return (
         <div className="min-h-screen sm:p-6 mt-22">
@@ -69,7 +61,7 @@ export default function Page() {
 
                         <Button
                             variant="primary"
-                            onClick={() => setCreateMatch(true)}
+                        // onClick={() => setCreateMatch(true)}
                         >
                             Create Match
                         </Button>

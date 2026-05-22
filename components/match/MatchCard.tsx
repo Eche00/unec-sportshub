@@ -10,7 +10,7 @@ import { AnimatePresence } from "framer-motion";
 
 import ManageMatches from "../table/ManageMatches";
 
-import { Matches } from "@/utils/logics/usematchesinfo";
+import useMatchesInfo, { Matches } from "@/utils/logics/usematchesinfo";
 
 type MatchCardProps = Matches & {
     onAdminClick?: (id: string) => void;
@@ -37,82 +37,22 @@ const MatchCard: React.FC<MatchCardProps> = ({
 
 }) => {
 
-    const router = useRouter();
 
-    const pathname = usePathname();
+    const {
+        manageMatches,
+        setManageMatches,
 
-    const [manageMatches, setManageMatches] =
-        useState(false);
+        isAdmin,
 
-    const isAdmin =
-        pathname?.startsWith("/admin");
+        statusLabel,
+        statusStyles,
 
-    /* STATUS LABEL */
-    const statusLabel = useMemo(() => {
-
-        if (status === "live") {
-
-            return (
-                <span className="text-green-400">
-                    LIVE
-                </span>
-            );
-        }
-
-        if (
-            status === "halftime" ||
-            isHalftime
-        ) {
-
-            return (
-                <span className="text-yellow-400">
-                    HALFTIME
-                </span>
-            );
-        }
-
-        if (status === "finished") {
-
-            return (
-                <span className="text-red-400">
-                    FULL TIME
-                </span>
-            );
-        }
-
-        return (
-            <span className="text-gray-400">
-                UPCOMING
-            </span>
-        );
-
-    }, [
-        status,
-        isHalftime,
-    ]);
-    const statusStyles = {
-        live: "bg-green-500/10 text-green-400 border-green-500/30",
-        finished: "bg-gray-500/10 text-gray-300 border-gray-500/30",
-        upcoming: "bg-blue-500/10 text-blue-400 border-blue-500/30",
-        halftime: "bg-yellow-500/10 text-yellow-400 border-yellow-500/30",
-    };
-    /* CARD CLICK */
-    const handleClick = () => {
-
-        if (isAdmin) {
-
-            setManageMatches(true);
-
-        } else {
-
-            router.push(`/Matches/${id}`);
-        }
-    };
-
+        handleClick,
+    } = useMatchesInfo();
     return (
         <>
             <div
-                onClick={handleClick}
+                onClick={() => handleClick(id)}
                 className="cursor-pointer rounded-2xl border border-gray-800 bg-gradient-to-b from-[#111827] to-[#0B0F19] p-5 transition-all duration-300 hover:border-gray-700"
             >
 
