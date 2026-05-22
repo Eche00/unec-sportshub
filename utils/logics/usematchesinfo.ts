@@ -91,7 +91,7 @@ const useMatchesInfo = (
         useState<Matches[]>([]);
 
     const [loading, setLoading] =
-        useState(false);
+        useState(true);
 
     /* SEARCH / UI STATES */
 
@@ -164,6 +164,8 @@ const useMatchesInfo = (
                         }));
 
                     setMatches(data);
+                    setLoading(false)
+
                 },
 
                 (error) => {
@@ -173,6 +175,8 @@ const useMatchesInfo = (
                     toast.error(
                         "Failed to fetch matches"
                     );
+                    setLoading(false)
+
                 }
             );
 

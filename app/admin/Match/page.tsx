@@ -2,19 +2,26 @@
 
 import React, { useState } from "react";
 import { AnimatePresence } from "framer-motion";
+import SearchIcon from "@mui/icons-material/Search";
 
 import MatchCard from "@/components/match/MatchCard";
 import CreateMatchForm from "@/components/forms/CreateMatchForm";
 import Button from "@/components/ui/Button";
 
 import useMatchesInfo from "@/utils/logics/usematchesinfo";
+import Empty from "@/components/ui/Empty";
+import MatchesSkeleton from "@/components/ui/skeletons/MatchesSkeleton";
 
 export default function Page() {
 
-    const { matches, loading, createMatch, setCreateMatch, isEmpty } = useMatchesInfo();
+    const { filteredMatches, loading, createMatch, setCreateMatch, isEmpty, search, setSearch } = useMatchesInfo();
 
-    const hasMatches = matches.length > 0;
-
+    const hasMatches = filteredMatches.length > 0;
+    if (loading) {
+        return (
+            <MatchesSkeleton />
+        );
+    }
     return (
         <div className="space-y-6">
 
@@ -34,39 +41,28 @@ export default function Page() {
 
             <hr className="border-gray-800" />
 
-            {/* LOADING */}
-            {loading && (
-                <div className="border border-gray-800 rounded-2xl p-10 text-center bg-[#0F172A]">
-                    <p className="text-sm text-gray-400">
-                        Loading matches...
-                    </p>
-                </div>
-            )}
 
+            {/* SEARCH BAR */}
+            <div className="relative">
+                <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+
+                <input
+                    type="text"
+                    placeholder="Search teams..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="w-full pl-10 pr-4 py-3 rounded-xl bg-[#1F2933] border border-gray-800 text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                />
+            </div>
             {/* EMPTY STATE */}
             {isEmpty && (
-                <div className="border border-gray-800 rounded-2xl p-10 text-center bg-[#0F172A]">
-                    <h2 className="text-lg font-semibold mb-2">
-                        No Matches Yet
-                    </h2>
-
-                    <p className="text-sm text-gray-400 mb-5">
-                        Create your first match to get started.
-                    </p>
-
-                    <Button
-                        variant="primary"
-                        onClick={() => setCreateMatch(true)}
-                    >
-                        Create Match
-                    </Button>
-                </div>
+                <Empty />
             )}
 
             {/* MATCHES GRID */}
             {hasMatches && (
                 <div className="grid gap-4 lg:grid-cols-2">
-                    {matches.map((match) => (
+                    {filteredMatches.map((match) => (
                         <MatchCard
                             key={match.id}
                             id={match.id}

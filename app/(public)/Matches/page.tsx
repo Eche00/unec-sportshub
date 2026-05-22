@@ -8,6 +8,8 @@ import Button from "@/components/ui/Button";
 import useMatchesInfo from "@/utils/logics/usematchesinfo";
 
 import SearchIcon from "@mui/icons-material/Search";
+import MatchesSkeleton from "@/components/ui/skeletons/MatchesSkeleton";
+import Empty from "@/components/ui/Empty";
 
 export default function Page() {
     const {
@@ -22,8 +24,19 @@ export default function Page() {
         filteredMatches,
     } = useMatchesInfo();
 
+    if (loading) {
+        return (
+            <MatchesSkeleton />
+        );
+    }
+    // if (isEmpty) {
+    //     return (
+    //         <Empty />
+    //     );
+    // }
     return (
         <div className="min-h-screen sm:p-6 mt-22">
+
             <div className="max-w-[90%] mx-auto space-y-6">
 
                 {/* SEARCH BAR */}
@@ -39,33 +52,10 @@ export default function Page() {
                     />
                 </div>
 
-                {/* LOADING */}
-                {loading && (
-                    <div className="border border-gray-800 rounded-2xl p-10 text-center bg-[#0F172A]">
-                        <p className="text-sm text-gray-400">
-                            Loading matches...
-                        </p>
-                    </div>
-                )}
 
                 {/* EMPTY STATE */}
-                {isEmpty && (
-                    <div className="border border-gray-800 rounded-2xl p-10 text-center bg-[#0F172A]">
-                        <h2 className="text-lg font-semibold mb-2">
-                            No Matches Yet
-                        </h2>
-
-                        <p className="text-sm text-gray-400 mb-5">
-                            Create your first match to get started.
-                        </p>
-
-                        <Button
-                            variant="primary"
-                        // onClick={() => setCreateMatch(true)}
-                        >
-                            Create Match
-                        </Button>
-                    </div>
+                {!loading && isEmpty && (
+                    <Empty />
                 )}
 
                 {/* MATCHES GRID */}

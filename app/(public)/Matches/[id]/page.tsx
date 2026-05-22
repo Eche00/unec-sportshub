@@ -7,6 +7,7 @@ import RoomIcon from "@mui/icons-material/Room";
 
 import useMatchesInfo from "@/utils/logics/usematchesinfo";
 import { Comment, SportsSoccer } from "@mui/icons-material";
+import MatchesSkeleton from "@/components/ui/skeletons/MatchesSkeleton";
 
 export default function Page() {
 
@@ -15,8 +16,8 @@ export default function Page() {
 
     const {
         match,
-        loading,
-        getMatchById
+        statusStyles,
+        getMatchById,
     } = useMatchesInfo();
 
     /* FETCH MATCH ON LOAD */
@@ -25,25 +26,9 @@ export default function Page() {
             getMatchById(id);
         }
     }, [id]);
-
-    const statusStyles = {
-        live: "bg-green-500/10 text-green-400 border-green-500/30",
-        finished: "bg-gray-500/10 text-gray-300 border-gray-500/30",
-        upcoming: "bg-blue-500/10 text-blue-400 border-blue-500/30",
-        halftime: "bg-yellow-500/10 text-yellow-400 border-yellow-500/30",
-    };
-
-    /* LOADING STATE */
-    if (loading || !match) {
-        return (
-            <main className="min-h-screen text-white px-4 py-8 mt-22">
-                <div className="max-w-3xl mx-auto text-center text-gray-400">
-                    Loading match...
-                </div>
-            </main>
-        );
+    if (!match) {
+        return <MatchesSkeleton />;
     }
-
     return (
         <main className="min-h-screen text-white px-4 py-8 mt-22">
             <div className="max-w-3xl mx-auto space-y-6">
