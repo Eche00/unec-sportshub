@@ -1,18 +1,18 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Input from "../ui/Input";
 import Button from "../ui/Button";
 import { motion } from "framer-motion";
 import { Close } from "@mui/icons-material";
-import useMatchesInfo from "@/utils/logics/usematchesinfo";
+import useMatchesInfo, { CreateMatchFormProps } from "@/utils/logics/usematchesinfo";
+import useTournamentInfo from "@/utils/logics/usetournamentinfo";
 
 
-type CreateMatchFormProps = {
-    onClose: () => void;
-};
 
-function CreateMatchForm({ onClose }: CreateMatchFormProps) {
+function CreateMatchForm({ onClose, tournamentId }: CreateMatchFormProps) {
+    const { tournaments } = useTournamentInfo();
+
     const {
         loading,
         // form states
@@ -34,10 +34,22 @@ function CreateMatchForm({ onClose }: CreateMatchFormProps) {
         status,
         setStatus,
 
+        useTournament,
+        setUseTournament,
+        selectedTournamentId,
+        setSelectedTournamentId,
         // submit handler
         handleSubmit,
 
+
     } = useMatchesInfo(onClose);
+    useEffect(() => {
+        if (tournamentId) {
+            setUseTournament(true);
+            setSelectedTournamentId(tournamentId);
+        }
+    }, [tournamentId]);
+    const isTournamentLocked = Boolean(selectedTournamentId);
     return (
         <form
             onSubmit={handleSubmit}
@@ -136,7 +148,50 @@ function CreateMatchForm({ onClose }: CreateMatchFormProps) {
                         <option value="finished">Finished</option>
                     </select>
                 </div>
+                <div className="mb-4 flex items-center gap-2">
+                    <input
+                        type="checkbox"
+                        checked={useTournament}
+                        onChange={(e) => setUseTournament(e.target.checked)}
+                    />
+                    <label className="text-sm text-gray-300">
+                        Associate with tournament
+                    </label>
+                </div>
 
+                {useTournament && (
+                    <div className="mb-6">
+                        <label className="text-sm text-gray-300 mb-1 block">
+                            Tournament
+                        </label>
+
+                        <select
+                            value={selectedTournamentId}
+                            onChange={(e) =>
+                                !isTournamentLocked && setSelectedTournamentId(e.target.value)
+                            }
+                            disabled={isTournamentLocked}
+                            className={`w-full border rounded-lg p-2 text-sm bg-[#0F1115] ${isTournamentLocked
+                                ? "border-gray-700 text-gray-400 cursor-not-allowed opacity-70"
+                                : "border-gray-700 text-white"
+                                }`}
+                        >
+                            <option value="">Select tournament</option>
+
+                            {tournaments.map((t) => (
+                                <option key={t.id} value={t.id}>
+                                    {t.name}
+                                </option>
+                            ))}
+                        </select>
+
+                        {isTournamentLocked && (
+                            <p className="text-xs text-gray-500 mt-1">
+                                Tournament is locked from prev selection
+                            </p>
+                        )}
+                    </div>
+                )}
                 {/* FOOTER */}
                 <div className="mt-auto flex gap-3 pt-4 border-t border-gray-800">
                     <Button type="button" variant="secondary" onClick={onClose}

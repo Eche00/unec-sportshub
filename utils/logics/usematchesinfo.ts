@@ -21,7 +21,10 @@ import toast from "react-hot-toast";
 import { db } from "@/lib/firebase";
 
 /* TYPES */
-
+export type CreateMatchFormProps = {
+    onClose: () => void;
+    tournamentId?: string;
+};
 export interface Matches {
     id: string;
 
@@ -51,6 +54,8 @@ export interface Matches {
     isHalftime?: boolean;
 
     events?: MatchEvent[];
+
+    tournamentId?: string;
 }
 
 export type MatchEvent = {
@@ -92,7 +97,8 @@ const useMatchesInfo = (
 
     const [loading, setLoading] =
         useState(true);
-
+    const [useTournament, setUseTournament] = useState(false);
+    const [selectedTournamentId, setSelectedTournamentId] = useState("");
     /* SEARCH / UI STATES */
 
     const [search, setSearch] =
@@ -625,7 +631,9 @@ const useMatchesInfo = (
             | "isLive"
             | "currentHalf"
             | "isHalftime"
-        >;
+        > & {
+            tournamentId?: string;
+        };
 
     const handleCreateMatch =
         async (
@@ -639,10 +647,11 @@ const useMatchesInfo = (
 
                 await addDoc(
                     matchesRef,
+
                     {
 
                         ...matchData,
-
+                        tournamentId: matchData.tournamentId || null,
                         scoreA: 0,
 
                         scoreB: 0,
@@ -1128,6 +1137,7 @@ const useMatchesInfo = (
                 time,
 
                 status,
+                tournamentId: useTournament ? selectedTournamentId : undefined,
             };
 
             await handleCreateMatch(
@@ -1232,6 +1242,11 @@ const useMatchesInfo = (
         handleHalftime,
         handleContinueMatch,
         handleEndMatch,
+
+        useTournament,
+        setUseTournament,
+        selectedTournamentId,
+        setSelectedTournamentId,
     };
 };
 
