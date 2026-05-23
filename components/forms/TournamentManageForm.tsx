@@ -248,7 +248,7 @@ export default function TournamentManageForm() {
                 )}
 
                 {manageTournament && selectedTournament && (
-                    <div className="fixed inset-0 bg-black/60 z-50">
+                    <div className="fixed  bg-black/60 z-50">
 
                         <div className="w-full">
 

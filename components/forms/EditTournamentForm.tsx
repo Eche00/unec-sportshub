@@ -5,12 +5,14 @@ import React, { useEffect, useState } from "react";
 import Input from "../ui/Input";
 import Button from "../ui/Button";
 import { Edit, Add } from "@mui/icons-material";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 
 import useTournamentInfo, { Tournament } from "@/utils/logics/usetournamentinfo";
 import useMatchesInfo, { Matches } from "@/utils/logics/usematchesinfo";
 
 import CreateMatchForm from "@/components/forms/CreateMatchForm";
+import ManageMatches from "../table/ManageMatches";
+import MatchCard from "../match/MatchCard";
 
 interface Props {
     tournament: Tournament;
@@ -26,20 +28,43 @@ function EditTournamentForm({ tournament, onClose }: Props) {
         matches,
         createMatch,
         setCreateMatch,
+        manageMatches,
+        setManageMatches,
+        handleClick
     } = useMatchesInfo();
 
     return (
         <div
-            className="fixed inset-0 bg-black/60 flex justify-end z-50"
+            className="fixed inset-0 bg-black/60 z-50 flex justify-end"
             onClick={onClose}
         >
+
             <motion.aside
-                initial={{ x: 200, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                exit={{ x: 200, opacity: 0 }}
-                transition={{ duration: 0.3 }}
-                className="bg-[#0F172A] sm:w-[540px] w-[100%] min-h-0  overflow-scroll border-l border-gray-800 rounded-tl-2xl rounded-bl-2xl p-6 overflow-y-scroll flex flex-col mt-10"
-                onClick={(e) => e.stopPropagation()}
+
+                initial={{
+                    x: 300,
+                    opacity: 0,
+                }}
+
+                animate={{
+                    x: 0,
+                    opacity: 1,
+                }}
+
+                exit={{
+                    x: 300,
+                    opacity: 0,
+                }}
+
+                transition={{
+                    duration: 0.3,
+                }}
+
+                onClick={(e) =>
+                    e.stopPropagation()
+                }
+
+                className="bg-[#0F172A] sm:w-[650px] mt-16 mb-10  w-full h-[90vh]  border-l border-gray-800 rounded-tl-2xl rounded-bl-2xl p-5 sm:p-6 overflow-y-auto flex flex-col"
             >
                 {/* HEADER */}
                 <div className="mt-8 flex justify-between items-center mb-4">
@@ -54,35 +79,52 @@ function EditTournamentForm({ tournament, onClose }: Props) {
 
                 {/*  TABLE / STANDINGS  */}
                 <>
-                    <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-lg font-semibold capitalize">{tab}</h3>
+                    {/* CONTROLS */}
+                    <div className="sticky top-0 z-20 bg-[#0F172A] pb-4">
+                        <div className="flex items-center justify-between gap-3">
 
-                        <div className="flex items-center gap-1 bg-[#0F172A] border border-gray-800 p-1.5 rounded-lg ">
-                            <button
-                                onClick={() => setTab("standings")}
-                                className={`px-3 py-1.5 text-sm rounded-lg transition cursor-pointer ${tab === "standings"
-                                    ? "bg-[#3B82F6] text-black"
-                                    : "text-gray-400 hover:text-white"
-                                    }`}
-                            >
-                                Standings
-                            </button>
+                            {/* LEFT */}
+                            <div className="flex items-center gap-3">
 
-                            <button
-                                onClick={() => setTab("matches")}
-                                className={`px-3 py-1.5 text-sm rounded-lg transition cursor-pointer ${tab === "matches"
-                                    ? "bg-[#3B82F6] text-black"
-                                    : "text-gray-400 hover:text-white"
-                                    }`}
-                            >
-                                Matches
-                            </button>
+                                <div className="flex items-center gap-1 bg-[#111827] border border-gray-800 p-1.5 rounded-lg">
+                                    <button
+                                        onClick={() => setTab("standings")}
+                                        className={`px-3 py-1.5 text-sm rounded-lg transition cursor-pointer ${tab === "standings"
+                                            ? "bg-[#3B82F6] text-black"
+                                            : "text-gray-400 hover:text-white"
+                                            }`}
+                                    >
+                                        Standings
+                                    </button>
+
+                                    <button
+                                        onClick={() => setTab("matches")}
+                                        className={`px-3 py-1.5 text-sm rounded-lg transition cursor-pointer ${tab === "matches"
+                                            ? "bg-[#3B82F6] text-black"
+                                            : "text-gray-400 hover:text-white"
+                                            }`}
+                                    >
+                                        Matches
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* RIGHT */}
+                            {tab === "matches" && (
+                                <Button
+                                    onClick={() => setCreateMatch(true)}
+                                    className="shrink-0"
+                                >
+                                    <Add fontSize="small" />
+                                    Create Match
+                                </Button>
+                            )}
                         </div>
                     </div>
                     {tab === "standings" ? (
-                        <div className="rounded-xl border border-gray-800 overflow-hidden">
-                            <div className="overflow-x-auto">
-                                <table className="min-w-[800px] w-full text-sm text-left">
+                        <div className="rounded-xl border border-gray-800 overflow-scroll">
+                            <div className="overflow-auto">
+                                <table className="min-w-[800px] w-full text-sm text-left text-nowrap">
                                     <thead className="bg-[#0F1115] text-gray-400 text-xs uppercase">
                                         <tr>
                                             <th className="p-3">#</th>
@@ -214,108 +256,29 @@ function EditTournamentForm({ tournament, onClose }: Props) {
                         </div>
 
                     ) : (
-                        <div className="rounded-xl border border-gray-800 overflow-hidden">
-                            <div className="overflow-x-auto">
-                                <table className="min-w-[800px] w-full text-sm text-left">
-                                    <thead className="bg-[#0F1115] text-gray-400 text-xs uppercase">
-                                        <tr>
-                                            <th className="p-3">Match</th>
-                                            <th className="p-3">Status</th>
-                                            <th className="p-3">Score</th>
-                                        </tr>
-                                    </thead>
+                        <div className="flex flex-col gap-4">
 
-                                    <tbody>
-                                        {matches?.map((match) => (
-                                            <tr
-                                                key={match.id}
-                                                className="border-t border-gray-800 hover:bg-white/5"
-                                            >
-                                                {/* MATCH */}
-                                                <td className="p-3">
-                                                    {match.teamA} vs {match.teamB}
-                                                </td>
+                            {matches.filter((m) => m.tournamentId === tournament?.id).map((match) => (
+                                <MatchCard
+                                    key={match.id}
+                                    id={match.id}
+                                    name={match.name}
+                                    teamA={match.teamA}
+                                    teamB={match.teamB}
+                                    scoreA={match.scoreA}
+                                    scoreB={match.scoreB}
+                                    status={match.status}
+                                    date={match.date}
+                                    time={match.time}
+                                    location={match.location}
+                                    tournamentId={match.tournamentId}
+                                />
 
-                                                {/* STATUS */}
-                                                <td className="p-3">
-                                                    <span
-                                                        className={
-                                                            match.status === "live"
-                                                                ? "text-green-400"
-                                                                : match.status === "finished"
-                                                                    ? "text-gray-400"
-                                                                    : "text-yellow-400"
-                                                        }
-                                                    >
-                                                        {match.status.toUpperCase()}
-                                                    </span>
-                                                </td>
+                            ))}
 
-                                                {/* SCORE */}
-                                                <td className="p-3">
-                                                    {match.scoreA ?? 0} -{" "}
-                                                    {match.scoreB ?? 0}
-                                                </td>
-
-
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
                         </div>)}
                 </>
-                {/* CREATE MATCH */}
-                {tab != "standings" && <div className="flex justify-end items-end my-3">
 
-                    <Button onClick={() => setCreateMatch(true)}>
-                        <Add fontSize="small" />
-                        Create Match
-                    </Button>
-                </div>
-                }
-
-
-                {/* SCORE MODAL */}
-                {/* {selectedMatch && (
-                    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-                        <div className="bg-[#0F172A] border border-gray-800 p-5 rounded-xl w-full max-w-md space-y-4">
-                            <h3 className="text-lg font-semibold">
-                                Edit Live Match
-                            </h3>
-
-                            <div className="flex gap-3">
-                                <Input
-                                    type="number"
-                                    value={editScoreA}
-                                    onChange={(e) =>
-                                        setEditScoreA(Number(e.target.value))
-                                    }
-                                />
-
-                                <Input
-                                    type="number"
-                                    value={editScoreB}
-                                    onChange={(e) =>
-                                        setEditScoreB(Number(e.target.value))
-                                    }
-                                />
-                            </div>
-
-                            <div className="flex justify-end gap-3">
-                                <Button
-                                    variant="secondary"
-                                    onClick={() => setSelectedMatch(null)}
-                                >
-                                    Cancel
-                                </Button>
-                                <Button onClick={saveMatch}>
-                                    Save
-                                </Button>
-                            </div>
-                        </div>
-                    </div>
-                )} */}
 
                 {/* CREATE MATCH */}
                 {createMatch && (
@@ -329,6 +292,7 @@ function EditTournamentForm({ tournament, onClose }: Props) {
                         </div>
                     </div>
                 )}
+
             </motion.aside>
         </div >
     );

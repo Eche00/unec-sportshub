@@ -11,6 +11,7 @@ import { AnimatePresence } from "framer-motion";
 import ManageMatches from "../table/ManageMatches";
 
 import useMatchesInfo, { Matches } from "@/utils/logics/usematchesinfo";
+import useTournamentInfo from "@/utils/logics/usetournamentinfo";
 
 type MatchCardProps = Matches & {
     onAdminClick?: (id: string) => void;
@@ -34,9 +35,12 @@ const MatchCard: React.FC<MatchCardProps> = ({
     currentHalf,
 
     isHalftime,
+    tournamentId,
 
 }) => {
-
+    const {
+        tournaments,
+    } = useTournamentInfo();
 
     const {
         manageMatches,
@@ -72,7 +76,7 @@ const MatchCard: React.FC<MatchCardProps> = ({
                     </span>
 
                     {/* HALF INFO */}
-                    {(status === "live" ||
+                    {/* {(status === "live" ||
                         status === "halftime") && (
                             <div className=" text-[11px] text-gray-500">
 
@@ -85,7 +89,12 @@ const MatchCard: React.FC<MatchCardProps> = ({
                                 {status === "halftime" &&
                                     " • Waiting for restart"}
                             </div>
-                        )}
+                        )} */}
+
+                    {tournamentId && tournaments.filter((t) => t.id === tournamentId).map((t) => (
+                        <div className=" text-[11px] text-gray-500">
+                            {t.name}
+                        </div>))}
                 </div>
 
                 {/* SCORE */}

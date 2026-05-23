@@ -75,6 +75,8 @@ export default function Page() {
                                     date={match.date}
                                     time={match.time}
                                     location={match.location}
+                                    tournamentId={match.tournamentId}
+
                                 />
                             ))
                         ) : (

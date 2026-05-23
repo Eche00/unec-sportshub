@@ -106,7 +106,6 @@ const useTournamentInfo = () => {
 
     /* MATCH STATE (ADDED) */
     const [matches, setMatches] = useState<Matches[]>([]);
-    const [createMatch, setCreateMatch] = useState(false);
 
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
@@ -121,7 +120,7 @@ const useTournamentInfo = () => {
     const [teams, setTeams] = useState<Team[]>([]);
 
     const tournamentRef = collection(db, "tournaments");
-    const matchesRef = collection(db, "matches"); // ✅ ADDED
+    const matchesRef = collection(db, "matches");
 
     /* REALTIME LIST (TOURNAMENTS) */
 
@@ -237,20 +236,7 @@ const useTournamentInfo = () => {
         }
     };
 
-    const createMatchFn = async (payload: Partial<Matches>) => {
-        try {
-            const body = {
-                ...payload,
-                createdAt: Date.now(),
-            };
 
-            await addDoc(matchesRef, body);
-            toast.success("Match created");
-        } catch (error) {
-            console.error(error);
-            toast.error("Failed to create match");
-        }
-    };
 
     /* TEAM LOGIC */
 
@@ -433,8 +419,6 @@ const useTournamentInfo = () => {
 
         /* MATCH EXPORTS (ADDED) */
         matches,
-        createMatch: createMatchFn,
-        setCreateMatch,
         handleUpdateMatch,
 
         name,
