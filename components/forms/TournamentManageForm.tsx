@@ -37,7 +37,7 @@ export default function TournamentManageForm() {
     const [selectedTournament, setSelectedTournament] =
         useState<Tournament | null>(null);
 
-    // ---------------- CLEAN HELPERS (NO MATCH LOGIC) ----------------
+    // CLEAN HELPERS (NO MATCH LOGIC)
 
     const getTournamentStatus = (_tournament: Tournament) => {
         return "Active";
@@ -55,7 +55,7 @@ export default function TournamentManageForm() {
         return "Final Stage";
     };
 
-    // ---------------- UI ----------------
+    // UI
     return (
         <div className="min-h-screen text-white space-y-6">
 
@@ -239,7 +239,7 @@ export default function TournamentManageForm() {
 
                         <div className="w-full max-w-lg">
                             <StandingsTable
-                                teams={selectedTournament.teams || []}
+                                tournament={selectedTournament}
                                 onClose={() => setOpenTournament(false)}
                             />
                         </div>

@@ -6,51 +6,41 @@ import {
     EmojiEvents,
 } from "@mui/icons-material";
 import { motion } from "framer-motion";
-import MatchesTable from "./MatchesTable";
+import { Tournament } from "@/utils/logics/usetournamentinfo";
+import MatchCard from "../match/MatchCard";
+import useMatchesInfo from "@/utils/logics/usematchesinfo";
 
-type Team = {
-    name: string;
-    played: number;
-    won?: number;
-    drawn?: number;
-    lost?: number;
-    goalsFor?: number;
-    goalsAgainst?: number;
-    points: number;
-};
 
-type Match = {
-    home: string;
-    away: string;
-    score?: string;
-    date?: string;
-    status: "upcoming" | "past";
-};
 
 type Props = {
-    teams: Team[];
+    tournament: Tournament;
     onClose: () => void;
 };
 
-function StandingsTable({ teams, onClose }: Props) {
-    const [manageTournament, setManageTournament] = useState(false)
+function StandingsTable({ tournament, onClose }: Props) {
     const [activeTab, setActiveTab] = useState<
-        "standings" | "upcoming" | "past"
+        "standings" | "live" | "upcoming" | "past"
     >("standings");
 
-    const sortedTeams = [...teams].sort((a, b) => b.points - a.points);
 
-    // Dummy matches (replace with real data later)
-    const matches: Match[] = [
-        { home: "Team A", away: "Team B", date: "Today 4:00 PM", status: "upcoming" },
-        { home: "Team C", away: "Team D", date: "Tomorrow 2:00 PM", status: "upcoming" },
-        { home: "Team A", away: "Team C", score: "2 - 1", status: "past" },
-        { home: "Team B", away: "Team D", score: "0 - 3", status: "past" },
-    ];
+    const {
+        matches,
 
-    const upcomingMatches = matches.filter(m => m.status === "upcoming");
-    const pastMatches = matches.filter(m => m.status === "past");
+    } = useMatchesInfo();
+    const tournamentMatches = matches.filter(
+        (m) => m.tournamentId === tournament?.id
+    );
+    const upcomingMatches = tournamentMatches.filter(
+        (m) => m.status === "upcoming"
+    );
 
+    const liveMatches = tournamentMatches.filter(
+        (m) => m.status === "live" || m.status === "halftime"
+    );
+
+    const pastMatches = tournamentMatches.filter(
+        (m) => m.status === "finished"
+    );
     return (
         <div
             className="fixed inset-0 top-16.5 bg-black/60 z-50 flex justify-end"
@@ -85,13 +75,14 @@ function StandingsTable({ teams, onClose }: Props) {
                 <div className="flex gap-2 mb-6 border-b border-gray-800 pb-2 text-sm">
                     {[
                         { key: "standings", label: "Standings" },
-                        { key: "upcoming", label: "Upcoming" },
-                        { key: "past", label: "Past Matches" },
+                        { key: "upcoming", label: "Upcoming " },
+                        { key: "past", label: "Past " },
+                        { key: "live", label: "Live " },
                     ].map((tab) => (
                         <button
                             key={tab.key}
                             onClick={() => setActiveTab(tab.key as any)}
-                            className={`px-3 py-1 rounded-lg transition ${activeTab === tab.key
+                            className={`px-3 py-1 rounded-lg transition  ${activeTab === tab.key
                                 ? "bg-white/10 text-white"
                                 : "text-gray-400 hover:text-white"
                                 }`}
@@ -105,7 +96,7 @@ function StandingsTable({ teams, onClose }: Props) {
                 <div className="flex-1 overflow-y-auto">
 
                     {/*  STANDINGS  */}
-                    {activeTab === "standings" && (
+                    {activeTab === "standings" ? (
                         <div className="rounded-xl border border-gray-800 overflow-hidden">
                             <table className="w-full text-sm text-left">
                                 <thead className="bg-[#0F1115] text-gray-400 text-xs uppercase">
@@ -123,53 +114,79 @@ function StandingsTable({ teams, onClose }: Props) {
                                 </thead>
 
                                 <tbody>
-                                    {sortedTeams.map((team, index) => (
-                                        <tr
-                                            key={index}
-                                            className="border-t border-gray-800 hover:bg-white/5"
-                                        >
-                                            <td className="p-3">{index + 1}</td>
-                                            <td className="p-3 text-gray-200">{team.name}</td>
-                                            <td className="p-3">{team.played}</td>
-                                            <td className="p-3">{team.won ?? "-"}</td>
-                                            <td className="p-3">{team.drawn ?? "-"}</td>
-                                            <td className="p-3">{team.lost ?? "-"}</td>
-                                            <td className="p-3">{team.goalsFor ?? "-"}</td>
-                                            <td className="p-3">{team.goalsAgainst ?? "-"}</td>
-                                            <td className="p-3 font-bold">{team.points}</td>
-                                        </tr>
-                                    ))}
+                                    {[...tournament.teams]
+                                        .sort((a, b) => {
+                                            //  Points
+                                            if ((b.points ?? 0) !== (a.points ?? 0)) {
+                                                return (b.points ?? 0) - (a.points ?? 0);
+                                            }
+
+                                            //  Goal Difference
+                                            const bGD = (b.goalsFor ?? 0) - (b.goalsAgainst ?? 0);
+                                            const aGD = (a.goalsFor ?? 0) - (a.goalsAgainst ?? 0);
+
+                                            if (bGD !== aGD) {
+                                                return bGD - aGD;
+                                            }
+
+                                            //  Goals Scored
+                                            if ((b.goalsFor ?? 0) !== (a.goalsFor ?? 0)) {
+                                                return (b.goalsFor ?? 0) - (a.goalsFor ?? 0);
+                                            }
+
+                                            // alphabetical fallback (keeps UI stable)
+                                            return a.name.localeCompare(b.name);
+                                        })
+                                        .map((team, index) => (
+                                            <tr
+                                                key={index}
+                                                className="border-t border-gray-800 hover:bg-white/5"
+                                            >
+                                                <td className="p-3">{index + 1}</td>
+                                                <td className="p-3 text-gray-200">{team.name}</td>
+                                                <td className="p-3">{team.played}</td>
+                                                <td className="p-3">{team.won ?? "-"}</td>
+                                                <td className="p-3">{team.drawn ?? "-"}</td>
+                                                <td className="p-3">{team.lost ?? "-"}</td>
+                                                <td className="p-3">{team.goalsFor ?? "-"}</td>
+                                                <td className="p-3">{team.goalsAgainst ?? "-"}</td>
+                                                <td className="p-3 font-bold">{team.points}</td>
+                                            </tr>
+                                        ))}
                                 </tbody>
                             </table>
+                        </div>
+                    ) : (
+                        <div className="flex flex-col gap-4">
+
+                            {activeTab === "upcoming" && (
+                                <div className="flex flex-col gap-4">
+                                    {upcomingMatches.map((match) => (
+                                        <MatchCard key={match.id} {...match} />
+                                    ))}
+                                </div>
+                            )}
+
+                            {activeTab === "past" && (
+                                <div className="flex flex-col gap-4">
+                                    {pastMatches.map((match) => (
+                                        <MatchCard key={match.id} {...match} />
+                                    ))}
+                                </div>
+                            )}
+                            {activeTab === "live" && (
+                                <div className="flex flex-col gap-4">
+                                    {liveMatches.map((match) => (
+                                        <MatchCard key={match.id} {...match} />
+                                    ))}
+                                </div>
+                            )}
+
                         </div>
                     )}
 
                     {/*  UPCOMING MATCHES  */}
-                    {activeTab === "upcoming" && (
-                        <MatchesTable
-                            type="upcoming"
-                            matches={upcomingMatches.map((m, i) => ({
-                                id: `upcoming-${i}`,
-                                teamA: m.home,
-                                teamB: m.away,
-                                date: m.date,
-                            }))}
-                        />
-                    )}
 
-                    {/*  PAST MATCHES  */}
-                    {activeTab === "past" && (
-                        <MatchesTable
-                            type="past"
-                            matches={pastMatches.map((m, i) => ({
-                                id: `past-${i}`,
-                                teamA: m.home,
-                                teamB: m.away,
-                                scoreA: Number(m.score?.split("-")[0]) || 0,
-                                scoreB: Number(m.score?.split("-")[1]) || 0,
-                            }))}
-                        />
-                    )}
                 </div>
             </motion.aside>
 
