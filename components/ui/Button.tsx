@@ -3,7 +3,7 @@
 import React from "react";
 
 type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
-    variant?: "primary" | "secondary";
+    variant?: "primary" | "secondary" | "secondaryRed";
 };
 
 function Button({
@@ -21,6 +21,8 @@ function Button({
             "bg-[#3B82F6] text-black hover:opacity-90",
         secondary:
             "border border-gray-600 text-white hover:border-white",
+        secondaryRed:
+            "border border-gray-600 bg-red-600 text-white hover:bg-red-500",
     };
 
     const disabledStyles = props.disabled

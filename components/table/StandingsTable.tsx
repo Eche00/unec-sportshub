@@ -25,7 +25,7 @@ function StandingsTable({ tournament, onClose }: Props) {
 
     const {
         matches,
-
+        statusStyles
     } = useMatchesInfo();
     const tournamentMatches = matches.filter(
         (m) => m.tournamentId === tournament?.id
@@ -61,6 +61,17 @@ function StandingsTable({ tournament, onClose }: Props) {
                         <h3 className="text-lg font-semibold">
                             Tournament Details
                         </h3>
+                        <span
+                            className={`text-xs px-3 py-1 rounded-full border ${statusStyles[tournament.status]} flex items-center gap-2 uppercase`}
+                        >
+                            {tournament?.status === "live" && (
+                                <span className="relative flex h-2 w-2">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                                </span>
+                            )}
+                            {tournament?.status}
+                        </span>
                     </div>
 
                     <button
@@ -82,7 +93,7 @@ function StandingsTable({ tournament, onClose }: Props) {
                         <button
                             key={tab.key}
                             onClick={() => setActiveTab(tab.key as any)}
-                            className={`px-3 py-1 rounded-lg transition  ${activeTab === tab.key
+                            className={`px-3 py-1 rounded-lg transition cursor-pointer  ${activeTab === tab.key
                                 ? "bg-white/10 text-white"
                                 : "text-gray-400 hover:text-white"
                                 }`}

@@ -7,12 +7,12 @@ import Button from "../ui/Button";
 import { Edit, Add } from "@mui/icons-material";
 import { AnimatePresence, motion } from "framer-motion";
 
-import useTournamentInfo, { Tournament } from "@/utils/logics/usetournamentinfo";
+import useTournamentInfo, { Team, Tournament } from "@/utils/logics/usetournamentinfo";
 import useMatchesInfo, { Matches } from "@/utils/logics/usematchesinfo";
 
 import CreateMatchForm from "@/components/forms/CreateMatchForm";
-import ManageMatches from "../table/ManageMatches";
 import MatchCard from "../match/MatchCard";
+import toast from "react-hot-toast";
 
 interface Props {
     tournament: Tournament;
@@ -22,17 +22,45 @@ interface Props {
 function EditTournamentForm({ tournament, onClose }: Props) {
     const [tab, setTab] = useState<"standings" | "matches">("standings");
     const {
-        updateTeam,
+        editTournament,
+        updateTournamentStatus,
+        deleteTournament
     } = useTournamentInfo();
     const {
         matches,
         createMatch,
         setCreateMatch,
-        manageMatches,
-        setManageMatches,
-        handleClick
     } = useMatchesInfo();
+    const [editTeams, setEditTeams] = useState<Record<string, Team>>({});
 
+    useEffect(() => {
+        if (!tournament?.teams) return;
+
+        const initial: Record<string, Team> = {};
+
+        tournament.teams.forEach((team) => {
+            initial[team.name] = { ...team };
+        });
+
+        setEditTeams(initial);
+    }, [tournament]);
+
+    const saveTeams = async () => {
+        const updatedTeams = tournament.teams.map((team) => {
+            const edited = editTeams[team.name];
+
+            return {
+                ...team,
+                ...edited, // only overrides changed fields
+            };
+        });
+
+        await editTournament(tournament.id, {
+            teams: updatedTeams,
+        });
+
+        toast.success("Standings updated");
+    };
     return (
         <div
             className="fixed inset-0 bg-black/60 z-50 flex justify-end"
@@ -110,7 +138,7 @@ function EditTournamentForm({ tournament, onClose }: Props) {
                             </div>
 
                             {/* RIGHT */}
-                            {tab === "matches" && (
+                            {tab === "matches" ? (
                                 <Button
                                     onClick={() => setCreateMatch(true)}
                                     className="shrink-0"
@@ -118,6 +146,29 @@ function EditTournamentForm({ tournament, onClose }: Props) {
                                     <Add fontSize="small" />
                                     Create Match
                                 </Button>
+                            ) : (
+                                <div className="flex items-center gap-1 bg-[#111827] border border-gray-800 p-1.5 rounded-lg">
+                                    <button
+                                        onClick={() => updateTournamentStatus(tournament.id, "live")}
+                                        className={`px-3 py-1.5 text-sm rounded-lg transition cursor-pointer ${tournament.status === "live"
+                                            ? "bg-[#3B82F6] text-black"
+                                            : "text-gray-400 hover:text-white"
+                                            }`}
+                                    >
+                                        live
+                                    </button>
+
+                                    <button
+                                        onClick={() => updateTournamentStatus(tournament.id, "finished")}
+                                        className={`px-3 py-1.5 text-sm rounded-lg transition cursor-pointer ${tournament.status === "finished"
+                                            ? "bg-[#3B82F6] text-black"
+                                            : "text-gray-400 hover:text-white"
+                                            }`}
+                                    >
+                                        Finish
+                                    </button>
+
+                                </div>
                             )}
                         </div>
                     </div>
@@ -154,13 +205,15 @@ function EditTournamentForm({ tournament, onClose }: Props) {
                                                 <td className="p-2">
                                                     <Input
                                                         type="number"
-                                                        value={team.played}
+                                                        value={editTeams[team.name]?.played ?? 0}
                                                         onChange={(e) =>
-                                                            updateTeam(
-                                                                tournament.id,
-                                                                team.name,
-                                                                { played: Number(e.target.value) }
-                                                            )
+                                                            setEditTeams((prev) => ({
+                                                                ...prev,
+                                                                [team.name]: {
+                                                                    ...prev[team.name],
+                                                                    played: Number(e.target.value),
+                                                                },
+                                                            }))
                                                         }
                                                     />
                                                 </td>
@@ -168,13 +221,15 @@ function EditTournamentForm({ tournament, onClose }: Props) {
                                                 <td className="p-2">
                                                     <Input
                                                         type="number"
-                                                        value={team.won}
+                                                        value={editTeams[team.name]?.won ?? 0}
                                                         onChange={(e) =>
-                                                            updateTeam(
-                                                                tournament.id,
-                                                                team.name,
-                                                                { won: Number(e.target.value) }
-                                                            )
+                                                            setEditTeams((prev) => ({
+                                                                ...prev,
+                                                                [team.name]: {
+                                                                    ...prev[team.name],
+                                                                    won: Number(e.target.value),
+                                                                },
+                                                            }))
                                                         }
                                                     />
                                                 </td>
@@ -182,13 +237,15 @@ function EditTournamentForm({ tournament, onClose }: Props) {
                                                 <td className="p-2">
                                                     <Input
                                                         type="number"
-                                                        value={team.drawn}
+                                                        value={editTeams[team.name]?.drawn ?? 0}
                                                         onChange={(e) =>
-                                                            updateTeam(
-                                                                tournament.id,
-                                                                team.name,
-                                                                { drawn: Number(e.target.value) }
-                                                            )
+                                                            setEditTeams((prev) => ({
+                                                                ...prev,
+                                                                [team.name]: {
+                                                                    ...prev[team.name],
+                                                                    drawn: Number(e.target.value),
+                                                                },
+                                                            }))
                                                         }
                                                     />
                                                 </td>
@@ -196,13 +253,15 @@ function EditTournamentForm({ tournament, onClose }: Props) {
                                                 <td className="p-2">
                                                     <Input
                                                         type="number"
-                                                        value={team.lost}
+                                                        value={editTeams[team.name]?.lost ?? 0}
                                                         onChange={(e) =>
-                                                            updateTeam(
-                                                                tournament.id,
-                                                                team.name,
-                                                                { lost: Number(e.target.value) }
-                                                            )
+                                                            setEditTeams((prev) => ({
+                                                                ...prev,
+                                                                [team.name]: {
+                                                                    ...prev[team.name],
+                                                                    lost: Number(e.target.value),
+                                                                },
+                                                            }))
                                                         }
                                                     />
                                                 </td>
@@ -210,13 +269,15 @@ function EditTournamentForm({ tournament, onClose }: Props) {
                                                 <td className="p-2">
                                                     <Input
                                                         type="number"
-                                                        value={team.goalsFor}
+                                                        value={editTeams[team.name]?.goalsFor ?? 0}
                                                         onChange={(e) =>
-                                                            updateTeam(
-                                                                tournament.id,
-                                                                team.name,
-                                                                { goalsFor: Number(e.target.value) }
-                                                            )
+                                                            setEditTeams((prev) => ({
+                                                                ...prev,
+                                                                [team.name]: {
+                                                                    ...prev[team.name],
+                                                                    goalsFor: Number(e.target.value),
+                                                                },
+                                                            }))
                                                         }
                                                     />
                                                 </td>
@@ -224,27 +285,32 @@ function EditTournamentForm({ tournament, onClose }: Props) {
                                                 <td className="p-2">
                                                     <Input
                                                         type="number"
-                                                        value={team.goalsAgainst}
+                                                        value={editTeams[team.name]?.goalsAgainst ?? 0}
                                                         onChange={(e) =>
-                                                            updateTeam(
-                                                                tournament.id,
-                                                                team.name,
-                                                                { goalsAgainst: Number(e.target.value) }
-                                                            )
+                                                            setEditTeams((prev) => ({
+                                                                ...prev,
+                                                                [team.name]: {
+                                                                    ...prev[team.name],
+                                                                    goalsAgainst: Number(e.target.value),
+                                                                },
+                                                            }))
                                                         }
+
                                                     />
                                                 </td>
 
                                                 <td className="p-2">
                                                     <Input
                                                         type="number"
-                                                        value={team.points}
+                                                        value={editTeams[team.name]?.points ?? 0}
                                                         onChange={(e) =>
-                                                            updateTeam(
-                                                                tournament.id,
-                                                                team.name,
-                                                                { points: Number(e.target.value) }
-                                                            )
+                                                            setEditTeams((prev) => ({
+                                                                ...prev,
+                                                                [team.name]: {
+                                                                    ...prev[team.name],
+                                                                    points: Number(e.target.value),
+                                                                },
+                                                            }))
                                                         }
                                                     />
                                                 </td>
@@ -293,6 +359,22 @@ function EditTournamentForm({ tournament, onClose }: Props) {
                     </div>
                 )}
 
+                <div className="w-full flex items-end justify-end gap-4 py-5 mb-10  border-t-[0.1px] border-gray-400">
+
+                    <Button
+                        onClick={() => { deleteTournament(tournament.id); onClose(); }}
+                        variant="secondaryRed"
+                    >
+                        Delete Tournament
+                    </Button>
+
+                    <Button
+                        onClick={saveTeams}
+                        variant="primary"
+                    >
+                        Update Standings
+                    </Button>
+                </div>
             </motion.aside>
         </div >
     );

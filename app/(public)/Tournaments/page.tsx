@@ -2,6 +2,7 @@
 
 import StandingsTable from "@/components/table/StandingsTable";
 import Button from "@/components/ui/Button";
+import useMatchesInfo from "@/utils/logics/usematchesinfo";
 import useTournamentInfo, { Tournament } from "@/utils/logics/usetournamentinfo";
 import { Add, Edit, Search, SportsSoccer } from "@mui/icons-material";
 import { AnimatePresence } from "framer-motion";
@@ -16,6 +17,9 @@ export default function Page() {
         tournaments,
         loading,
     } = useTournamentInfo();
+    const {
+        statusStyles,
+    } = useMatchesInfo();
 
 
     const [selectedTournament, setSelectedTournament] =
@@ -23,9 +27,7 @@ export default function Page() {
 
     // CLEAN HELPERS (NO MATCH LOGIC)
 
-    const getTournamentStatus = (_tournament: Tournament) => {
-        return "Active";
-    };
+
 
     const getTournamentStage = (tournament: Tournament) => {
 
@@ -66,12 +68,11 @@ export default function Page() {
                     )}
 
                     {/* LIST */}
-                    <div className="flex flex-col gap-4">
+                    <div className="flex flex-col sm:grid sm:grid-cols-2 gap-4">
 
                         {!loading && tournaments.length > 0 ? (
                             tournaments.map((tournament) => {
 
-                                const status = getTournamentStatus(tournament);
                                 const stage = getTournamentStage(tournament);
 
                                 return (
@@ -106,8 +107,16 @@ export default function Page() {
                                             </div>
 
                                             {/* STATUS */}
-                                            <span className="px-3 py-1 text-xs rounded-full border bg-blue-400/10 text-blue-300 border-blue-400/20">
-                                                {status}
+                                            <span
+                                                className={`text-xs px-3 py-1 rounded-full border ${statusStyles[tournament.status]} flex items-center gap-2 uppercase`}
+                                            >
+                                                {tournament?.status === "live" && (
+                                                    <span className="relative flex h-2 w-2">
+                                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                                        <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                                                    </span>
+                                                )}
+                                                {tournament?.status}
                                             </span>
                                         </div>
 

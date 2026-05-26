@@ -55,6 +55,8 @@ export default function ManageMatches({
         handleContinueMatch,
         handleEndMatch,
 
+        handleDeleteMatch
+
     } = useMatchesInfo(
         onClose,
         matchId
@@ -485,8 +487,16 @@ export default function ManageMatches({
 
                 {/* SAVE */}
 
-                <div className="w-full flex items-end justify-end py-3 mb-10  border-t-[0.1px] border-gray-400">
+                <div className="w-full flex items-end justify-end gap-4 py-5 mb-10  border-t-[0.1px] border-gray-400">
 
+                    <Button
+                        variant="secondaryRed"
+                        onClick={() => handleDeleteMatch(matchId)}
+                        disabled={loading}
+                    >
+                        Delete Match
+
+                    </Button>
                     <Button
                         variant="primary"
                         onClick={handleManageMatch}

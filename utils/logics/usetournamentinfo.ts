@@ -43,6 +43,7 @@ export type Tournament = {
     location?: string;
     startDate?: string;
     endDate?: string;
+    status: "upcoming" | "live" | "finished";
     createdAt?: number;
     settings?: TournamentSettings;
     teams: Team[];
@@ -295,6 +296,7 @@ const useTournamentInfo = () => {
                 location: payload?.location || location,
                 startDate: payload?.startDate || startDate,
                 endDate: payload?.endDate || endDate,
+                status: "upcoming",
                 settings: payload?.settings || {
                     format,
                     teamCount,
@@ -339,9 +341,22 @@ const useTournamentInfo = () => {
             setUpdating(false);
         }
     };
+    const updateTournamentStatus = async (
+        id: string,
+        status: "upcoming" | "live" | "finished"
+    ) => {
+        try {
+            const ref = doc(db, "tournaments", id);
 
+            await updateDoc(ref, { status });
+
+            toast.success(`Tournament is now ${status}`);
+        } catch (error) {
+            console.error(error);
+            toast.error("Failed to update tournament status");
+        }
+    };
     /* DELETE */
-
     const deleteTournament = async (id: string) => {
         try {
             await deleteDoc(doc(db, "tournaments", id));
@@ -352,37 +367,7 @@ const useTournamentInfo = () => {
         }
     };
 
-    /* TEAM UPDATE */
-
-    const updateTeam = async (
-        tournamentId: string,
-        teamName: string,
-        updatedData: Partial<Team>
-    ) => {
-        try {
-            const target = tournaments.find((t) => t.id === tournamentId);
-
-            if (!target) return toast.error("Tournament not found");
-
-            const updatedTeams = target.teams.map((team) =>
-                team.name === teamName
-                    ? { ...team, ...updatedData }
-                    : team
-            );
-
-            await editTournament(tournamentId, {
-                teams: updatedTeams,
-            });
-
-            toast.success("Team updated");
-        } catch (error) {
-            console.error(error);
-            toast.error("Failed to update team");
-        }
-    };
-
     /* TEAM DELETE */
-
     const deleteTeam = async (tournamentId: string, teamName: string) => {
         try {
             const target = tournaments.find((t) => t.id === tournamentId);
@@ -444,12 +429,12 @@ const useTournamentInfo = () => {
 
         addTeam,
         removeTeam,
-        updateTeam,
         deleteTeam,
 
         getTournament,
         createTournament,
         editTournament,
+        updateTournamentStatus,
         deleteTournament,
 
         resetTournamentForm,
