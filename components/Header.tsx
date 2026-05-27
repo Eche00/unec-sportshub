@@ -6,24 +6,24 @@ import { usePathname } from "next/navigation";
 import DragHandleIcon from "@mui/icons-material/DragHandle";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Close } from "@mui/icons-material";
+import { Close, DashboardRounded, EmojiEventsRounded, HomeRounded, LeaderboardRounded, SportsSoccerRounded } from "@mui/icons-material";
 
 function Header() {
     const pathname = usePathname();
     const [openMenu, setOpenMenu] = useState<boolean>(false);
 
     return (
-        <div className="bg-[#020C17] text-white md:py-3 py-2  fixed top-0 left-0 w-full z-50">
+        <div className="bg-[#020C17] text-white md:py-3 py-2  fixed md:top-0 top-2 md:left-0 md:right-0 left-2 right-2 md:w-full z-50 md:rounded-none rounded-[28px] ">
             {/* container  */}
             <section className="flex items-center justify-center gap-2 md:w-[90%] w-[98%] mx-auto">
                 {/* Logo   */}
                 <div className="flex flex-1 items-center relative ">
-                    <span className="flex items-center w-full rounded-full px-4 md:text-2xl text-xl font-extrabold text-[#3B82F6] tracking-wide">
+                    <span className="flex items-center md:w-full w-fit rounded-full px-4 md:text-2xl text-xl font-extrabold text-[#3B82F6] tracking-wide md:mx-0 mx-auto">
                         <Link
                             href="/"
                             className=" border-2 border-[#3B82F6] rounded-full p-2 mr-2 flex items-center justify-center"
                         >
-                            <img src="/logo.png" alt="" className=" w-8 h-8 object-cover" />
+                            <img src="/logo.png" alt="" className=" md:w-8 md:h-8 w-6 h-6 object-cover" />
                         </Link>
                     </span>
                 </div>
@@ -56,57 +56,65 @@ function Header() {
                         Get Started
                     </Link>
                 </div>
-                {/* mobile menu button  */}
-                <div className="flex md:hidden  items-center justify-end gap-5 ">
-                    <button
-                        className=" text-white  cursor-pointer w-fit pr-4"
-                        onClick={() => setOpenMenu(!openMenu)}
-                    >
-                        {openMenu ? <Close /> : <DragHandleIcon />}
-                    </button>
-                </div>
+
             </section>
             {/* Mobile menu */}
             <AnimatePresence>
-                {openMenu && (
-                    <section
-                        onClick={() => setOpenMenu(false)}
-                        className="fixed top-17.5 left-0 w-full h-screen bg-black/50 mx-auto flex  justify-end md:hidden"
+                <section
+                    className="fixed bottom-2 left-1/2 -translate-x-1/2 z-50 md:hidden w-fit "
+                >
+                    <motion.aside
+                        initial={{ y: 120, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        exit={{ y: 120, opacity: 0 }}
+                        transition={{ duration: 0.35 }}
+                        onClick={(e) => e.stopPropagation()}
+                        className="relative overflow-hidden rounded-full border border-white/10 bg-[#0B1220]/95 backdrop-blur-2xl shadow-2xl p-1"
                     >
-                        <motion.aside
-                            initial={{ x: 170, opacity: 0 }}
-                            animate={{ x: 0, opacity: 1 }}
-                            exit={{ x: 170, opacity: 0 }}
-                            transition={{ duration: 0.3 }}
-                            className="bg-[#0F172A] flex flex-col gap-2 text-[10px] w-[70%] p-5"
-                            onClick={(e) => e.stopPropagation()}
-                        >
-                            {publicItems.map((item) => (
-                                <Link
-                                    href={item.link}
-                                    key={item.name}
-                                    onClick={() => setOpenMenu(false)}
-                                    className={
-                                        pathname === item.link
-                                            ? "text-white font-bold bg-[#3B82F6] py-3 px-4  rounded-full flex items-center gap-2"
-                                            : "text-gray-400 py-3 px-4  rounded-full hover:bg-[#3B82F6]/10 flex items-center gap-2"
-                                    }
-                                >
-                                    {item.name}
-                                </Link>
-                            ))}
-                            <hr className=" w-full h-[0.1px] bg-gray-600 border-none" />
-                            <div className="flex items-center justify-end gap-5  ">
-                                <Link
-                                    href="/auth"
-                                    className=" text-white bg-[#3B82F6] hover:bg-[#3B82F6]/90 font-bold  md:py-2 py-1.5 md:px-7 px-3 rounded-full cursor-pointer w-fit"
-                                >
-                                    Get Started
-                                </Link>
-                            </div>
-                        </motion.aside>
-                    </section>
-                )}
+                        {/* Glow */}
+                        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-cyan-500/10 pointer-events-none" />
+
+                        <div className="relative z-10 flex items-center justify-between gap-2">
+
+                            {publicItems.map((item) => {
+
+                                const isActive = pathname === item.link;
+
+                                const icon =
+                                    item.name.toLowerCase() === "home" ? (
+                                        <HomeRounded />
+                                    ) : item.name.toLowerCase() === "matches" ? (
+                                        <SportsSoccerRounded />
+                                    ) : item.name.toLowerCase() === "tournaments" ? (
+                                        <EmojiEventsRounded />
+                                    ) : item.name.toLowerCase() === "standings" ? (
+                                        <LeaderboardRounded />
+                                    ) : (
+                                        <DashboardRounded />
+                                    );
+
+                                return (
+                                    <Link
+                                        href={item.link}
+                                        key={item.name}
+                                        onClick={() => setOpenMenu(false)}
+                                        className={`relative h-10 w-10 rounded-full flex items-center justify-center transition-all duration-300 ${isActive
+                                            ? "bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg shadow-purple-500/30 scale-105"
+                                            : "bg-gray-400/10 text-gray-400 hover:text-white hover:bg-white/5"
+                                            }`}
+                                    >
+                                        {icon}
+
+                                        {/* Active Dot */}
+                                        {/* {isActive && (
+                                            <span className="absolute bottom-1 h-2 w-2 rounded-full bg-white animate-pulse" />
+                                        )} */}
+                                    </Link>
+                                );
+                            })}
+                        </div>
+                    </motion.aside>
+                </section>
             </AnimatePresence>
         </div>
     );
