@@ -98,7 +98,7 @@ function Header() {
                                         href={item.link}
                                         key={item.name}
                                         onClick={() => setOpenMenu(false)}
-                                        className={`relative h-10 w-10 rounded-full flex items-center justify-center transition-all duration-300 ${isActive
+                                        className={`relative h-12 w-12 rounded-full flex items-center justify-center transition-all duration-300 ${isActive
                                             ? "bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg shadow-purple-500/30 scale-105"
                                             : "bg-gray-400/10 text-gray-400 hover:text-white hover:bg-white/5"
                                             }`}

@@ -2,7 +2,7 @@ import React from "react";
 
 function HomeSkeleton() {
     return (
-        <div className="animate-pulse space-y-10 max-w-7xl mx-auto">
+        <div className="animate-pulse space-y-10 max-w-7xl mx-auto sm:pt-28">
 
             {/* HERO SKELETON */}
             <section className="rounded-[30px] border border-white/10 bg-[#1B2230] p-6 sm:p-10 space-y-6">

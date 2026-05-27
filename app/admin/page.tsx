@@ -1,248 +1,458 @@
-'use client'
+"use client";
 
-import AddIcon from "@mui/icons-material/Add";
-import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
-import GroupsIcon from "@mui/icons-material/Groups";
-import SportsEsportsIcon from "@mui/icons-material/SportsEsports";
-import PaidIcon from "@mui/icons-material/Paid";
+import React, { useEffect, useMemo, useState } from "react";
+
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+
+import {
+    Add,
+    EmojiEvents,
+    SportsSoccer,
+    TrendingUp,
+    AccessTime,
+    ArrowOutward,
+    Logout,
+    Stadium,
+} from "@mui/icons-material";
+
 import { handleSignOut, useUserInfo } from "@/utils/logics/userinfo";
-import { useRouter } from 'next/navigation';
+
+import useTournamentInfo from "@/utils/logics/usetournamentinfo";
+import useMatchesInfo from "@/utils/logics/usematchesinfo";
 
 export default function Page() {
-    const userInfo = useUserInfo()
-    const router = useRouter()
+
+    const router = useRouter();
+
+    const userInfo = useUserInfo();
+
+    const {
+        tournaments,
+        filteredTournaments,
+    } = useTournamentInfo();
+
+    const {
+        filteredMatches,
+    } = useMatchesInfo();
+
+    // Featured match 
+    const [currentHeroIndex, setCurrentHeroIndex] = useState(0);
+
+    useEffect(() => {
+        if (!filteredMatches?.length) return;
+
+        const interval = setInterval(() => {
+            setCurrentHeroIndex((prev) => (prev + 1) % filteredMatches.length);
+        }, 5000);
+
+        return () => clearInterval(interval);
+    }, [filteredMatches?.length]); // 👈 better dependency
+
+    const featuredMatch = useMemo(() => {
+        if (!filteredMatches?.length) return null;
+
+        const safeIndex = currentHeroIndex % filteredMatches.length;
+
+        return filteredMatches[safeIndex];
+    }, [filteredMatches, currentHeroIndex]);
+
     return (
-        <div className="min-h-screen bg-[#0A0F1C] text-white flex flex-col gap-8">
-            <section className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
+        <main className="min-h-screen bg- text-white pb-32">
 
-                {/* LEFT SIDE */}
-                <div className="flex items-center gap-4 bg-white/[0.04] border border-white/10 
-        rounded-2xl px-5 py-4 backdrop-blur-xl shadow-[0_0_30px_rgba(0,255,255,0.05)]">
+            {/* HERO */}
+            <section className="relative overflow-hidden rounded-[36px] border border-white/10 bg-gradient-to-br from-[#13233E] via-[#0A0F1C] to-[#4B1D74] p-4 sm:p-8">
 
-                    {/* Avatar */}
-                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br 
-            from-cyan-400 to-purple-500 flex items-center justify-center 
-            text-black font-bold text-lg shadow-lg">
-                        {userInfo?.fullName?.charAt(0)}
-                    </div>
+                {/* glow */}
+                <div className="absolute inset-0 bg-gradient-to-tr from-cyan-500/10 via-transparent to-purple-500/20 pointer-events-none" />
 
-                    {/* User Info */}
-                    <div className="flex flex-col">
-                        <div className="flex items-center gap-2 mb-1">
-                            <span className="text-gray-400 text-xs uppercase tracking-wider">
-                                Admin Panel
-                            </span>
+                <div className="relative z-10 flex flex-col xl:flex-row gap-10 xl:items-center xl:justify-between">
 
-                            <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold 
-                    uppercase tracking-wide bg-cyan-500/10 text-cyan-300 
-                    border border-cyan-500/20">
-                                {userInfo?.role}
-                            </span>
+                    {/* LEFT */}
+                    <div className="max-w-2xl">
+
+                        <div className="flex items-center gap-3 mb-6">
+
+                            <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-cyan-400 to-purple-500 flex items-center justify-center text-black font-black text-xl shadow-xl">
+                                {userInfo?.fullName?.charAt(0)}
+                            </div>
+
+                            <div>
+                                <div className="flex items-center gap-2 mb-1">
+
+                                    <span className="text-xs uppercase tracking-[0.3em] text-cyan-300">
+                                        Dashboard
+                                    </span>
+
+                                    <span className="px-2 py-1 rounded-full text-[10px] border border-cyan-400/20 bg-cyan-400/10 text-cyan-300 uppercase">
+                                        {userInfo?.role}
+                                    </span>
+                                </div>
+
+                                <h1 className="text-2xl sm:text-3xl font-black leading-tight">
+                                    Welcome back,
+                                    <br />
+                                    {userInfo?.fullName}
+                                </h1>
+                            </div>
                         </div>
 
-                        <h2 className="text-xl font-semibold text-white leading-none">
-                            Welcome back, {userInfo?.fullName}
-                        </h2>
-
-                        <p className="text-sm text-gray-400 mt-1">
-                            Manage tournaments, teams and live matches
+                        <p className="text-gray-300 max-w-xl leading-relaxed">
+                            Manage tournaments, monitor live football matches,
+                            update scores in real-time and control the entire
+                            sports experience from one place.
                         </p>
+
+                        {/* ACTIONS */}
+                        <div className="flex flex-wrap items-center gap-4 mt-8">
+
+                            <Link
+                                href="/admin/Tournaments"
+                                className="group flex items-center gap-2 rounded-2xl bg-white text-black px-6 py-4 font-semibold hover:scale-[1.02] transition"
+                            >
+                                <Add className="group-hover:rotate-90 transition" />
+                                Create Tournament
+                            </Link>
+
+                            <button
+                                onClick={() =>
+                                    handleSignOut(router)
+                                }
+                                className="flex items-center gap-2 rounded-2xl border border-red-500/20 bg-red-500/10 text-red-400 px-6 py-4 font-semibold hover:bg-red-500/20 transition cursor-pointer"
+                            >
+                                <Logout />
+                                Sign Out
+                            </button>
+                        </div>
                     </div>
-                </div>
 
-                {/* RIGHT SIDE ACTIONS */}
-                <div className="flex items-center gap-3">
+                    {/* RIGHT HERO CARD */}
+                    <div className="relative w-full xl:max-w-md">
 
-                    {/* New Tournament */}
-                    <Link
-                        href="/admin/Tournaments"
-                        className="group flex items-center gap-2 px-5 py-3 rounded-xl 
-            font-medium bg-gradient-to-r from-cyan-400 to-purple-500 
-            text-black hover:scale-[1.03] active:scale-[0.98] 
-            transition-all duration-300 shadow-lg shadow-cyan-500/10"
-                    >
-                        <AddIcon
-                            fontSize="small"
-                            className="group-hover:rotate-90 transition-transform duration-300"
-                        />
-                        New Tournament
-                    </Link>
+                        <div className="relative overflow-hidden rounded-[32px] border border-white/10 bg-black/30 backdrop-blur-xl p-5">
 
-                    {/* Sign Out */}
-                    <button
-                        onClick={() => handleSignOut(router)}
-                        className="px-4 py-3 rounded-xl border border-red-500/20 
-            bg-red-500/10 text-red-400 hover:bg-red-500/20 
-            hover:text-red-300 transition-all duration-300"
-                    >
-                        Sign Out
-                    </button>
+                            <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent pointer-events-none" />
+
+                            <div className="relative z-10">
+
+                                <div className="flex items-center justify-between mb-6">
+
+                                    <div>
+                                        <p className="text-xs uppercase tracking-[0.3em] text-gray-400">
+                                            Featured Match
+                                        </p>
+
+                                        <h3 className="text-xl font-black mt-2">
+                                            {featuredMatch?.teamA} vs{" "}
+                                            {featuredMatch?.teamB}
+                                        </h3>
+                                    </div>
+
+                                    <div className="h-12 w-12 rounded-2xl bg-purple-500/20 border border-purple-400/20 flex items-center justify-center">
+                                        <SportsSoccer className="text-purple-300" />
+                                    </div>
+                                </div>
+
+                                {/* SCORE */}
+                                <div className="rounded-3xl bg-white/5 border border-white/10 p-6">
+
+                                    <div className="flex items-center justify-between">
+
+                                        <div className="text-center">
+                                            <div className="h-16 w-16 rounded-full bg-white/10 flex items-center justify-center text-xl font-black">
+                                                {String(
+                                                    featuredMatch?.teamA || "A"
+                                                )
+                                                    .charAt(0)
+                                                    .toUpperCase()}
+                                            </div>
+
+                                            <p className="mt-3 font-semibold">
+                                                {featuredMatch?.teamA}
+                                            </p>
+                                        </div>
+
+                                        <div className="text-center">
+                                            <h1 className="text-5xl font-black">
+                                                {featuredMatch?.scoreA}:
+                                                {featuredMatch?.scoreB}
+                                            </h1>
+
+                                            <span className="inline-flex mt-3 px-3 py-1 rounded-full text-xs uppercase bg-green-500/10 border border-green-500/20 text-green-400">
+                                                {featuredMatch?.status}
+                                            </span>
+                                        </div>
+
+                                        <div className="text-center">
+                                            <div className="h-16 w-16 rounded-full bg-white/10 flex items-center justify-center text-xl font-black">
+                                                {String(
+                                                    featuredMatch?.teamB || "B"
+                                                )
+                                                    .charAt(0)
+                                                    .toUpperCase()}
+                                            </div>
+
+                                            <p className="mt-3 font-semibold">
+                                                {featuredMatch?.teamB}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* DETAILS */}
+                                <div className="flex items-center justify-between mt-5 text-sm text-gray-400">
+
+                                    <div className="flex items-center gap-2">
+                                        <AccessTime className="text-[18px]!" />
+                                        {featuredMatch?.time}
+                                    </div>
+
+                                    <div className="flex items-center gap-2">
+                                        <Stadium className="text-[18px]!" />
+                                        {featuredMatch?.location}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </section>
 
-            {/* Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {/* STATS */}
+            <section className="grid grid-cols-2 xl:grid-cols-4 gap-5 mt-8">
+
                 <StatCard
-                    label="Tournaments"
-                    value="128"
-                    icon={<EmojiEventsIcon />}
+                    title="Tournaments"
+                    value={String(tournaments.length)}
+                    icon={<EmojiEvents />}
+                    glow="from-cyan-500/20 to-blue-500/10"
                 />
                 <StatCard
-                    label="Active Tournaments"
-                    value="14"
-                    icon={<EmojiEventsIcon />}
+                    title="Matches"
+                    value={String(filteredMatches.length)}
+                    icon={<TrendingUp />}
+                    glow="from-orange-500/20 to-yellow-500/10"
                 />
-                <StatCard
-                    label="Active Matches"
-                    value="4"
-                    icon={<GroupsIcon />}
-                />
-                <StatCard
-                    label="Teams"
-                    value="14"
-                    icon={<SportsEsportsIcon />}
-                />
-            </div>
 
-            {/* Active Tournaments */}
-            <div>
-                <h3 className="text-lg font-semibold mb-4 bg-linear-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">
-                    Active Tournaments
-                </h3>
 
-                <div className="relative group bg-gradient-to-b from-[#111827] to-[#0B0F19]  rounded-2xl p-6 border border-gray-800 
-        hover:border-purple-400/40 transition overflow-hidden">
 
-                    {/* Glow Layer */}
-                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition 
-            bg-linear-to-r from-cyan-500/10 to-purple-500/10 blur-xl" />
+            </section>
 
-                    {/* Top Row */}
-                    <div className="flex justify-between items-start relative z-10">
+            {/* GRID */}
+            <section className="grid xl:grid-cols-[1.2fr_0.8fr] gap-8 mt-10">
+
+                {/* TOURNAMENTS */}
+                <div className="rounded-[32px] border border-white/10 bg-[#0F172A] p-6">
+
+                    <div className="flex items-center justify-between mb-8">
+
                         <div>
-                            <p className="text-xs text-gray-500 uppercase tracking-wide">
-                                Tournament
+                            <p className="text-sm uppercase tracking-[0.3em] text-cyan-300">
+                                Tournaments
                             </p>
 
-                            <h4 className="text-xl sm:text-2xl font-bold mt-1">
-                                Neon Strike Masters
-                            </h4>
+                            <h2 className="text-2xl font-black mt-2">
+                                Active Competitions
+                            </h2>
                         </div>
 
-                        {/* Status Badge */}
-                        <span className="px-3 py-1 text-xs rounded-full 
-                bg-green-400/10 text-green-400 border border-green-400/20">
-                            Live
-                        </span>
-                    </div>
-
-                    {/* Divider */}
-                    <div className="my-4 h-[1px] bg-gray-800" />
-
-                    {/* Bottom Row */}
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
-
-                        {/* Left Info */}
-                        <div className="flex items-center gap-6 text-sm text-gray-400">
-                            <div>
-                                <p className="text-xs">Stage</p>
-                                <p className="text-white font-medium">Round 3</p>
-                            </div>
-
-                            <div>
-                                <p className="text-xs">Teams</p>
-                                <p className="text-white font-medium">16</p>
-                            </div>
-
-                            <div>
-                                <p className="text-xs">Matches</p>
-                                <p className="text-white font-medium">8 Active</p>
-                            </div>
-                        </div>
-
-                        {/* CTA */}
-                        <Link href='/admin/Tournaments' className="group/btn flex items-center gap-2 text-sm font-medium">
-                            <span className="bg-linear-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">
-                                View All
-                            </span>
-
-                            <span className="transform group-hover/btn:translate-x-1 transition">
-                                →
-                            </span>
+                        <Link
+                            href="/admin/Tournaments"
+                            className="flex items-center gap-2 text-sm text-cyan-300 hover:text-white transition"
+                        >
+                            View All
+                            <ArrowOutward className="text-[18px]!" />
                         </Link>
                     </div>
+
+                    <div className="space-y-4">
+
+                        {filteredTournaments
+                            ?.slice(0, 3)
+                            .map((tournament) => (
+
+                                <div
+                                    key={tournament.id}
+                                    className="group relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-b from-[#111827] to-[#0B0F19] p-5 hover:border-cyan-400/40 transition"
+                                >
+
+                                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition bg-gradient-to-r from-cyan-500/10 to-purple-500/10 blur-2xl" />
+
+                                    <div className="relative z-10 flex items-start justify-between gap-5">
+
+                                        <div className="flex items-start gap-4">
+
+                                            <div className="h-14 w-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center">
+                                                <EmojiEvents className="text-yellow-400" />
+                                            </div>
+
+                                            <div>
+                                                <h3 className="font-bold text-lg">
+                                                    {tournament.name}
+                                                </h3>
+
+                                                <p className="text-sm text-gray-400 mt-1">
+                                                    {tournament.location}
+                                                </p>
+
+                                                <div className="flex items-center gap-6 mt-4 text-sm text-gray-400">
+
+                                                    <div>
+                                                        <p className="text-xs">
+                                                            Teams
+                                                        </p>
+
+                                                        <p className="text-white font-semibold">
+                                                            {tournament
+                                                                .teams
+                                                                ?.length || 0}
+                                                        </p>
+                                                    </div>
+
+                                                    <div>
+                                                        <p className="text-xs">
+                                                            Start Date
+                                                        </p>
+
+                                                        <p className="text-white font-semibold">
+                                                            {tournament.startDate}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <span className="px-3 py-1 rounded-full text-xs uppercase border bg-green-500/10 border-green-500/20 text-green-400">
+                                            {tournament.status}
+                                        </span>
+                                    </div>
+                                </div>
+                            ))}
+                    </div>
                 </div>
-            </div>
 
-            {/* Upcoming Matches */}
-            <div>
-                <h3 className="text-lg font-semibold mb-4 bg-linear-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">
-                    Upcoming Matches
-                </h3>
+                {/* MATCHES */}
+                <div className="rounded-[32px] border border-white/10 bg-[#0F172A] p-6">
 
-                <div className="relative group bg-gradient-to-b from-[#111827] to-[#0B0F19]  rounded-2xl p-5 border border-gray-800 
-        hover:border-cyan-400/40 transition flex justify-between items-center overflow-hidden">
+                    <div className="flex items-center justify-between mb-8">
 
-                    {/* Glow hover effect */}
-                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition 
-            bg-linear-to-r from-cyan-500/10 to-purple-500/10 blur-xl" />
+                        <div>
+                            <p className="text-sm uppercase tracking-[0.3em] text-purple-300">
+                                Live Matches
+                            </p>
 
-                    {/* Left Content */}
-                    <div className="relative z-10">
-                        <p className="text-xs text-gray-500 tracking-wide uppercase">
-                            Match #32
-                        </p>
+                            <h2 className="text-2xl font-black mt-2">
+                                Match Center
+                            </h2>
+                        </div>
 
-                        <h4 className="font-semibold text-lg mt-1">
-                            Cyber Circuit Pro
-                        </h4>
-
-                        {/* Optional status badge */}
-                        <span className="inline-block mt-2 px-3 py-1 text-xs rounded-full 
-                bg-cyan-400/10 text-cyan-400 border border-cyan-400/20">
-                            Upcoming
-                        </span>
+                        <Link
+                            href="/admin/Match"
+                            className="flex items-center gap-2 text-sm text-purple-300 hover:text-white transition"
+                        >
+                            View All
+                            <ArrowOutward className="text-[18px]!" />
+                        </Link>
                     </div>
 
-                    {/* Right Content */}
-                    <div className="relative z-10 text-right">
-                        <p className="text-sm text-gray-400">Tomorrow</p>
-                        <p className="text-lg font-semibold">8:00 PM</p>
+                    <div className="space-y-4">
+
+                        {filteredMatches
+                            ?.slice(0, 4)
+                            .map((match) => (
+
+                                <div
+                                    key={match.id}
+                                    className="group rounded-3xl border border-white/10 bg-gradient-to-r from-[#111827] to-[#0D1524] p-5 hover:border-purple-400/40 transition"
+                                >
+
+                                    <div className="flex items-center justify-between">
+
+                                        <div>
+
+                                            <div className="flex items-center gap-3">
+
+                                                <span className="text-lg font-black">
+                                                    {match.teamA}
+                                                </span>
+
+                                                <span className="text-gray-500">
+                                                    VS
+                                                </span>
+
+                                                <span className="text-lg font-black">
+                                                    {match.teamB}
+                                                </span>
+                                            </div>
+
+                                            <div className="flex items-center gap-4 mt-3 text-sm text-gray-400">
+
+                                                <span>
+                                                    {match.time}
+                                                </span>
+
+                                                <span>
+                                                    {match.location}
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <div className="text-right">
+
+                                            <h2 className="text-3xl font-black">
+                                                {match.scoreA}:{match.scoreB}
+                                            </h2>
+
+                                            <span className="text-xs uppercase text-green-400">
+                                                {match.status}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
                     </div>
                 </div>
-            </div>
-        </div>
+            </section>
+        </main>
     );
 }
 
-/*  STAT CARD  */
+/* STAT CARD */
 
 function StatCard({
-    label,
+    title,
     value,
     icon,
+    glow,
 }: {
-    label: string;
+    title: string;
     value: string;
     icon: React.ReactNode;
+    glow: string;
 }) {
     return (
-        <div className="relative bg-[#111827] p-5 rounded-2xl border border-gray-800 
-            hover:border-cyan-400/40 transition group overflow-hidden">
+        <div className="group relative overflow-hidden rounded-[28px] border border-white/10 bg-[#0F172A] p-5">
 
-            {/* glow */}
-            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition 
-                bg-linear-to-r from-cyan-500/10 to-purple-500/10 blur" />
+            <div
+                className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition bg-gradient-to-r ${glow} blur-2xl`}
+            />
 
-            <div className="relative z-10 flex flex-col gap-2">
-                <div className="text-cyan-400">
-                    {icon}
+            <div className="relative z-10">
+
+                <div className="flex items-center justify-between">
+
+                    <div className="h-12 w-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-cyan-300">
+                        {icon}
+                    </div>
+
+                    <TrendingUp className="text-green-400 text-[20px]!" />
                 </div>
 
-                <p className="text-gray-400 text-sm">{label}</p>
+                <p className="text-sm text-gray-400 mt-5">
+                    {title}
+                </p>
 
-                <h2 className="text-xl sm:text-2xl font-bold">
+                <h2 className="text-3xl font-black mt-2">
                     {value}
                 </h2>
             </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import {
     EmojiEvents,
@@ -52,11 +52,25 @@ export default function Page() {
     } = useTournamentInfo();
 
     /* HERO MATCH */
+    const [currentHeroIndex, setCurrentHeroIndex] = useState(0);
+
+    useEffect(() => {
+        if (!filteredMatches?.length) return;
+
+        const interval = setInterval(() => {
+            setCurrentHeroIndex((prev) => (prev + 1) % filteredMatches.length);
+        }, 5000);
+
+        return () => clearInterval(interval);
+    }, [filteredMatches?.length]); // 👈 better dependency
+
     const heroMatch = useMemo(() => {
         if (!filteredMatches?.length) return null;
 
-        return filteredMatches[0];
-    }, [filteredMatches]);
+        const safeIndex = currentHeroIndex % filteredMatches.length;
+
+        return filteredMatches[safeIndex];
+    }, [filteredMatches, currentHeroIndex]);
 
     /* LIMIT */
     const homeMatches = filteredMatches?.slice(0, 4);
@@ -199,7 +213,7 @@ export default function Page() {
                 </section>
 
                 {/* TABS */}
-                <section className="mt-10 md:p-4">
+                <section className="mt-10 md:p-0 p-4">
 
                     <div className="flex items-center gap-3 overflow-x-auto border-b border-white/10 pb-3">
 
