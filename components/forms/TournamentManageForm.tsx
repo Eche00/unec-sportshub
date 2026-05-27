@@ -5,6 +5,7 @@ import {
     SportsSoccer,
     Edit,
     Add,
+    Search,
 } from "@mui/icons-material";
 
 import Button from "../ui/Button";
@@ -18,12 +19,16 @@ import useTournamentInfo, {
     Tournament,
 } from "@/utils/logics/usetournamentinfo";
 import useMatchesInfo from "@/utils/logics/usematchesinfo";
+import TournamentsSkeleton from "../ui/skeletons/TournamentsSkeleton";
 
 export default function TournamentManageForm() {
 
     const {
+        filteredTournaments,
         tournaments,
         loading,
+        search,
+        setSearch
     } = useTournamentInfo();
     const {
         statusStyles,
@@ -55,7 +60,8 @@ export default function TournamentManageForm() {
 
         return "Final Stage";
     };
-
+    const hasTournaments = tournaments.length > 0;
+    const isSearching = search.trim().length > 0;
     // UI
     return (
         <div className="min-h-screen text-white space-y-6">
@@ -81,19 +87,23 @@ export default function TournamentManageForm() {
             <section className="space-y-4 pt-6 border-t border-gray-800">
 
                 {/* LOADING */}
-                {loading && (
-                    <div className="flex items-center justify-center py-10">
-                        <p className="text-sm text-gray-400">
-                            Loading tournaments...
-                        </p>
-                    </div>
-                )}
-
+                {loading && <TournamentsSkeleton />}
+                {/*  Search Bar */}
+                <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <input
+                        type="text"
+                        placeholder="Search by name or status..."
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        className="w-full pl-10 pr-4 py-3 rounded-xl bg-[#1F2933] border border-gray-800 text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                    />
+                </div>
                 {/* LIST */}
                 <div className="flex flex-col md:grid md:grid-cols-2 gap-4">
 
-                    {!loading && tournaments.length > 0 ? (
-                        tournaments.map((tournament) => {
+                    {!loading && filteredTournaments.length > 0 ? (
+                        filteredTournaments.map((tournament) => {
 
                             const stage = getTournamentStage(tournament);
 
@@ -205,29 +215,36 @@ export default function TournamentManageForm() {
                         })
                     ) : !loading ? (
 
-                        /* EMPTY STATE */
-                        <div className="flex flex-col items-center justify-center text-center border border-dashed border-gray-700 rounded-xl p-10 bg-[#0F1115]">
+                        /* EMPTY/SEARCH STATE */
+                        <div className="sm:col-span-2 flex flex-col items-center justify-center text-center border border-dashed border-gray-700 rounded-xl p-10 bg-[#0F1115] w-full mx-auto min-h-[300px]">
 
                             <div className="p-3 rounded-full bg-white/5 border border-gray-700 mb-4">
                                 <SportsSoccer className="text-gray-300" />
                             </div>
 
+                            {/* DYNAMIC TITLE */}
                             <h3 className="text-sm font-semibold text-gray-200 mb-1">
-                                No tournaments yet
+                                {hasTournaments
+                                    ? "No tournaments found"
+                                    : "No tournaments yet"}
                             </h3>
 
+                            {/* DYNAMIC MESSAGE */}
                             <p className="text-xs text-gray-400 mb-4 max-w-xs">
-                                You haven’t created any tournaments. Start by creating one to manage teams.
+                                {hasTournaments
+                                    ? `No tournaments match "${search}". Try a different keyword.`
+                                    : "No tournaments have been created yet. Come back later."}
                             </p>
 
-                            <Button
-                                variant="secondary"
-                                onClick={() => setCreateTournament(true)}
-                                className="flex items-center gap-2"
-                            >
-                                <Add />
-                                Create Tournament
-                            </Button>
+                            {/* OPTIONAL RESET */}
+                            {isSearching && (
+                                <button
+                                    onClick={() => setSearch("")}
+                                    className="text-xs text-blue-400  cursor-pointer"
+                                >
+                                    Clear search
+                                </button>
+                            )}
                         </div>
                     ) : null}
                 </div>

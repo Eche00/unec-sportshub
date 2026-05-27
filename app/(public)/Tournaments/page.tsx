@@ -2,6 +2,7 @@
 
 import StandingsTable from "@/components/table/StandingsTable";
 import Button from "@/components/ui/Button";
+import TournamentsSkeleton from "@/components/ui/skeletons/TournamentsSkeleton";
 import useMatchesInfo from "@/utils/logics/usematchesinfo";
 import useTournamentInfo, { Tournament } from "@/utils/logics/usetournamentinfo";
 import { Add, Edit, Search, SportsSoccer } from "@mui/icons-material";
@@ -15,7 +16,10 @@ export default function Page() {
 
     const {
         tournaments,
+        filteredTournaments,
         loading,
+        search,
+        setSearch
     } = useTournamentInfo();
     const {
         statusStyles,
@@ -40,6 +44,8 @@ export default function Page() {
 
         return "Final Stage";
     };
+    const hasTournaments = tournaments.length > 0;
+    const isSearching = search.trim().length > 0;
     return (
         <div className="min-h-screen sm:p-6 mt-22">
             <div className="max-w-[90%] mx-auto space-y-6">
@@ -48,30 +54,23 @@ export default function Page() {
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                     <input
                         type="text"
-                        placeholder="Search teams..."
-                        // value={search}
-                        // onChange={(e) => setSearch(e.target.value)}
+                        placeholder="Search by name or status..."
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
                         className="w-full pl-10 pr-4 py-3 rounded-xl bg-[#1F2933] border border-gray-800 text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
                     />
                 </div>
                 {/* Tournament List */}
-                {/* OVERVIEW */}
                 <section className="space-y-4 pt-6 border-t border-gray-800">
 
                     {/* LOADING */}
-                    {loading && (
-                        <div className="flex items-center justify-center py-10">
-                            <p className="text-sm text-gray-400">
-                                Loading tournaments...
-                            </p>
-                        </div>
-                    )}
+                    {loading && <TournamentsSkeleton />}
 
                     {/* LIST */}
                     <div className="flex flex-col sm:grid sm:grid-cols-2 gap-4">
 
-                        {!loading && tournaments.length > 0 ? (
-                            tournaments.map((tournament) => {
+                        {!loading && filteredTournaments.length > 0 ? (
+                            filteredTournaments.map((tournament) => {
 
                                 const stage = getTournamentStage(tournament);
 
@@ -174,45 +173,42 @@ export default function Page() {
                             })
                         ) : !loading ? (
 
-                            /* EMPTY STATE */
-                            <div className="flex flex-col items-center justify-center text-center border border-dashed border-gray-700 rounded-xl p-10 bg-[#0F1115]">
+                            //  EMPTY / SEARCH STATE 
+                            <div className="sm:col-span-2 flex flex-col items-center justify-center text-center border border-dashed border-gray-700 rounded-xl p-10 bg-[#0F1115] w-full mx-auto min-h-[300px]">
 
                                 <div className="p-3 rounded-full bg-white/5 border border-gray-700 mb-4">
                                     <SportsSoccer className="text-gray-300" />
                                 </div>
 
+                                {/* DYNAMIC TITLE */}
                                 <h3 className="text-sm font-semibold text-gray-200 mb-1">
-                                    No tournaments yet
+                                    {hasTournaments
+                                        ? "No tournaments found"
+                                        : "No tournaments yet"}
                                 </h3>
 
+                                {/* DYNAMIC MESSAGE */}
                                 <p className="text-xs text-gray-400 mb-4 max-w-xs">
-                                    You haven’t created any tournaments. Start by creating one to manage teams.
+                                    {hasTournaments
+                                        ? `No tournaments match "${search}". Try a different keyword.`
+                                        : "No tournaments have been created yet. Come back later."}
                                 </p>
 
-
+                                {/* OPTIONAL RESET */}
+                                {isSearching && (
+                                    <button
+                                        onClick={() => setSearch("")}
+                                        className="text-xs text-blue-400  cursor-pointer"
+                                    >
+                                        Clear search
+                                    </button>
+                                )}
                             </div>
-                        ) : (
-                            /* EMPTY STATE */
-                            <div className="flex flex-col items-center justify-center text-center border border-dashed border-gray-700 rounded-xl p-10 bg-[#0F1115]">
-                                <div className="p-3 rounded-full bg-white/5 border border-gray-700 mb-4">
-                                    <SportsSoccer className="text-gray-300" />
-                                </div>
-
-                                <h3 className="text-sm font-semibold text-gray-200 mb-1">
-                                    No tournaments yet
-                                </h3>
-
-                                <p className="text-xs text-gray-400 mb-4 max-w-xs">
-                                    No tournaments has been created at the moment. Kindly Come back later for more..
-                                </p>
-
-
-                            </div>
-                        )}
+                        ) : null}
                     </div>
                 </section>
 
-                {/* Open MODAL */}
+                {/* Open MODAL  */}
                 <AnimatePresence>
                     {openTournament && selectedTournament && (
                         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">

@@ -104,7 +104,7 @@ const useTournamentInfo = () => {
 
     const [tournaments, setTournaments] = useState<Tournament[]>([]);
     const [tournament, setTournament] = useState<Tournament | null>(null);
-
+    const [search, setSearch] = useState("");
     /* MATCH STATE (ADDED) */
     const [matches, setMatches] = useState<Matches[]>([]);
 
@@ -155,6 +155,15 @@ const useTournamentInfo = () => {
         return () => unsubscribe();
     }, []);
 
+    const filteredTournaments = tournaments.filter((tournament) => {
+        const query = search.toLowerCase();
+
+        return (
+            tournament.name?.toLowerCase().includes(query) ||
+            tournament.status?.toLowerCase().includes(query)
+
+        );
+    });
     /* REALTIME LIST (MATCHES - ADDED) */
 
     useEffect(() => {
@@ -398,7 +407,8 @@ const useTournamentInfo = () => {
 
         tournaments,
         tournament,
-
+        search,
+        setSearch,
         setTournament,
         setTournaments,
 
@@ -441,6 +451,7 @@ const useTournamentInfo = () => {
 
         getTournamentStatus,
         getTournamentStage,
+        filteredTournaments
     };
 };
 
