@@ -19,8 +19,10 @@ import { db } from "@/lib/firebase";
 
 /* TYPES */
 
-export type Team = {
+type Team = {
+    id: string;
     name: string;
+    eliminated: boolean;
     played: number;
     won: number;
     drawn: number;
@@ -264,7 +266,9 @@ const useTournamentInfo = () => {
             return toast.error("Team limit reached");
 
         const newTeam: Team = {
+            id: Date.now().toString(),
             name: trimmed,
+            eliminated: false,
             played: 0,
             won: 0,
             drawn: 0,

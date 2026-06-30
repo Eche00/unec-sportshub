@@ -108,65 +108,117 @@ function StandingsTable({ tournament, onClose }: Props) {
 
                     {/*  STANDINGS  */}
                     {activeTab === "standings" ? (
-                        <div className="rounded-xl border border-gray-800 overflow-hidden">
-                            <table className="w-full text-sm text-left">
-                                <thead className="bg-[#0F1115] text-gray-400 text-xs uppercase">
-                                    <tr>
-                                        <th className="p-3">#</th>
-                                        <th className="p-3">Team</th>
-                                        <th className="p-3">MP</th>
-                                        <th className="p-3">W</th>
-                                        <th className="p-3">D</th>
-                                        <th className="p-3">L</th>
-                                        <th className="p-3">GF</th>
-                                        <th className="p-3">GA</th>
-                                        <th className="p-3">Pts</th>
-                                    </tr>
-                                </thead>
+                        tournament.settings?.format === "group" ? (
+                            <div className="rounded-xl border border-gray-800 overflow-hidden">
+                                <table className="w-full text-sm text-left">
+                                    <thead className="bg-[#0F1115] text-gray-400 text-xs uppercase">
+                                        <tr>
+                                            <th className="p-3">#</th>
+                                            <th className="p-3">Team</th>
+                                            <th className="p-3">MP</th>
+                                            <th className="p-3">W</th>
+                                            <th className="p-3">D</th>
+                                            <th className="p-3">L</th>
+                                            <th className="p-3">GF</th>
+                                            <th className="p-3">GA</th>
+                                            <th className="p-3">Pts</th>
+                                        </tr>
+                                    </thead>
 
-                                <tbody>
-                                    {[...tournament.teams]
-                                        .sort((a, b) => {
-                                            //  Points
-                                            if ((b.points ?? 0) !== (a.points ?? 0)) {
-                                                return (b.points ?? 0) - (a.points ?? 0);
-                                            }
+                                    <tbody>
+                                        {[...tournament.teams]
+                                            .sort((a, b) => {
+                                                if ((b.points ?? 0) !== (a.points ?? 0)) {
+                                                    return (b.points ?? 0) - (a.points ?? 0);
+                                                }
 
-                                            //  Goal Difference
-                                            const bGD = (b.goalsFor ?? 0) - (b.goalsAgainst ?? 0);
-                                            const aGD = (a.goalsFor ?? 0) - (a.goalsAgainst ?? 0);
+                                                const bGD =
+                                                    (b.goalsFor ?? 0) - (b.goalsAgainst ?? 0);
+                                                const aGD =
+                                                    (a.goalsFor ?? 0) - (a.goalsAgainst ?? 0);
 
-                                            if (bGD !== aGD) {
-                                                return bGD - aGD;
-                                            }
+                                                if (bGD !== aGD) return bGD - aGD;
 
-                                            //  Goals Scored
-                                            if ((b.goalsFor ?? 0) !== (a.goalsFor ?? 0)) {
-                                                return (b.goalsFor ?? 0) - (a.goalsFor ?? 0);
-                                            }
+                                                if ((b.goalsFor ?? 0) !== (a.goalsFor ?? 0)) {
+                                                    return (b.goalsFor ?? 0) - (a.goalsFor ?? 0);
+                                                }
 
-                                            // alphabetical fallback (keeps UI stable)
-                                            return a.name.localeCompare(b.name);
-                                        })
-                                        .map((team, index) => (
-                                            <tr
+                                                return a.name.localeCompare(b.name);
+                                            })
+                                            .map((team, index) => (
+                                                <tr
+                                                    key={team.id ?? index}
+                                                    className="border-t border-gray-800 hover:bg-white/5"
+                                                >
+                                                    <td className="p-3">{index + 1}</td>
+                                                    <td className="p-3 text-gray-200">{team.name}</td>
+                                                    <td className="p-3">{team.played}</td>
+                                                    <td className="p-3">{team.won ?? "-"}</td>
+                                                    <td className="p-3">{team.drawn ?? "-"}</td>
+                                                    <td className="p-3">{team.lost ?? "-"}</td>
+                                                    <td className="p-3">{team.goalsFor ?? "-"}</td>
+                                                    <td className="p-3">{team.goalsAgainst ?? "-"}</td>
+                                                    <td className="p-3 font-bold">
+                                                        {team.points ?? 0}
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        ) : (
+                            <div className="space-y-6">
+                                <h3 className="text-lg font-semibold text-white">
+                                    Knockout Bracket
+                                </h3>
+
+                                <div className="grid gap-4">
+                                    {Array.from({
+                                        length: Math.ceil(tournament.teams.length / 2),
+                                    }).map((_, index) => {
+                                        const teamA = tournament.teams[index * 2];
+                                        const teamB = tournament.teams[index * 2 + 1];
+
+                                        return (
+                                            <div
                                                 key={index}
-                                                className="border-t border-gray-800 hover:bg-white/5"
+                                                className="rounded-xl border border-gray-800 bg-[#111827] p-4"
                                             >
-                                                <td className="p-3">{index + 1}</td>
-                                                <td className="p-3 text-gray-200">{team.name}</td>
-                                                <td className="p-3">{team.played}</td>
-                                                <td className="p-3">{team.won ?? "-"}</td>
-                                                <td className="p-3">{team.drawn ?? "-"}</td>
-                                                <td className="p-3">{team.lost ?? "-"}</td>
-                                                <td className="p-3">{team.goalsFor ?? "-"}</td>
-                                                <td className="p-3">{team.goalsAgainst ?? "-"}</td>
-                                                <td className="p-3 font-bold">{team.points}</td>
-                                            </tr>
-                                        ))}
-                                </tbody>
-                            </table>
-                        </div>
+                                                <div className="flex items-center justify-between mb-3">
+                                                    <span className="text-xs uppercase text-gray-400">
+                                                        Match {index + 1}
+                                                    </span>
+
+                                                    <span className="px-2 py-1 rounded-full bg-yellow-500/10 text-yellow-400 text-xs">
+                                                        Awaiting Draw
+                                                    </span>
+                                                </div>
+
+                                                <div className="space-y-2">
+                                                    <div className="flex justify-between items-center rounded-lg bg-[#1F2937] px-3 py-2">
+                                                        <span>{teamA?.name ?? "TBD"}</span>
+                                                        <span className="text-gray-500">—</span>
+                                                    </div>
+
+                                                    <div className="text-center text-gray-500 text-xs">
+                                                        VS
+                                                    </div>
+
+                                                    <div className="flex justify-between items-center rounded-lg bg-[#1F2937] px-3 py-2">
+                                                        <span>{teamB?.name ?? "TBD"}</span>
+                                                        <span className="text-gray-500">—</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+
+                                <p className="text-center text-sm text-gray-500">
+                                    Matchups will be generated once the tournament draw is completed.
+                                </p>
+                            </div>
+                        )
                     ) : (
                         <div className="flex flex-col gap-4">
 
