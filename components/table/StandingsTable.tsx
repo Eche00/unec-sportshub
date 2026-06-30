@@ -173,45 +173,34 @@ function StandingsTable({ tournament, onClose }: Props) {
                                 </h3>
 
                                 <div className="grid gap-4">
-                                    {Array.from({
-                                        length: Math.ceil(tournament.teams.length / 2),
-                                    }).map((_, index) => {
-                                        const teamA = tournament.teams[index * 2];
-                                        const teamB = tournament.teams[index * 2 + 1];
+                                    {tournament.teams.map((team, index) => (
+                                        <div
+                                            key={team.id}
+                                            className="rounded-xl border border-gray-800 bg-[#111827] p-4"
+                                        >
+                                            <div className="flex items-center justify-between mb-3">
+                                                <span className="text-xs uppercase text-gray-400">
+                                                    Team {index + 1}
+                                                </span>
 
-                                        return (
-                                            <div
-                                                key={index}
-                                                className="rounded-xl border border-gray-800 bg-[#111827] p-4"
-                                            >
-                                                <div className="flex items-center justify-between mb-3">
-                                                    <span className="text-xs uppercase text-gray-400">
-                                                        Match {index + 1}
+                                                <span className="px-2 py-1 rounded-full bg-yellow-500/10 text-yellow-400 text-xs font-medium">
+                                                    Awaiting Draw
+                                                </span>
+                                            </div>
+
+                                            <div className="rounded-lg bg-[#1F2937] px-4 py-3">
+                                                <div className="flex items-center justify-between">
+                                                    <span className="text-white font-medium">
+                                                        {team.name}
                                                     </span>
 
-                                                    <span className="px-2 py-1 rounded-full bg-yellow-500/10 text-yellow-400 text-xs">
-                                                        Awaiting Draw
+                                                    <span className="text-gray-500 text-sm">
+                                                        Opponent TBD
                                                     </span>
-                                                </div>
-
-                                                <div className="space-y-2">
-                                                    <div className="flex justify-between items-center rounded-lg bg-[#1F2937] px-3 py-2">
-                                                        <span>{teamA?.name ?? "TBD"}</span>
-                                                        <span className="text-gray-500">—</span>
-                                                    </div>
-
-                                                    <div className="text-center text-gray-500 text-xs">
-                                                        VS
-                                                    </div>
-
-                                                    <div className="flex justify-between items-center rounded-lg bg-[#1F2937] px-3 py-2">
-                                                        <span>{teamB?.name ?? "TBD"}</span>
-                                                        <span className="text-gray-500">—</span>
-                                                    </div>
                                                 </div>
                                             </div>
-                                        );
-                                    })}
+                                        </div>
+                                    ))}
                                 </div>
 
                                 <p className="text-center text-sm text-gray-500">
