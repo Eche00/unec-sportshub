@@ -19,7 +19,7 @@ import { db } from "@/lib/firebase";
 
 /* TYPES */
 
-type Team = {
+export type Team = {
     id: string;
     name: string;
     eliminated: boolean;
