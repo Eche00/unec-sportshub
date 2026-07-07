@@ -30,6 +30,9 @@ function TournamentForm({
         location,
         setLocation,
 
+        category,
+        setCategory,
+
         format,
         setFormat,
 
@@ -144,6 +147,39 @@ function TournamentForm({
                     />
                 </div>
 
+                {/* Category */}
+                <div className="mb-6">
+
+                    <label className="text-sm text-gray-300 mb-1 block">
+                        Tournament Category
+                    </label>
+
+                    <select
+                        value={category}
+                        onChange={(e) =>
+                            setCategory(
+                                e.target.value as
+                                | "football"
+                                | "basketball"
+                                | "volleyball"
+                            )
+                        }
+                        className="w-full bg-[#0F1115] border border-gray-700 rounded-lg p-2 text-sm"
+                    >
+                        <option value="football">
+                            Football
+                        </option>
+
+                        <option value="basketball">
+                            Basketball
+                        </option>
+
+                        <option value="volleyball">
+                            Volleyball
+                        </option>
+                    </select>
+
+                </div>
                 {/* Dates */}
                 <div className="grid grid-cols-2 gap-4 mb-6">
 

@@ -3,8 +3,9 @@
 import { useEffect, useMemo, useState } from "react";
 
 import {
-    EmojiEvents,
+    SportsBasketball,
     SportsSoccer,
+    SportsVolleyball,
 } from "@mui/icons-material";
 
 import SearchIcon from "@mui/icons-material/Search";
@@ -127,7 +128,7 @@ export default function Page() {
                             <h1 className="text-4xl sm:text-6xl font-black leading-tight italic">
                                 LIVE
                                 <br />
-                                FOOTBALL
+                                Sports
                             </h1>
 
                             <p className="mt-5 text-gray-300 max-w-lg text-sm sm:text-base leading-relaxed">
@@ -204,7 +205,9 @@ export default function Page() {
                                     </div>
 
                                     <div className="h-11 w-11 rounded-full bg-purple-500/30 flex items-center justify-center border border-purple-400/30">
-                                        <SportsSoccer />
+                                        <SportsSoccer fontSize="small" />
+                                        <SportsBasketball fontSize="small" />
+                                        <SportsVolleyball fontSize="small" />
                                     </div>
                                 </div>
                             </div>
@@ -258,6 +261,7 @@ export default function Page() {
                                             <MatchCard
                                                 key={match.id}
                                                 id={match.id}
+                                                category={match.category}
                                                 name={match.name}
                                                 teamA={match.teamA}
                                                 teamB={match.teamB}
@@ -320,13 +324,15 @@ export default function Page() {
                                                     <div className="flex items-center gap-3">
 
                                                         <div className="p-2 rounded-lg bg-white/5 border border-gray-700">
-                                                            <SportsSoccer className="text-gray-300" />
+                                                            {tournament?.category === "football" && <SportsSoccer className="text-gray-300" />}
+                                                            {tournament?.category === "basketball" && <SportsBasketball className="text-gray-300" />}
+                                                            {tournament?.category === "volleyball" && <SportsVolleyball className="text-gray-300" />}
                                                         </div>
 
                                                         <div>
 
                                                             <span className="text-sm font-medium text-gray-200 block">
-                                                                {tournament.name}
+                                                                {tournament.name} - {tournament.category}
                                                             </span>
 
                                                             {tournament.location && (

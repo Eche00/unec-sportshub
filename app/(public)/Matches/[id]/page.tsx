@@ -6,7 +6,7 @@ import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import RoomIcon from "@mui/icons-material/Room";
 
 import useMatchesInfo from "@/utils/logics/usematchesinfo";
-import { Comment, SportsSoccer } from "@mui/icons-material";
+import { Comment, SportsBasketball, SportsSoccer, SportsVolleyball } from "@mui/icons-material";
 import MatchesSkeleton from "@/components/ui/skeletons/MatchesSkeleton";
 
 export default function Page() {
@@ -38,9 +38,14 @@ export default function Page() {
 
                     {/* STATUS */}
                     <div className="flex justify-between items-center mb-6">
-                        <span className="text-xs uppercase tracking-wider text-gray-400">
-                            Match Status
-                        </span>
+                        <div className="flex items-center gap-2 capitalize text-[11px] text-gray-500">
+                            <div className="p-2 rounded-lg bg-white/5 border border-gray-700">
+                                {match.category === "football" && <SportsSoccer className="text-gray-300" />}
+                                {match.category === "basketball" && <SportsBasketball className="text-gray-300" />}
+                                {match.category === "volleyball" && <SportsVolleyball className="text-gray-300" />}
+                            </div>
+
+                        </div>
 
                         <span
                             className={`text-xs px-3 py-1 rounded-full border ${statusStyles[match.status]} flex items-center gap-2`}

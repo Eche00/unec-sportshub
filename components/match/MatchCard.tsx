@@ -12,6 +12,7 @@ import ManageMatches from "../table/ManageMatches";
 
 import useMatchesInfo, { Matches } from "@/utils/logics/usematchesinfo";
 import useTournamentInfo from "@/utils/logics/usetournamentinfo";
+import { SportsBasketball, SportsSoccer, SportsVolleyball } from "@mui/icons-material";
 
 type MatchCardProps = Matches & {
     onAdminClick?: (id: string) => void;
@@ -20,6 +21,8 @@ type MatchCardProps = Matches & {
 const MatchCard: React.FC<MatchCardProps> = ({
 
     id,
+
+    category,
 
     teamA,
     teamB,
@@ -74,27 +77,20 @@ const MatchCard: React.FC<MatchCardProps> = ({
                         )}
                         {status.toUpperCase()}
                     </span>
-
-                    {/* HALF INFO */}
-                    {/* {(status === "live" ||
-                        status === "halftime") && (
-                            <div className=" text-[11px] text-gray-500">
-
-                                {currentHalf === 1 &&
-                                    "First Half"}
-
-                                {currentHalf === 2 &&
-                                    "Second Half"}
-
-                                {status === "halftime" &&
-                                    " • Waiting for restart"}
-                            </div>
-                        )} */}
-
                     {tournamentId && tournaments.filter((t) => t.id === tournamentId).map((t) => (
-                        <div className=" text-[11px] text-gray-500">
+                        <p className=" text-[10px] text-gray-500 uppercase border-y border-gray-500 h-fit py-1">
                             {t.name}
-                        </div>))}
+                        </p>))}
+
+                    <div className="flex items-center gap-2 capitalize text-[11px] text-gray-500">{category}
+                        <div className="p-2 rounded-lg bg-white/5 border border-gray-700">
+                            {category === "football" && <SportsSoccer fontSize="small" className="text-gray-300" />}
+                            {category === "basketball" && <SportsBasketball fontSize="small" className="text-gray-300" />}
+                            {category === "volleyball" && <SportsVolleyball fontSize="small" className="text-gray-300" />}
+                        </div>
+
+                    </div>
+
                 </div>
 
                 {/* SCORE */}

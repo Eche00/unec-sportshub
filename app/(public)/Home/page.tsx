@@ -4,7 +4,9 @@ import { useState } from "react";
 
 import {
     EmojiEvents,
+    SportsBasketball,
     SportsSoccer,
+    SportsVolleyball,
 } from "@mui/icons-material";
 
 import useMatchesInfo from "@/utils/logics/usematchesinfo";
@@ -389,15 +391,17 @@ export default function Page() {
 
                                                     <div className="flex items-center gap-4">
 
-                                                        <div className="h-14 w-14 rounded-2xl bg-white/10 flex items-center justify-center border border-white/10">
-                                                            <EmojiEvents className="text-yellow-400" />
+                                                        <div className="p-2 rounded-lg bg-white/5 border border-gray-700">
+                                                            {tournament?.category === "football" && <SportsSoccer className="text-gray-300" />}
+                                                            {tournament?.category === "basketball" && <SportsBasketball className="text-gray-300" />}
+                                                            {tournament?.category === "volleyball" && <SportsVolleyball className="text-gray-300" />}
                                                         </div>
 
                                                         <div>
                                                             <h2 className="text-xl font-bold">
                                                                 {
                                                                     tournament.name
-                                                                }
+                                                                } - {tournament.category}
                                                             </h2>
 
                                                             <p className="text-sm text-gray-400 mt-1">

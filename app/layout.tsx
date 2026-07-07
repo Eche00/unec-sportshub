@@ -63,12 +63,12 @@ export const metadata: Metadata = {
     description:
       "Manage tournaments, teams, fixtures, standings, and live matches with UNEC Sports Hub.",
 
-    url: "https://unecsportshub.com", // Replace with your domain
+    url: "https://unecsportshub.com", // Replace with  domain
     siteName: "UNEC Sports Hub",
 
     images: [
       {
-        url: "/og-image.png", // Place this image in /public
+        url: "/logo.png",
         width: 1200,
         height: 630,
         alt: "UNEC Sports Hub",

@@ -19,8 +19,9 @@ import {
 import toast from "react-hot-toast";
 
 import { db } from "@/lib/firebase";
+import useTournamentInfo from "./usetournamentinfo";
 
-/* TYPES */
+//  TYPES 
 export type CreateMatchFormProps = {
     onClose: () => void;
     tournamentId?: string;
@@ -29,6 +30,8 @@ export interface Matches {
     id: string;
 
     name: string;
+
+    category: "football" | "basketball" | "volleyball";
 
     teamA: string;
     teamB: string;
@@ -56,7 +59,18 @@ export interface Matches {
     events?: MatchEvent[];
 
     tournamentId?: string;
+    round?:
+    | "Round of 32"
+    | "Round of 16"
+    | "Quarter Final"
+    | "Semi Final"
+    | "Third Place"
+    | "Final";
+
+    winner?: string;
+    nextMatchId?: string;
 }
+
 
 export type MatchEvent = {
     id: string;
@@ -76,18 +90,19 @@ export type MatchEvent = {
     text?: string;
 };
 
-/* HOOK */
+//  HOOK 
 
 const useMatchesInfo = (
     onClose?: () => void,
     matchId?: string
 ) => {
+    const { tournaments } = useTournamentInfo();
 
     const router = useRouter();
 
     const pathname = usePathname();
 
-    /* STATES */
+    //  STATES 
 
     const [match, setMatch] =
         useState<Matches | null>(null);
@@ -99,7 +114,7 @@ const useMatchesInfo = (
         useState(true);
     const [useTournament, setUseTournament] = useState(false);
     const [selectedTournamentId, setSelectedTournamentId] = useState("");
-    /* SEARCH / UI STATES */
+    //  SEARCH / UI STATES 
 
     const [search, setSearch] =
         useState("");
@@ -110,7 +125,7 @@ const useMatchesInfo = (
     const [manageMatches, setManageMatches] =
         useState(false);
 
-    /* EVENTS */
+    //  EVENTS 
 
     const [events, setEvents] =
         useState<MatchEvent[]>([]);
@@ -120,7 +135,7 @@ const useMatchesInfo = (
             type: "goal",
         });
 
-    /* FORM STATES */
+    //  FORM STATES 
 
     const [teamA, setTeamA] =
         useState("");
@@ -130,6 +145,10 @@ const useMatchesInfo = (
 
     const [location, setLocation] =
         useState("");
+
+    const [category, setCategory] = useState<
+        "football" | "basketball" | "volleyball"
+    >("football");
 
     const [date, setDate] =
         useState("");
@@ -145,12 +164,12 @@ const useMatchesInfo = (
             | "halftime"
         >("upcoming");
 
-    /* FIREBASE */
+    //  FIREBASE
 
     const matchesRef =
         collection(db, "matches");
 
-    /* REALTIME MATCHES */
+    //  REALTIME MATCHES
 
     useEffect(() => {
 
@@ -190,7 +209,7 @@ const useMatchesInfo = (
 
     }, []);
 
-    /* CURRENT MATCH */
+    //  CURRENT MATCH
 
     const currentMatch = useMemo(
         () =>
@@ -201,7 +220,7 @@ const useMatchesInfo = (
         [matches, matchId]
     );
 
-    /* SYNC MATCH */
+    //  SYNC MATCH
 
     useEffect(() => {
 
@@ -216,7 +235,7 @@ const useMatchesInfo = (
 
     }, [currentMatch]);
 
-    /* ESC CLOSE */
+    //  ESC CLOSE
 
     useEffect(() => {
 
@@ -247,7 +266,7 @@ const useMatchesInfo = (
 
     }, [onClose]);
 
-    /* LOCK SCROLL */
+    //  LOCK SCROLL
 
     useEffect(() => {
 
@@ -264,7 +283,7 @@ const useMatchesInfo = (
 
     }, [onClose]);
 
-    /* MATCH STATES */
+    //  MATCH STATES
 
     const isEmpty =
         !loading &&
@@ -276,7 +295,7 @@ const useMatchesInfo = (
     const isAdmin =
         pathname?.startsWith("/admin");
 
-    /* FILTERED MATCHES */
+    //  FILTERED MATCHES
 
     const filteredMatches =
         useMemo(() => {
@@ -301,7 +320,7 @@ const useMatchesInfo = (
 
         }, [search, matches]);
 
-    /* STATUS LABEL */
+    //  STATUS LABEL
 
     const statusLabel =
         useMemo(() => {
@@ -332,7 +351,7 @@ const useMatchesInfo = (
             match?.isHalftime,
         ]);
 
-    /* STATUS STYLES */
+    //  STATUS STYLES
 
     const statusStyles = {
 
@@ -349,7 +368,7 @@ const useMatchesInfo = (
             "bg-yellow-500/10 text-yellow-400 border-yellow-500/30",
     };
 
-    /* CARD CLICK */
+    //  CARD CLICK
 
     const handleClick = (
         id: string
@@ -367,7 +386,7 @@ const useMatchesInfo = (
         }
     };
 
-    /* UPDATE FIELD */
+    //  UPDATE FIELD
 
     const handleManageChange = <
         K extends keyof Matches
@@ -387,7 +406,7 @@ const useMatchesInfo = (
         });
     };
 
-    /* ADD EVENT */
+    //  ADD EVENT
 
     const addEvent = () => {
 
@@ -405,7 +424,7 @@ const useMatchesInfo = (
                 newEvent.type,
         };
 
-        /* OPTIONAL FIELDS */
+        //  OPTIONAL FIELDS
 
         if (
             newEvent.type !==
@@ -452,7 +471,7 @@ const useMatchesInfo = (
             ...match,
         };
 
-        /* AUTO SCORE */
+        //  AUTO SCORE
 
         if (
             event.type === "goal"
@@ -490,7 +509,7 @@ const useMatchesInfo = (
         });
     };
 
-    /* SAVE MANAGED MATCH */
+    //  SAVE MANAGED MATCH
 
     const handleManageMatch =
         async (
@@ -537,7 +556,7 @@ const useMatchesInfo = (
             }
         };
 
-    /* REALTIME SINGLE MATCH */
+    //  REALTIME SINGLE MATCH
 
     const getMatchById = (
         id: string
@@ -620,7 +639,7 @@ const useMatchesInfo = (
         }
     };
 
-    /* CREATE MATCH */
+    //  CREATE MATCH
 
     type CreateMatchInput =
         Omit<
@@ -687,7 +706,7 @@ const useMatchesInfo = (
             }
         };
 
-    /* UPDATE MATCH */
+    //  UPDATE MATCH
 
     const handleUpdateMatch =
         async (
@@ -741,7 +760,7 @@ const useMatchesInfo = (
             }
         };
 
-    /* DELETE MATCH */
+    //  DELETE MATCH
 
     const handleDeleteMatch =
         async (
@@ -778,7 +797,7 @@ const useMatchesInfo = (
             }
         };
 
-    /* START MATCH */
+    //  START MATCH
 
     const startMatch = async (
         id: string
@@ -824,7 +843,7 @@ const useMatchesInfo = (
         }
     };
 
-    /* HALFTIME */
+    //  HALFTIME
 
     const pauseMatch = async (
         id: string
@@ -869,7 +888,7 @@ const useMatchesInfo = (
         }
     };
 
-    /* CONTINUE MATCH */
+    //  CONTINUE MATCH
 
     const continueMatch =
         async (
@@ -920,7 +939,7 @@ const useMatchesInfo = (
             }
         };
 
-    /* END MATCH */
+    //  END MATCH
 
     const endMatch = async (
         id: string
@@ -965,7 +984,7 @@ const useMatchesInfo = (
         }
     };
 
-    /* HANDLE START */
+    //  HANDLE START
 
     const handleStartMatch =
         async () => {
@@ -994,7 +1013,7 @@ const useMatchesInfo = (
             );
         };
 
-    /* HANDLE HALFTIME */
+    //  HANDLE HALFTIME
 
     const handleHalftime =
         async () => {
@@ -1030,7 +1049,7 @@ const useMatchesInfo = (
             );
         };
 
-    /* HANDLE CONTINUE */
+    //  HANDLE CONTINUE
 
     const handleContinueMatch =
         async () => {
@@ -1059,7 +1078,7 @@ const useMatchesInfo = (
             );
         };
 
-    /* HANDLE END */
+    //  HANDLE END
 
     const handleEndMatch =
         async () => {
@@ -1086,7 +1105,7 @@ const useMatchesInfo = (
             );
         };
 
-    /* FORM SUBMIT */
+    //  FORM SUBMIT
 
     const handleSubmit =
         async (
@@ -1121,10 +1140,14 @@ const useMatchesInfo = (
                 return;
             }
 
-            const matchData = {
+            const selectedTournament = tournaments.find(
+                (t) => t.id === selectedTournamentId
+            );
 
-                name:
-                    `${teamA} vs ${teamB}`,
+            const matchData = {
+                name: `${teamA} vs ${teamB}`,
+
+                category: selectedTournament?.category ?? category,
 
                 teamA,
 
@@ -1137,7 +1160,10 @@ const useMatchesInfo = (
                 time,
 
                 status,
-                tournamentId: useTournament ? selectedTournamentId : undefined,
+
+                tournamentId: useTournament
+                    ? selectedTournamentId
+                    : undefined,
             };
 
             await handleCreateMatch(
@@ -1157,9 +1183,10 @@ const useMatchesInfo = (
             setStatus(
                 "upcoming"
             );
+            setCategory("football");
         };
 
-    /* EXPORT */
+    //  EXPORT
 
     return {
 
@@ -1202,6 +1229,9 @@ const useMatchesInfo = (
 
         teamB,
         setTeamB,
+
+        category,
+        setCategory,
 
         location,
         setLocation,

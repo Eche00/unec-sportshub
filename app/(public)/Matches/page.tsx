@@ -29,11 +29,7 @@ export default function Page() {
             <MatchesSkeleton />
         );
     }
-    // if (isEmpty) {
-    //     return (
-    //         <Empty />
-    //     );
-    // }
+
     return (
         <div className="min-h-screen sm:p-6 mt-22">
 
@@ -67,6 +63,7 @@ export default function Page() {
                                     key={match.id}
                                     id={match.id}
                                     name={match.name}
+                                    category={match.category}
                                     teamA={match.teamA}
                                     teamB={match.teamB}
                                     scoreA={match.scoreA}

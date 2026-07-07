@@ -22,7 +22,6 @@ import { db } from "@/lib/firebase";
 export type Team = {
     id: string;
     name: string;
-    eliminated: boolean;
     played: number;
     won: number;
     drawn: number;
@@ -32,12 +31,56 @@ export type Team = {
     points: number;
 };
 
-export type TournamentSettings = {
-    format: string;
-    teamCount: number;
-    autoMatchups: boolean;
+export type KnockoutSettings = {
+    currentRound:
+    | "Round of 32"
+    | "Round of 16"
+    | "Quarter Final"
+    | "Semi Final"
+    | "Third Place"
+    | "Final";
+
+    editingRound?:
+    | "Round of 32"
+    | "Round of 16"
+    | "Quarter Final"
+    | "Semi Final"
+    | "Third Place"
+    | "Final";
+
+    thirdPlace: boolean;
+    twoLegged: boolean;
+};
+export type DrawMatch = {
+    id: string;
+
+    round:
+    | "Round of 32"
+    | "Round of 16"
+    | "Quarter Final"
+    | "Semi Final"
+    | "Third Place"
+    | "Final";
+
+    position: number;
+
+    teamA?: Team | null;
+    teamB?: Team | null;
+
+    winner?: Team | null;
+
+    matchId?: string;
+
+    nextMatchId?: string;
 };
 
+export type TournamentSettings = {
+    format: "league" | "knockout" | "group";
+    teamCount: number;
+    autoMatchups: boolean;
+
+    knockout?: KnockoutSettings;
+};
 export type Tournament = {
     id: string;
     name: string;
@@ -48,7 +91,10 @@ export type Tournament = {
     status: "upcoming" | "live" | "finished";
     createdAt?: number;
     settings?: TournamentSettings;
+    category?: "football" | "basketball" | "volleyball";
     teams: Team[];
+    draw?: DrawMatch[];
+
 };
 
 /* MATCH TYPE (ADDED) */
@@ -62,6 +108,7 @@ export type Matches = {
     scoreA?: number;
     scoreB?: number;
     status: "upcoming" | "live" | "finished";
+    category?: string
     isLive?: boolean;
     createdAt?: number;
 };
@@ -93,6 +140,7 @@ type CreateTournamentPayload = {
     location?: string;
     startDate?: string;
     endDate?: string;
+    category?: "football" | "basketball" | "volleyball";
     settings?: TournamentSettings;
     teams?: Team[];
 };
@@ -115,6 +163,9 @@ const useTournamentInfo = () => {
     const [location, setLocation] = useState("");
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
+    const [category, setCategory] = useState<
+        "football" | "basketball" | "volleyball"
+    >("football");
 
     const [format, setFormat] = useState("knockout");
     const [teamCount, setTeamCount] = useState(8);
@@ -268,7 +319,6 @@ const useTournamentInfo = () => {
         const newTeam: Team = {
             id: Date.now().toString(),
             name: trimmed,
-            eliminated: false,
             played: 0,
             won: 0,
             drawn: 0,
@@ -291,6 +341,7 @@ const useTournamentInfo = () => {
         setLocation("");
         setStartDate("");
         setEndDate("");
+        setCategory("football");
         setFormat("knockout");
         setTeamCount(8);
         setAutoMatchups(true);
@@ -309,12 +360,39 @@ const useTournamentInfo = () => {
                 location: payload?.location || location,
                 startDate: payload?.startDate || startDate,
                 endDate: payload?.endDate || endDate,
+                category: payload?.category || category,
                 status: "upcoming",
-                settings: payload?.settings || {
-                    format,
-                    teamCount,
-                    autoMatchups,
-                },
+                settings:
+                    payload?.settings || {
+                        format,
+                        teamCount,
+                        autoMatchups,
+
+                        ...(format === "knockout" && {
+                            knockout: {
+                                currentRound:
+                                    teamCount === 32
+                                        ? "Round of 32"
+                                        : teamCount === 16
+                                            ? "Round of 16"
+                                            : teamCount === 8
+                                                ? "Quarter Final"
+                                                : "Semi Final",
+
+                                editingRound:
+                                    teamCount === 32
+                                        ? "Round of 32"
+                                        : teamCount === 16
+                                            ? "Round of 16"
+                                            : teamCount === 8
+                                                ? "Quarter Final"
+                                                : "Semi Final",
+
+                                thirdPlace: true,
+                                twoLegged: false,
+                            },
+                        }),
+                    },
                 teams: payload?.teams || teams,
                 createdAt: Date.now(),
             };
@@ -354,6 +432,7 @@ const useTournamentInfo = () => {
             setUpdating(false);
         }
     };
+
     const updateTournamentStatus = async (
         id: string,
         status: "upcoming" | "live" | "finished"
@@ -431,8 +510,13 @@ const useTournamentInfo = () => {
         endDate,
         setEndDate,
 
+
+        category,
+        setCategory,
+
         format,
         setFormat,
+
         teamCount,
         setTeamCount,
         autoMatchups,

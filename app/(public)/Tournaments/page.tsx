@@ -5,7 +5,7 @@ import Button from "@/components/ui/Button";
 import TournamentsSkeleton from "@/components/ui/skeletons/TournamentsSkeleton";
 import useMatchesInfo from "@/utils/logics/usematchesinfo";
 import useTournamentInfo, { Tournament } from "@/utils/logics/usetournamentinfo";
-import { Add, Edit, Search, SportsSoccer } from "@mui/icons-material";
+import { Add, Edit, Search, SportsBasketball, SportsSoccer, SportsVolleyball } from "@mui/icons-material";
 import { AnimatePresence } from "framer-motion";
 import { useState } from "react";
 
@@ -89,12 +89,14 @@ export default function Page() {
                                             <div className="flex items-center gap-3">
 
                                                 <div className="p-2 rounded-lg bg-white/5 border border-gray-700">
-                                                    <SportsSoccer className="text-gray-300" />
+                                                    {tournament?.category === "football" && <SportsSoccer className="text-gray-300" />}
+                                                    {tournament?.category === "basketball" && <SportsBasketball className="text-gray-300" />}
+                                                    {tournament?.category === "volleyball" && <SportsVolleyball className="text-gray-300" />}
                                                 </div>
 
                                                 <div>
-                                                    <span className="text-sm font-medium text-gray-200 block">
-                                                        {tournament.name}
+                                                    <span className="text-sm font-medium text-gray-200 block capitalize">
+                                                        {tournament.name} - {tournament.category}
                                                     </span>
 
                                                     {tournament.location && (

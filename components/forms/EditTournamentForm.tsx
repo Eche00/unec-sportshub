@@ -4,11 +4,11 @@
 import React, { useEffect, useState } from "react";
 import Input from "../ui/Input";
 import Button from "../ui/Button";
-import { Edit, Add } from "@mui/icons-material";
-import { AnimatePresence, motion } from "framer-motion";
+import { Add } from "@mui/icons-material";
+import { motion } from "framer-motion";
 
-import useTournamentInfo, { Team, Tournament } from "@/utils/logics/usetournamentinfo";
-import useMatchesInfo, { Matches } from "@/utils/logics/usematchesinfo";
+import useTournamentInfo, { DrawMatch, Team, Tournament } from "@/utils/logics/usetournamentinfo";
+import useMatchesInfo from "@/utils/logics/usematchesinfo";
 
 import CreateMatchForm from "@/components/forms/CreateMatchForm";
 import MatchCard from "../match/MatchCard";
@@ -21,6 +21,8 @@ interface Props {
 
 function EditTournamentForm({ tournament, onClose }: Props) {
     const [tab, setTab] = useState<"standings" | "matches">("standings");
+    const [draw, setDraw] = useState<DrawMatch[]>([]);
+    const [editingRound, setEditingRound] = useState<DrawMatch["round"]>();
     const {
         editTournament,
         updateTournamentStatus,
@@ -44,7 +46,86 @@ function EditTournamentForm({ tournament, onClose }: Props) {
 
         setEditTeams(initial);
     }, [tournament]);
+    useEffect(() => {
+        if (tournament.draw?.length) {
+            console.log("Tournament draw:", tournament.draw);
+            setDraw(tournament.draw);
+            return;
+        }
 
+        const teamCount = tournament.teams.length;
+
+        const rounds: DrawMatch[] = [];
+
+        const addRound = (
+            round: DrawMatch["round"],
+            matches: number
+        ) => {
+            for (let i = 0; i < matches; i++) {
+                rounds.push({
+                    id: crypto.randomUUID(),
+                    round,
+                    position: i + 1,
+                    teamA: null,
+                    teamB: null,
+                    winner: null,
+                });
+            }
+        };
+
+        if (teamCount === 32) {
+            addRound("Round of 32", 16);
+            addRound("Round of 16", 8);
+            addRound("Quarter Final", 4);
+            addRound("Semi Final", 2);
+            addRound("Final", 1);
+
+            if (tournament.settings?.knockout?.thirdPlace) {
+                addRound("Third Place", 1);
+            }
+        }
+
+        else if (teamCount === 16) {
+            addRound("Round of 16", 8);
+            addRound("Quarter Final", 4);
+            addRound("Semi Final", 2);
+            addRound("Final", 1);
+
+            if (tournament.settings?.knockout?.thirdPlace) {
+                addRound("Third Place", 1);
+            }
+        }
+
+        else if (teamCount === 8) {
+            addRound("Quarter Final", 4);
+            addRound("Semi Final", 2);
+            addRound("Final", 1);
+
+            if (tournament.settings?.knockout?.thirdPlace) {
+                addRound("Third Place", 1);
+            }
+        }
+
+        else if (teamCount === 4) {
+            addRound("Semi Final", 2);
+            addRound("Final", 1);
+
+            if (tournament.settings?.knockout?.thirdPlace) {
+                addRound("Third Place", 1);
+            }
+        }
+
+        setDraw(rounds);
+
+    }, [tournament]);
+    useEffect(() => {
+        if (!draw.length) return;
+
+        setEditingRound(
+            tournament.settings?.knockout?.editingRound ??
+            draw[0].round
+        );
+    }, [draw, tournament]);
     const saveTeams = async () => {
         const updatedTeams = tournament.teams.map((team) => {
             const edited = editTeams[team.name];
@@ -59,8 +140,124 @@ function EditTournamentForm({ tournament, onClose }: Props) {
             teams: updatedTeams,
         });
 
-        toast.success("Standings updated");
     };
+    const updateDrawTeam = (
+        matchId: string,
+        side: "teamA" | "teamB",
+        teamId: string
+    ) => {
+        const team = tournament.teams.find(t => t.id === teamId);
+
+        if (!team) return;
+
+        setDraw(prev =>
+            prev.map(match => {
+                if (match.id !== matchId) return match;
+
+                const other =
+                    side === "teamA"
+                        ? match.teamB
+                        : match.teamA;
+
+                if (other?.id === team.id) {
+                    toast.error("A team cannot play itself");
+                    return match;
+                }
+
+                return {
+                    ...match,
+                    [side]: team,
+                };
+            })
+        );
+    };
+    const validateDraw = () => {
+        const currentRoundMatches = draw.filter(match => match.round === editingRound).sort((a, b) => a.position - b.position)
+
+        const usedTeams = new Set<string>();
+
+        for (const match of currentRoundMatches) {
+
+            if (!match.teamA || !match.teamB) {
+                toast.error("Every match must have two teams");
+                return false;
+            }
+
+            if (match.teamA.id === match.teamB.id) {
+                toast.error("A team cannot play itself");
+                return false;
+            }
+
+            if (usedTeams.has(match.teamA.id)) {
+                toast.error(`${match.teamA.name} already used`);
+                return false;
+            }
+
+            if (usedTeams.has(match.teamB.id)) {
+                toast.error(`${match.teamB.name} already used`);
+                return false;
+            }
+
+            usedTeams.add(match.teamA.id);
+            usedTeams.add(match.teamB.id);
+        }
+
+        return true;
+    };
+    const handleSaveDraw = async () => {
+
+        if (!validateDraw()) return;
+        const currentRoundMatches = draw.filter(
+            m => m.round === editingRound
+        );
+
+        const allAssigned = currentRoundMatches.every(
+            m => m.teamA && m.teamB
+        );
+
+        if (!allAssigned) {
+            toast.error("Complete all fixtures first.");
+            return;
+        }
+        const order: DrawMatch["round"][] = [
+            "Round of 32",
+            "Round of 16",
+            "Quarter Final",
+            "Semi Final",
+            "Third Place",
+            "Final",
+        ];
+
+        const currentIndex = order.indexOf(editingRound!);
+        const nextRound = order[currentIndex + 1] ?? "Final";
+
+        await editTournament(tournament.id, {
+            draw,
+
+            settings: {
+                format: tournament.settings!.format,
+                teamCount: tournament.settings!.teamCount,
+                autoMatchups: tournament.settings!.autoMatchups,
+
+                knockout: {
+                    currentRound: nextRound,
+                    thirdPlace: tournament.settings!.knockout!.thirdPlace,
+                    twoLegged: tournament.settings!.knockout!.twoLegged,
+                    editingRound: nextRound,
+                },
+            },
+        });
+
+        setEditingRound(nextRound);
+
+        toast.success(`${editingRound} saved!`);
+
+    };
+    const format = tournament.settings?.format;
+    console.log("Format:" + tournament.settings?.format);
+
+
+
     return (
         <div
             className="fixed inset-0 bg-black/60 z-50 flex justify-end"
@@ -97,7 +294,7 @@ function EditTournamentForm({ tournament, onClose }: Props) {
                 {/* HEADER */}
                 <div className="mt-8 flex justify-between items-center mb-4">
                     <h2 className="text-xl font-semibold">
-                        Manage {tournament.name}
+                        {tournament.name}
                     </h2>
 
                     <Button variant="secondary" onClick={onClose}>
@@ -172,7 +369,131 @@ function EditTournamentForm({ tournament, onClose }: Props) {
                             )}
                         </div>
                     </div>
-                    {tab === "standings" ? (
+                    {format === "knockout" && tab === "standings" ? (
+                        <div className="space-y-6">
+
+                            <div className="space-y-5">
+
+                                <h3 className="font-semibold">
+                                    Create Tournament Draw
+                                </h3>
+
+                                {draw
+                                    .filter(match => match.round === editingRound)
+                                    .map((match, index) => (
+
+                                        <div
+                                            key={match.id}
+                                            className="rounded-lg border border-gray-700 p-4 bg-[#111827]"
+                                        >
+
+                                            <p className="text-xs text-gray-500 mb-3">
+
+                                                Match {index + 1}
+
+                                            </p>
+                                            <h3 className="text-lg font-semibold text-white mb-4">
+                                                {editingRound}
+                                            </h3>
+                                            <div className="grid grid-cols-2 gap-3">
+
+                                                <select
+
+                                                    value={match.teamA?.id ?? ""}
+
+                                                    onChange={(e) =>
+                                                        updateDrawTeam(
+                                                            match.id,
+                                                            "teamA",
+                                                            e.target.value
+                                                        )
+                                                    }
+
+                                                    className="bg-[#0F172A] border border-gray-700 rounded-lg p-2"
+
+                                                >
+
+                                                    <option value="">
+
+                                                        Select Team
+
+                                                    </option>
+
+                                                    {tournament.teams.map(team => (
+
+                                                        <option
+
+                                                            key={team.id}
+
+                                                            value={team.id}
+
+                                                        >
+
+                                                            {team.name}
+
+                                                        </option>
+
+                                                    ))}
+
+                                                </select>
+
+                                                <select
+
+                                                    value={match.teamB?.id ?? ""}
+
+                                                    onChange={(e) =>
+                                                        updateDrawTeam(
+                                                            match.id,
+                                                            "teamB",
+                                                            e.target.value
+                                                        )
+                                                    }
+
+                                                    className="bg-[#0F172A] border border-gray-700 rounded-lg p-2"
+
+                                                >
+
+                                                    <option value="">
+
+                                                        Select Team
+
+                                                    </option>
+
+                                                    {tournament.teams.map(team => (
+
+                                                        <option
+
+                                                            key={team.id}
+
+                                                            value={team.id}
+
+                                                        >
+
+                                                            {team.name}
+
+                                                        </option>
+
+                                                    ))}
+
+                                                </select>
+
+                                            </div>
+
+                                        </div>
+
+                                    ))}
+
+                                <Button
+                                    onClick={handleSaveDraw}
+                                >
+
+                                    Save Draw
+
+                                </Button>
+
+                            </div>
+                        </div>
+                    ) : format === "league" && tab === "standings" ? (
                         <div className="rounded-xl border border-gray-800 overflow-scroll">
                             <div className="overflow-auto">
                                 <table className="min-w-[800px] w-full text-sm text-left text-nowrap">
@@ -320,29 +641,30 @@ function EditTournamentForm({ tournament, onClose }: Props) {
                                 </table>
                             </div>
                         </div>
-
                     ) : (
                         <div className="flex flex-col gap-4">
 
-                            {matches.filter((m) => m.tournamentId === tournament?.id).map((match) => (
-                                <MatchCard
-                                    key={match.id}
-                                    id={match.id}
-                                    name={match.name}
-                                    teamA={match.teamA}
-                                    teamB={match.teamB}
-                                    scoreA={match.scoreA}
-                                    scoreB={match.scoreB}
-                                    status={match.status}
-                                    date={match.date}
-                                    time={match.time}
-                                    location={match.location}
-                                    tournamentId={match.tournamentId}
-                                />
-
-                            ))}
-
-                        </div>)}
+                            {matches
+                                .filter((m) => m.tournamentId === tournament.id)
+                                .map((match) => (
+                                    <MatchCard
+                                        key={match.id}
+                                        id={match.id}
+                                        name={match.name}
+                                        teamA={match.teamA}
+                                        teamB={match.teamB}
+                                        scoreA={match.scoreA}
+                                        scoreB={match.scoreB}
+                                        status={match.status}
+                                        date={match.date}
+                                        time={match.time}
+                                        category={match.category}
+                                        location={match.location}
+                                        tournamentId={match.tournamentId}
+                                    />
+                                ))}
+                        </div>
+                    )}
                 </>
 
 
@@ -359,20 +681,20 @@ function EditTournamentForm({ tournament, onClose }: Props) {
                     </div>
                 )}
 
-                <div className="w-full flex items-end justify-end gap-4 py-5 mb-10  border-t-[0.1px] border-gray-400">
+                <div className="w-full flex items-end justify-end gap-4 py-5 my-10  border-t-[0.1px] border-gray-400">
 
                     <Button
                         onClick={() => { deleteTournament(tournament.id); onClose(); }}
                         variant="secondaryRed"
                     >
-                        Delete Tournament
+                        Delete
                     </Button>
 
                     <Button
                         onClick={saveTeams}
                         variant="primary"
                     >
-                        Update Standings
+                        Update
                     </Button>
                 </div>
             </motion.aside>

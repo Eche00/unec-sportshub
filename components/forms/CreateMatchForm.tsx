@@ -22,6 +22,9 @@ function CreateMatchForm({ onClose, tournamentId }: CreateMatchFormProps) {
         teamB,
         setTeamB,
 
+        category,
+        setCategory,
+
         location,
         setLocation,
 
@@ -50,6 +53,10 @@ function CreateMatchForm({ onClose, tournamentId }: CreateMatchFormProps) {
         }
     }, [tournamentId]);
     const isTournamentLocked = Boolean(selectedTournamentId);
+
+    const selectedTournament = tournaments.find(
+        (t) => t.id === selectedTournamentId
+    );
     return (
         <form
             onSubmit={handleSubmit}
@@ -148,6 +155,42 @@ function CreateMatchForm({ onClose, tournamentId }: CreateMatchFormProps) {
                         <option value="finished">Finished</option>
                     </select>
                 </div>
+                {!useTournament && (
+                    <div className="mb-6">
+                        <label className="text-sm text-gray-300 mb-1 block">
+                            Match Category
+                        </label>
+
+                        <select
+                            value={category}
+                            onChange={(e) =>
+                                setCategory(
+                                    e.target.value as
+                                    | "football"
+                                    | "basketball"
+                                    | "volleyball"
+                                )
+                            }
+                            className="w-full bg-[#0F1115] border border-gray-700 rounded-lg p-2 text-sm"
+                        >
+                            <option value="football">Football</option>
+                            <option value="basketball">Basketball</option>
+                            <option value="volleyball">Volleyball</option>
+                        </select>
+                    </div>
+                )}
+
+                {useTournament && selectedTournament && (
+                    <div className="mb-6">
+                        <label className="text-sm text-gray-300 mb-1 block">
+                            Category
+                        </label>
+
+                        <div className="bg-[#0F1115] border border-gray-700 rounded-lg p-2 text-sm capitalize">
+                            {selectedTournament.category}
+                        </div>
+                    </div>
+                )}
                 <div className="mb-4 flex items-center gap-2">
                     <input
                         type="checkbox"
