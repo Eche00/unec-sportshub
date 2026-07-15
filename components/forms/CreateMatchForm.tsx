@@ -169,6 +169,8 @@ function CreateMatchForm({ onClose, tournamentId }: CreateMatchFormProps) {
                                     | "football"
                                     | "basketball"
                                     | "volleyball"
+                                    | "tennis"
+                                    | "chess"
                                 )
                             }
                             className="w-full bg-[#0F1115] border border-gray-700 rounded-lg p-2 text-sm"
@@ -176,6 +178,8 @@ function CreateMatchForm({ onClose, tournamentId }: CreateMatchFormProps) {
                             <option value="football">Football</option>
                             <option value="basketball">Basketball</option>
                             <option value="volleyball">Volleyball</option>
+                            <option value="tennis">Tennis</option>
+                            <option value="chess">Chess</option>
                         </select>
                     </div>
                 )}

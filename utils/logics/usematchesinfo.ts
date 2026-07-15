@@ -31,7 +31,7 @@ export interface Matches {
 
     name: string;
 
-    category: "football" | "basketball" | "volleyball";
+    category: "football" | "basketball" | "volleyball" | "tennis" | "chess";
 
     teamA: string;
     teamB: string;
@@ -147,7 +147,7 @@ const useMatchesInfo = (
         useState("");
 
     const [category, setCategory] = useState<
-        "football" | "basketball" | "volleyball"
+        "football" | "basketball" | "volleyball" | "tennis" | "chess"
     >("football");
 
     const [date, setDate] =

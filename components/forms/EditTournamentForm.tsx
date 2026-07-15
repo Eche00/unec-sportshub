@@ -113,6 +113,14 @@ function EditTournamentForm({ tournament, onClose }: Props) {
             if (tournament.settings?.knockout?.thirdPlace) {
                 addRound("Third Place", 1);
             }
+        } else if (teamCount === 6) {
+            addRound("Quarter Final", 3); // 3 matches (6 teams)
+            addRound("Semi Final", 2);    // You'll handle how teams get here later
+            addRound("Final", 1);
+
+            if (tournament.settings?.knockout?.thirdPlace) {
+                addRound("Third Place", 1);
+            }
         }
 
         setDraw(rounds);

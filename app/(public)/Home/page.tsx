@@ -4,8 +4,10 @@ import { useState } from "react";
 
 import {
     EmojiEvents,
+    Extension,
     SportsBasketball,
     SportsSoccer,
+    SportsTennis,
     SportsVolleyball,
 } from "@mui/icons-material";
 
@@ -395,6 +397,8 @@ export default function Page() {
                                                             {tournament?.category === "football" && <SportsSoccer className="text-gray-300" />}
                                                             {tournament?.category === "basketball" && <SportsBasketball className="text-gray-300" />}
                                                             {tournament?.category === "volleyball" && <SportsVolleyball className="text-gray-300" />}
+                                                            {tournament?.category === "chess" && <Extension className="text-gray-300" />}
+                                                            {tournament?.category === "tennis" && <SportsTennis className="text-gray-300" />}
                                                         </div>
 
                                                         <div>

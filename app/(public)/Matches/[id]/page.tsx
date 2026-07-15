@@ -6,7 +6,7 @@ import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import RoomIcon from "@mui/icons-material/Room";
 
 import useMatchesInfo from "@/utils/logics/usematchesinfo";
-import { Comment, SportsBasketball, SportsSoccer, SportsVolleyball } from "@mui/icons-material";
+import { Comment, Extension, SportsBasketball, SportsSoccer, SportsTennis, SportsVolleyball } from "@mui/icons-material";
 import MatchesSkeleton from "@/components/ui/skeletons/MatchesSkeleton";
 
 export default function Page() {
@@ -43,6 +43,8 @@ export default function Page() {
                                 {match.category === "football" && <SportsSoccer className="text-gray-300" />}
                                 {match.category === "basketball" && <SportsBasketball className="text-gray-300" />}
                                 {match.category === "volleyball" && <SportsVolleyball className="text-gray-300" />}
+                                {match.category === "chess" && <Extension className="text-gray-300" />}
+                                {match.category === "tennis" && <SportsTennis className="text-gray-300" />}
                             </div>
 
                         </div>

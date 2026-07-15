@@ -91,7 +91,7 @@ export type Tournament = {
     status: "upcoming" | "live" | "finished";
     createdAt?: number;
     settings?: TournamentSettings;
-    category?: "football" | "basketball" | "volleyball";
+    category?: "football" | "basketball" | "volleyball" | "tennis" | "chess";
     teams: Team[];
     draw?: DrawMatch[];
 
@@ -140,7 +140,7 @@ type CreateTournamentPayload = {
     location?: string;
     startDate?: string;
     endDate?: string;
-    category?: "football" | "basketball" | "volleyball";
+    category?: "football" | "basketball" | "volleyball" | "tennis" | "chess";
     settings?: TournamentSettings;
     teams?: Team[];
 };
@@ -164,7 +164,7 @@ const useTournamentInfo = () => {
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
     const [category, setCategory] = useState<
-        "football" | "basketball" | "volleyball"
+        "football" | "basketball" | "volleyball" | "tennis" | "chess"
     >("football");
 
     const [format, setFormat] = useState("knockout");

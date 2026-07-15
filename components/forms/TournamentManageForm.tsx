@@ -8,6 +8,8 @@ import {
     Search,
     SportsBasketball,
     SportsVolleyball,
+    SportsTennis,
+    Extension,
 } from "@mui/icons-material";
 
 import Button from "../ui/Button";
@@ -127,6 +129,8 @@ export default function TournamentManageForm() {
                                                 {tournament?.category === "football" && <SportsSoccer className="text-gray-300" />}
                                                 {tournament?.category === "basketball" && <SportsBasketball className="text-gray-300" />}
                                                 {tournament?.category === "volleyball" && <SportsVolleyball className="text-gray-300" />}
+                                                {tournament?.category === "chess" && <Extension className="text-gray-300" />}
+                                                {tournament?.category === "tennis" && <SportsTennis className="text-gray-300" />}
                                             </div>
 
                                             <div>
