@@ -15,7 +15,7 @@ function Header() {
     return (
         <div className="bg-[#020C17] text-white md:py-3 py-2  fixed md:top-0 top-2 md:left-0 md:right-0 left-2 right-2 md:w-full z-50 md:rounded-none rounded-[28px] ">
             {/* container  */}
-            <section className="flex items-center justify-center gap-2 md:w-[90%] w-[98%] mx-auto">
+            <section className="flex items-center justify-between gap-2 md:w-[90%] w-[98%] mx-auto">
                 {/* Logo   */}
                 <div className="flex flex-1 items-center relative ">
                     <span className="flex items-center md:w-full w-fit rounded-full px-4 md:text-2xl text-xl font-extrabold text-[#3B82F6] tracking-wide md:mx-0 mx-auto">
@@ -29,7 +29,7 @@ function Header() {
                 </div>
 
                 {/* Navigation */}
-                <div className="md:flex hidden flex-1 items-center justify-center">
+                <div className="md:flex hidden flex-1 items-center justify-end">
                     <nav className="w-fit bg-[#151B23] flex items-center gap-4 py-2 px-6 rounded-full">
                         {publicItems.map((item) => (
                             <Link
@@ -47,15 +47,7 @@ function Header() {
                     </nav>
                 </div>
 
-                {/* Auth Button  */}
-                <div className="md:flex hidden flex-1 items-center justify-end gap-5  ">
-                    <Link
-                        href="/auth"
-                        className=" text-white bg-[#3B82F6] hover:bg-[#3B82F6]/90 font-bold  md:py-2 py-1.5 md:px-7 px-3 rounded-full cursor-pointer w-fit"
-                    >
-                        Get Started
-                    </Link>
-                </div>
+
 
             </section>
             {/* Mobile menu */}

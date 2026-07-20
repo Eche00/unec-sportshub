@@ -1,9 +1,7 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
 
 import MatchCard from "@/components/match/MatchCard";
-import Button from "@/components/ui/Button";
 
 import useMatchesInfo from "@/utils/logics/usematchesinfo";
 

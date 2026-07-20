@@ -1,11 +1,10 @@
 "use client";
 
 import StandingsTable from "@/components/table/StandingsTable";
-import Button from "@/components/ui/Button";
 import TournamentsSkeleton from "@/components/ui/skeletons/TournamentsSkeleton";
 import useMatchesInfo from "@/utils/logics/usematchesinfo";
 import useTournamentInfo, { Tournament } from "@/utils/logics/usetournamentinfo";
-import { Add, Edit, Extension, Search, SportsBasketball, SportsSoccer, SportsTennis, SportsVolleyball } from "@mui/icons-material";
+import { Extension, Search, SportsBasketball, SportsSoccer, SportsTennis, SportsVolleyball } from "@mui/icons-material";
 import { AnimatePresence } from "framer-motion";
 import { useState } from "react";
 

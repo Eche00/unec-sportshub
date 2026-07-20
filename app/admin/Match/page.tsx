@@ -1,6 +1,5 @@
 "use client";
 
-import React, { useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import SearchIcon from "@mui/icons-material/Search";
 

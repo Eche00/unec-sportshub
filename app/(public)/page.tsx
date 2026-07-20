@@ -10,11 +10,9 @@ import {
     SportsVolleyball,
 } from "@mui/icons-material";
 
-import SearchIcon from "@mui/icons-material/Search";
 
 import MatchCard from "@/components/match/MatchCard";
 import Empty from "@/components/ui/Empty";
-import MatchesSkeleton from "@/components/ui/skeletons/MatchesSkeleton";
 import TournamentsSkeleton from "@/components/ui/skeletons/TournamentsSkeleton";
 import StandingsTable from "@/components/table/StandingsTable";
 
@@ -462,26 +460,6 @@ export default function Page() {
                         </div>
                     )}
                 </section>
-
-                {/* FEATURES */}
-                <section className="max-w-6xl mx-auto mt-24 grid md:grid-cols-3 gap-6 p-4">
-
-                    {features.map((feature) => (
-                        <div
-                            key={feature.title}
-                            className="bg-[#1F2933] p-6 rounded-3xl border border-gray-800 hover:border-gray-600 transition"
-                        >
-
-                            <h3 className="text-xl font-semibold mb-2">
-                                {feature.title}
-                            </h3>
-
-                            <p className="text-gray-400 text-sm leading-relaxed">
-                                {feature.description}
-                            </p>
-                        </div>
-                    ))}
-                </section>
             </div>
 
             {/* MODAL */}
@@ -505,20 +483,3 @@ export default function Page() {
     );
 }
 
-const features = [
-    {
-        title: "Create Tournaments",
-        description:
-            "Quickly set up tournaments with teams, formats, and schedules.",
-    },
-    {
-        title: "Live Match Control",
-        description:
-            "Update scores and events in real-time from the admin panel.",
-    },
-    {
-        title: "Real-Time Viewing",
-        description:
-            "Users can watch match progress live with instant updates.",
-    },
-];
