@@ -46,7 +46,7 @@ export function useUserInfo(): UserInfo | null {
 export const handleSignOut = async (router: ReturnType<typeof useRouter>) => {
     try {
         await signOut(auth)
-        router.push("/auth/sign-in")
+        router.push("/auth")
     } catch (error) {
         console.error("Error signing out:", error)
     }

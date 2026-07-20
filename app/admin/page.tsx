@@ -47,7 +47,7 @@ export default function Page() {
         }, 5000);
 
         return () => clearInterval(interval);
-    }, [filteredMatches?.length]); // 👈 better dependency
+    }, [filteredMatches?.length]);
 
     const featuredMatch = useMemo(() => {
         if (!filteredMatches?.length) return null;
