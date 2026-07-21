@@ -96,19 +96,67 @@ function CreateMatchForm({ onClose, tournamentId }: CreateMatchFormProps) {
 
                 {/* TEAMS */}
                 <div className="grid grid-cols-2 gap-4 mb-6">
-                    <Input
-                        label="Team A"
-                        placeholder="Enter Team A"
-                        value={teamA}
-                        onChange={(e) => setTeamA(e.target.value)}
-                    />
+                    {useTournament && selectedTournament ? (
+                        <>
+                            <div>
+                                <label className="text-sm text-gray-300 mb-1 block">
+                                    Team A
+                                </label>
 
-                    <Input
-                        label="Team B"
-                        placeholder="Enter Team B"
-                        value={teamB}
-                        onChange={(e) => setTeamB(e.target.value)}
-                    />
+                                <select
+                                    value={teamA}
+                                    onChange={(e) => setTeamA(e.target.value)}
+                                    className="w-full bg-[#0F1115] border border-gray-700 rounded-lg p-2 text-sm"
+                                >
+                                    <option value="">Select Team A</option>
+
+                                    {selectedTournament.teams.map((team) => (
+                                        <option key={team.id} value={team.name}>
+                                            {team.name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            <div>
+                                <label className="text-sm text-gray-300 mb-1 block">
+                                    Team B
+                                </label>
+
+                                <select
+                                    value={teamB}
+                                    onChange={(e) => setTeamB(e.target.value)}
+                                    className="w-full bg-[#0F1115] border border-gray-700 rounded-lg p-2 text-sm"
+                                >
+                                    <option value="">Select Team B</option>
+
+                                    {selectedTournament.teams
+                                        .filter((team) => team.name !== teamA)
+                                        .map((team) => (
+                                            <option key={team.id} value={team.name}>
+                                                {team.name}
+                                            </option>
+                                        ))}
+                                </select>
+                            </div>
+                        </>
+                    ) : (
+                        <>
+                            <Input
+                                label="Team A"
+                                placeholder="Enter Team A"
+                                value={teamA}
+                                onChange={(e) => setTeamA(e.target.value)}
+                            />
+
+                            <Input
+                                label="Team B"
+                                placeholder="Enter Team B"
+                                value={teamB}
+                                onChange={(e) => setTeamB(e.target.value)}
+                            />
+                        </>
+                    )}
                 </div>
 
                 {/* LOCATION */}
