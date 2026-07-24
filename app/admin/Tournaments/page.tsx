@@ -32,6 +32,7 @@ export default function Page() {
         search,
         setSearch
     } = useTournamentInfo();
+
     const {
         statusStyles,
 
@@ -46,9 +47,12 @@ export default function Page() {
     const [manageTournament, setManageTournament] =
         useState(false);
 
-    const [selectedTournament, setSelectedTournament] =
-        useState<Tournament | null>(null);
 
+    const [selectedTournamentId, setSelectedTournamentId] =
+        useState<string | null>(null);
+
+    const selectedTournament =
+        tournaments.find(t => t.id === selectedTournamentId) ?? null;
 
 
     const getTournamentStage = (tournament: Tournament) => {
@@ -64,6 +68,8 @@ export default function Page() {
     };
     const hasTournaments = tournaments.length > 0;
     const isSearching = search.trim().length > 0;
+
+
     // UI
     return (
         <div className="min-h-screen text-white space-y-6">
@@ -195,7 +201,7 @@ export default function Page() {
                                             <button
                                                 className="group-hover:text-gray-300 transition text-xs cursor-pointer hover:underline flex items-center gap-1"
                                                 onClick={() => {
-                                                    setSelectedTournament(tournament);
+                                                    setSelectedTournamentId(tournament.id);
                                                     setManageTournament(true);
                                                 }}
                                             >
@@ -208,7 +214,7 @@ export default function Page() {
                                             <button
                                                 className="group-hover:text-gray-300 transition text-xs cursor-pointer hover:underline"
                                                 onClick={() => {
-                                                    setSelectedTournament(tournament);
+                                                    setSelectedTournamentId(tournament.id);
                                                     setOpenTournament(true);
                                                 }}
                                             >

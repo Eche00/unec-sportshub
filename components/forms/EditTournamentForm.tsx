@@ -20,13 +20,23 @@ interface Props {
 }
 
 function EditTournamentForm({ tournament, onClose }: Props) {
-    const [tab, setTab] = useState<"standings" | "matches">("standings");
+    const [tab, setTab] = useState<"standings" | "matches" | "scorers">("standings");
     const [draw, setDraw] = useState<DrawMatch[]>([]);
     const [editingRound, setEditingRound] = useState<DrawMatch["round"]>();
+    const [playerName, setPlayerName] = useState("");
+    const [topScorers, setTopScorers] = useState(
+        tournament.topScorers || []
+    );
+    const [createScorer, setCreateScorer] =
+        useState(false);
+
+    const [selectedTeam, setSelectedTeam] = useState("");
+
+    const [goals, setGoals] = useState(0);
     const {
         editTournament,
         updateTournamentStatus,
-        deleteTournament
+        deleteTournament, addTopScorer, updateTopScorer
     } = useTournamentInfo();
     const {
         matches,
@@ -134,6 +144,9 @@ function EditTournamentForm({ tournament, onClose }: Props) {
             draw[0].round
         );
     }, [draw, tournament]);
+    useEffect(() => {
+        setTopScorers(tournament.topScorers || []);
+    }, [tournament.topScorers]);
     const saveTeams = async () => {
         const updatedTeams = tournament.teams.map((team) => {
             const edited = editTeams[team.name];
@@ -262,10 +275,58 @@ function EditTournamentForm({ tournament, onClose }: Props) {
 
     };
     const format = tournament.settings?.format;
-    console.log("Format:" + tournament.settings?.format);
 
+    const handleAddScorer = async () => {
 
+        const team = tournament.teams.find(
+            t => t.id === selectedTeam
+        );
+        if (!team) return;
 
+        await addTopScorer(
+            tournament.id,
+            {
+                id: crypto.randomUUID(),
+                playerName,
+                teamId: team.id,
+                teamName: team.name,
+                goals
+            }
+        );
+
+        setPlayerName("");
+        setGoals(0);
+        setCreateScorer(false)
+    };
+    const handleUpdateScorer = async (
+        scorerId: string,
+        action: "increment" | "decrement"
+    ) => {
+
+        setTopScorers(prev =>
+            prev.map(player =>
+                player.id === scorerId
+                    ? {
+                        ...player,
+                        goals:
+                            action === "increment"
+                                ? player.goals + 1
+                                : Math.max(0, player.goals - 1),
+                    }
+                    : player
+            )
+        );
+
+        await updateTopScorer(
+            tournament.id,
+            scorerId,
+            action
+        );
+    };
+    useEffect(() => {
+        console.log("Tournament prop updated");
+        console.log(tournament.topScorers);
+    }, [tournament]);
     return (
         <div
             className="fixed inset-0 bg-black/60 z-50 flex justify-end"
@@ -314,7 +375,7 @@ function EditTournamentForm({ tournament, onClose }: Props) {
                 <>
                     {/* CONTROLS */}
                     <div className="sticky top-0 z-20 bg-[#0F172A] pb-4">
-                        <div className="flex items-center justify-between gap-3">
+                        <div className="flex md:flex-row flex-col items-center justify-between gap-3">
 
                             {/* LEFT */}
                             <div className="flex items-center gap-3">
@@ -339,11 +400,20 @@ function EditTournamentForm({ tournament, onClose }: Props) {
                                     >
                                         Matches
                                     </button>
+                                    <button
+                                        onClick={() => setTab("scorers")}
+                                        className={`px-3 py-1.5 rounded-lg cursor-pointer ${tab === "scorers"
+                                            ? "bg-[#3B82F6] text-black"
+                                            : "text-gray-400"
+                                            }`}
+                                    >
+                                        Scorers
+                                    </button>
                                 </div>
                             </div>
 
                             {/* RIGHT */}
-                            {tab === "matches" ? (
+                            <div> {tab === "matches" ? (
                                 <Button
                                     onClick={() => setCreateMatch(true)}
                                     className="shrink-0"
@@ -351,7 +421,7 @@ function EditTournamentForm({ tournament, onClose }: Props) {
                                     <Add fontSize="small" />
                                     Create Match
                                 </Button>
-                            ) : (
+                            ) : tab === "standings" ? (
                                 <div className="flex items-center gap-1 bg-[#111827] border border-gray-800 p-1.5 rounded-lg">
                                     <button
                                         onClick={() => updateTournamentStatus(tournament.id, "live")}
@@ -374,7 +444,14 @@ function EditTournamentForm({ tournament, onClose }: Props) {
                                     </button>
 
                                 </div>
-                            )}
+                            ) : <Button
+                                onClick={() => setCreateScorer(!createScorer)}
+                                className="shrink-0"
+                            >
+
+                                {createScorer ? <span><Add fontSize="small" /> Add Scorer</span> : "Close"}
+                            </Button>}
+                            </div>
                         </div>
                     </div>
                     {format === "knockout" && tab === "standings" ? (
@@ -649,7 +726,7 @@ function EditTournamentForm({ tournament, onClose }: Props) {
                                 </table>
                             </div>
                         </div>
-                    ) : (
+                    ) : tab === "matches" ? (
                         <div className="flex flex-col gap-4">
 
                             {matches
@@ -672,7 +749,127 @@ function EditTournamentForm({ tournament, onClose }: Props) {
                                     />
                                 ))}
                         </div>
-                    )}
+                    ) :
+                        (
+
+                            <div className="space-y-6">
+
+                                <h2 className="text-lg font-semibold">
+                                    Top Scorers
+                                </h2>
+                                {createScorer ?
+                                    (<div className="space-y-6">
+
+                                        <Input
+                                            value={playerName}
+                                            onChange={(e) => setPlayerName(e.target.value)}
+                                            placeholder="Player name"
+                                        />
+
+                                        <select
+                                            value={selectedTeam}
+                                            onChange={(e) => setSelectedTeam(e.target.value)}
+                                            className="w-full bg-[#0F1115] border border-gray-700 rounded-lg p-2 text-sm"
+                                        >
+                                            <option>Select Team</option>
+
+                                            {tournament.teams.map(team => (
+                                                <option
+                                                    key={team.id}
+                                                    value={team.id}
+                                                >
+                                                    {team.name}
+                                                </option>
+                                            ))}
+
+                                        </select>
+
+                                        <Input
+                                            type="number"
+                                            value={goals}
+                                            onChange={(e) => setGoals(Number(e.target.value))}
+                                        />
+
+                                        <Button onClick={handleAddScorer}>
+                                            Add Player
+                                        </Button>
+                                    </div>) : (
+                                        <div className="space-y-3">
+                                            {(tournament.topScorers || [])
+                                                .sort((a, b) => b.goals - a.goals)
+                                                .map((player, index) => (
+                                                    <div
+                                                        key={player.id}
+                                                        className="flex items-center justify-between rounded-xl border border-gray-700 bg-[#111827] px-4 py-2 hover:border-[#3B82F6] transition-all"
+                                                    >
+                                                        <div className="flex items-center gap-4">
+                                                            {/* Position */}
+                                                            <div
+                                                                className={`flex items-center justify-center rounded-full font-bold text-xs`}
+                                                            >
+                                                                #{index + 1}
+                                                            </div>
+
+
+
+                                                            {/* Details */}
+                                                            <div>
+                                                                <h3 className="font-semibold text-white">
+                                                                    {player.playerName}
+                                                                </h3>
+
+                                                                <p className="text-xs text-gray-400">
+                                                                    {player.teamName}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+
+                                                        <div className="flex items-center gap-3">
+                                                            <span className="text-sm text-gray-400 md:inline hidden">
+                                                                Goals
+                                                            </span>
+
+                                                            <div className="flex items-center gap-2">
+                                                                <button
+                                                                    onClick={() =>
+                                                                        handleUpdateScorer(
+                                                                            player.id,
+                                                                            "decrement"
+                                                                        )
+                                                                    }
+                                                                    className="flex  items-center justify-center rounded-lg transition"
+                                                                >
+                                                                    −
+                                                                </button>
+
+                                                                <div className="text-center text-lg font-bold text-white bg-[#0F1115] border border-gray-700 rounded-lg px-2 text-sm">
+                                                                    {player.goals}
+                                                                </div>
+
+                                                                <button
+                                                                    onClick={() =>
+                                                                        handleUpdateScorer(
+                                                                            player.id,
+                                                                            "increment"
+                                                                        )
+                                                                    }
+                                                                    className="flex items-center justify-center rounded-lg transition"
+                                                                >
+                                                                    +
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                        </div>
+                                    )}
+
+
+
+                            </div>
+
+                        )}
+
                 </>
 
 

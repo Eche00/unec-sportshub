@@ -18,6 +18,16 @@ import toast from "react-hot-toast";
 import { db } from "@/lib/firebase";
 
 /* TYPES */
+export type TopScorer = {
+    id: string;
+    playerName: string;
+    teamId: string;
+    teamName: string;
+    goals: number;
+    assists?: number;
+    yellowCards?: number;
+    redCards?: number;
+};
 
 export type Team = {
     id: string;
@@ -94,6 +104,7 @@ export type Tournament = {
     category?: "football" | "basketball" | "volleyball" | "tennis" | "chess";
     teams: Team[];
     draw?: DrawMatch[];
+    topScorers?: TopScorer[];
 
 };
 
@@ -480,7 +491,86 @@ const useTournamentInfo = () => {
             toast.error("Failed to delete team");
         }
     };
+    const addTopScorer = async (
+        tournamentId: string,
+        scorer: TopScorer
+    ) => {
+        try {
+            const target = tournaments.find(
+                t => t.id === tournamentId
+            );
 
+            if (!target) return;
+
+            const topScorers = target.topScorers || [];
+
+            await editTournament(tournamentId, {
+                topScorers: [
+                    ...topScorers,
+                    scorer
+                ]
+            });
+
+            toast.success("Top scorer added");
+        } catch (error) {
+            console.log(error);
+            toast.error("Failed");
+        }
+    };
+    const updateTopScorer = async (
+        tournamentId: string,
+        scorerId: string,
+        action: "increment" | "decrement"
+    ) => {
+        try {
+            const target = tournaments.find(
+                t => t.id === tournamentId
+            );
+
+            if (!target) return;
+
+            const updated = (target.topScorers || []).map(player => {
+                if (player.id !== scorerId) return player;
+
+                return {
+                    ...player,
+                    goals:
+                        action === "increment"
+                            ? player.goals + 1
+                            : Math.max(0, player.goals - 1),
+                };
+            });
+
+            await editTournament(tournamentId, {
+                topScorers: updated,
+            });
+        } catch (error) {
+            console.log(error);
+            toast.error("Failed to update scorer");
+        }
+    };
+    const deleteTopScorer = async (
+        tournamentId: string,
+        scorerId: string
+    ) => {
+        try {
+            const target = tournaments.find(
+                t => t.id === tournamentId
+            );
+
+            if (!target) return;
+
+            await editTournament(tournamentId, {
+                topScorers: target.topScorers?.filter(
+                    p => p.id !== scorerId
+                )
+            });
+
+            toast.success("Deleted");
+        } catch (error) {
+            console.log(error);
+        }
+    };
     /* EXPORT */
 
     return {
@@ -539,7 +629,11 @@ const useTournamentInfo = () => {
 
         getTournamentStatus,
         getTournamentStage,
-        filteredTournaments
+        filteredTournaments,
+
+        addTopScorer,
+        updateTopScorer,
+        deleteTopScorer,
     };
 };
 

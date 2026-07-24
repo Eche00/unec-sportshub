@@ -20,7 +20,7 @@ type Props = {
 
 function StandingsTable({ tournament, onClose }: Props) {
     const [activeTab, setActiveTab] = useState<
-        "standings" | "live" | "upcoming" | "past"
+        "standings" | "live" | "upcoming" | "past" | "top-scorers"
     >("standings");
 
 
@@ -83,8 +83,7 @@ function StandingsTable({ tournament, onClose }: Props) {
         return grouped;
     }, [tournament.draw]);
 
-    console.log("Rounds:", rounds);
-    console.log("Grouped draw:", drawByRound);
+
     return (
         <div
             className="fixed inset-0 top-16.5 bg-black/60 z-50 flex justify-end"
@@ -133,6 +132,7 @@ function StandingsTable({ tournament, onClose }: Props) {
                         { key: "upcoming", label: "Upcoming " },
                         { key: "past", label: "Past " },
                         { key: "live", label: "Live " },
+                        { key: "top-scorers", label: "Top Scorers " },
                     ].map((tab) => (
                         <button
                             key={tab.key}
@@ -397,11 +397,61 @@ function StandingsTable({ tournament, onClose }: Props) {
                                     </div>
                                 )
                             )}
+                            {activeTab === "top-scorers" && (
+                                <>
+                                    <h2 className="text-lg font-semibold">
+                                        Top Scorers
+                                    </h2>
+                                    <div className="space-y-3">
+                                        {(tournament.topScorers?.length ?? 0) > 0 ? (
+                                            tournament.topScorers!
+                                                .sort((a, b) => b.goals - a.goals)
+                                                .map((player, index) => (
+                                                    <div
+                                                        key={player.id}
+                                                        className="flex items-center justify-between rounded-xl border border-gray-700 bg-[#111827] px-4 py-2 hover:border-[#3B82F6] transition-all"
+                                                    >
+                                                        <div className="flex items-center gap-4">
+                                                            <div className="flex items-center justify-center rounded-full font-bold text-xs">
+                                                                #{index + 1}
+                                                            </div>
+
+                                                            <div>
+                                                                <h3 className="font-semibold text-white">
+                                                                    {player.playerName}
+                                                                </h3>
+
+                                                                <p className="text-xs text-gray-400">
+                                                                    {player.teamName}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+
+                                                        <div className="flex items-center gap-3">
+                                                            <span className="text-sm text-gray-400 md:inline hidden">
+                                                                Goals
+                                                            </span>
+
+                                                            <div className="text-center text-lg font-bold text-white bg-[#0F1115] border border-gray-700 rounded-lg px-2 text-sm">
+                                                                {player.goals}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ))
+                                        ) : (
+                                            <div className="rounded-xl border border-dashed border-gray-700 bg-[#111827] p-6 text-center">
+                                                <p className="text-sm text-gray-400">
+                                                    No top scorers yet.
+                                                </p>
+                                            </div>
+                                        )}
+                                    </div>
+                                </>
+                            )}
 
                         </div>
                     )}
 
-                    {/*  UPCOMING MATCHES  */}
 
                 </div>
             </motion.aside>
