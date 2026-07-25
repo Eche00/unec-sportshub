@@ -4,7 +4,7 @@
 import React, { useEffect, useState } from "react";
 import Input from "../ui/Input";
 import Button from "../ui/Button";
-import { Add } from "@mui/icons-material";
+import { Add, Settings } from "@mui/icons-material";
 import { motion } from "framer-motion";
 
 import useTournamentInfo, { DrawMatch, Team, Tournament } from "@/utils/logics/usetournamentinfo";
@@ -13,6 +13,7 @@ import useMatchesInfo from "@/utils/logics/usematchesinfo";
 import CreateMatchForm from "@/components/forms/CreateMatchForm";
 import MatchCard from "../match/MatchCard";
 import toast from "react-hot-toast";
+import AddPlayersForm from "./AddPlayersForm";
 
 interface Props {
     tournament: Tournament;
@@ -20,23 +21,33 @@ interface Props {
 }
 
 function EditTournamentForm({ tournament, onClose }: Props) {
-    const [tab, setTab] = useState<"standings" | "matches" | "scorers">("standings");
+    const [tab, setTab] = useState<"teams" | "standings" | "matches" | "stats">("teams");
     const [draw, setDraw] = useState<DrawMatch[]>([]);
     const [editingRound, setEditingRound] = useState<DrawMatch["round"]>();
     const [playerName, setPlayerName] = useState("");
+    const [goals, setGoals] = useState(0);
+    const [assists, setAssists] = useState(0);
+    const [yellowCards, setYellowCards] = useState(0);
+    const [redCards, setRedCards] = useState(0);
     const [topScorers, setTopScorers] = useState(
         tournament.topScorers || []
     );
+    const [settings, setSettings] = useState(true);
+    const [addPlayers, setAddPlayers] = useState(false);
     const [createScorer, setCreateScorer] =
         useState(false);
 
     const [selectedTeam, setSelectedTeam] = useState("");
+    const [selectedTeamP, setSelectedTeamP] = useState<Team | null>(null);
+    const selectedTeamData = tournament.teams.find(
+        (team) => team.id === selectedTeam
+    );
 
-    const [goals, setGoals] = useState(0);
+    const players = selectedTeamData?.squad ?? [];
     const {
         editTournament,
         updateTournamentStatus,
-        deleteTournament, addTopScorer, updateTopScorer
+        deleteTournament, addTopScorer, updatePlayerStat
     } = useTournamentInfo();
     const {
         matches,
@@ -58,7 +69,6 @@ function EditTournamentForm({ tournament, onClose }: Props) {
     }, [tournament]);
     useEffect(() => {
         if (tournament.draw?.length) {
-            console.log("Tournament draw:", tournament.draw);
             setDraw(tournament.draw);
             return;
         }
@@ -277,29 +287,35 @@ function EditTournamentForm({ tournament, onClose }: Props) {
     const format = tournament.settings?.format;
 
     const handleAddScorer = async () => {
-
         const team = tournament.teams.find(
             t => t.id === selectedTeam
         );
+
         if (!team) return;
 
-        await addTopScorer(
-            tournament.id,
-            {
-                id: crypto.randomUUID(),
-                playerName,
-                teamId: team.id,
-                teamName: team.name,
-                goals
-            }
-        );
+        await addTopScorer(tournament.id, {
+            id: crypto.randomUUID(),
+            playerName,
+            teamId: team.id,
+            teamName: team.name,
+            goals,
+            assists,
+            yellowCards,
+            redCards,
+        });
 
         setPlayerName("");
+        setSelectedTeam("");
         setGoals(0);
-        setCreateScorer(false)
+        setAssists(0);
+        setYellowCards(0);
+        setRedCards(0);
+        setCreateScorer(false);
     };
-    const handleUpdateScorer = async (
+
+    const handleUpdatePlayer = async (
         scorerId: string,
+        stat: "goals" | "assists" | "yellowCards" | "redCards",
         action: "increment" | "decrement"
     ) => {
 
@@ -308,25 +324,23 @@ function EditTournamentForm({ tournament, onClose }: Props) {
                 player.id === scorerId
                     ? {
                         ...player,
-                        goals:
+                        [stat]:
                             action === "increment"
-                                ? player.goals + 1
-                                : Math.max(0, player.goals - 1),
+                                ? (player[stat] ?? 0) + 1
+                                : Math.max(0, (player[stat] ?? 0) - 1),
                     }
                     : player
             )
         );
 
-        await updateTopScorer(
+        await updatePlayerStat(
             tournament.id,
             scorerId,
+            stat,
             action
         );
     };
-    useEffect(() => {
-        console.log("Tournament prop updated");
-        console.log(tournament.topScorers);
-    }, [tournament]);
+
     return (
         <div
             className="fixed inset-0 bg-black/60 z-50 flex justify-end"
@@ -372,44 +386,32 @@ function EditTournamentForm({ tournament, onClose }: Props) {
                 </div>
 
                 {/*  TABLE / STANDINGS  */}
+
                 <>
                     {/* CONTROLS */}
                     <div className="sticky top-0 z-20 bg-[#0F172A] pb-4">
                         <div className="flex md:flex-row flex-col items-center justify-between gap-3">
 
-                            {/* LEFT */}
-                            <div className="flex items-center gap-3">
 
-                                <div className="flex items-center gap-1 bg-[#111827] border border-gray-800 p-1.5 rounded-lg">
+                            {/* Tabs */}
+                            <div className="flex gap-2 flex-wrap mb-6 border-b border-gray-800 pb-2 text-sm">
+                                {[
+                                    { key: "teams", label: "Teams" },
+                                    { key: "standings", label: "Standings" },
+                                    { key: "matches", label: "Matches" },
+                                    { key: "stats", label: "Stats" },
+                                ].map((item) => (
                                     <button
-                                        onClick={() => setTab("standings")}
-                                        className={`px-3 py-1.5 text-sm rounded-lg transition cursor-pointer ${tab === "standings"
-                                            ? "bg-[#3B82F6] text-black"
+                                        key={item.key}
+                                        onClick={() => setTab(item.key as typeof tab)}
+                                        className={`px-3 py-1 rounded-lg transition cursor-pointer ${tab === item.key
+                                            ? "bg-white/10 text-white"
                                             : "text-gray-400 hover:text-white"
                                             }`}
                                     >
-                                        Standings
+                                        {item.label}
                                     </button>
-
-                                    <button
-                                        onClick={() => setTab("matches")}
-                                        className={`px-3 py-1.5 text-sm rounded-lg transition cursor-pointer ${tab === "matches"
-                                            ? "bg-[#3B82F6] text-black"
-                                            : "text-gray-400 hover:text-white"
-                                            }`}
-                                    >
-                                        Matches
-                                    </button>
-                                    <button
-                                        onClick={() => setTab("scorers")}
-                                        className={`px-3 py-1.5 rounded-lg cursor-pointer ${tab === "scorers"
-                                            ? "bg-[#3B82F6] text-black"
-                                            : "text-gray-400"
-                                            }`}
-                                    >
-                                        Scorers
-                                    </button>
-                                </div>
+                                ))}
                             </div>
 
                             {/* RIGHT */}
@@ -444,23 +446,56 @@ function EditTournamentForm({ tournament, onClose }: Props) {
                                     </button>
 
                                 </div>
-                            ) : <Button
+                            ) : tab === "stats" ? <Button
                                 onClick={() => setCreateScorer(!createScorer)}
                                 className="shrink-0"
                             >
 
-                                {!createScorer ? <span><Add fontSize="small" /> Add Scorer</span> : "Close"}
-                            </Button>}
+                                {!createScorer ? <span><Add fontSize="small" /> Add Stats</span> : "Close"}
+                            </Button> : <></>}
                             </div>
                         </div>
                     </div>
-                    {format === "knockout" && tab === "standings" ? (
+                    {tab === "teams" ? (<div className="space-y-4">
+                        {tournament.teams.map((t) => (
+                            <div
+                                key={t.id}
+                                className="rounded-xl flex items-center justify-between border border-gray-700 bg-[#111827] p-4 transition hover:border-cyan-500"
+                            >
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <h3 className="text-base font-semibold text-white">
+                                            {t.name}
+                                            <span className="rounded-full bg-cyan-500/10 px-3 py-1 text-xs font-medium text-cyan-400">
+                                                Squad
+                                            </span>
+                                        </h3>
+
+                                        <p className="mt-1 text-sm text-gray-400">
+                                            {t.squad?.length || 0} Player{(t.squad?.length || 0) !== 1 && "s"}
+                                        </p>
+                                    </div>
+
+
+                                </div>
+
+                                <Button
+                                    onClick={() => {
+                                        setSelectedTeamP(t);
+                                        setAddPlayers(true);
+                                    }}
+                                >
+                                    Add Player
+                                </Button>
+                            </div>
+                        ))}
+                    </div>) : format === "knockout" && tab === "standings" ? (
                         <div className="space-y-6">
 
                             <div className="space-y-5">
 
                                 <h3 className="font-semibold">
-                                    Create Tournament Draw
+                                    Tournament Draw
                                 </h3>
 
                                 {draw
@@ -755,44 +790,95 @@ function EditTournamentForm({ tournament, onClose }: Props) {
                             <div className="space-y-6">
 
                                 <h2 className="text-lg font-semibold">
-                                    Top Scorers
+                                    Stats
                                 </h2>
                                 {createScorer ?
                                     (<div className="space-y-6">
-
-                                        <Input
-                                            value={playerName}
-                                            onChange={(e) => setPlayerName(e.target.value)}
-                                            placeholder="Player name"
-                                        />
-
                                         <select
                                             value={selectedTeam}
-                                            onChange={(e) => setSelectedTeam(e.target.value)}
+                                            onChange={(e) => {
+                                                setSelectedTeam(e.target.value);
+                                                setPlayerName(""); // reset player when team changes
+                                            }}
                                             className="w-full bg-[#0F1115] border border-gray-700 rounded-lg p-2 text-sm"
                                         >
-                                            <option>Select Team</option>
+                                            <option value="">Select Team</option>
 
-                                            {tournament.teams.map(team => (
-                                                <option
-                                                    key={team.id}
-                                                    value={team.id}
-                                                >
+                                            {tournament.teams.map((team) => (
+                                                <option key={team.id} value={team.id}>
                                                     {team.name}
                                                 </option>
                                             ))}
+                                        </select>
+                                        <select
+                                            value={playerName}
+                                            onChange={(e) => setPlayerName(e.target.value)}
+                                            disabled={!selectedTeam}
+                                            className="w-full bg-[#0F1115] border border-gray-700 rounded-lg p-2 text-sm"
+                                        >
+                                            <option value="">Select Player</option>
 
+                                            {players.map((player) => (
+                                                <option key={player.id} value={player.name}>
+                                                    {player.name}
+                                                </option>
+                                            ))}
                                         </select>
 
-                                        <Input
-                                            type="number"
-                                            value={goals}
-                                            onChange={(e) => setGoals(Number(e.target.value))}
-                                        />
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div className="space-y-1">
+                                                <label className="text-sm font-medium text-gray-300">
+                                                    Goals
+                                                </label>
+                                                <Input
+                                                    type="number"
+                                                    min={0}
+                                                    value={goals}
+                                                    onChange={(e) => setGoals(Number(e.target.value))}
+                                                    placeholder="0"
+                                                />
+                                            </div>
 
-                                        <Button onClick={handleAddScorer}>
-                                            Add Player
-                                        </Button>
+                                            <div className="space-y-1">
+                                                <label className="text-sm font-medium text-gray-300">
+                                                    Assists
+                                                </label>
+                                                <Input
+                                                    type="number"
+                                                    min={0}
+                                                    value={assists}
+                                                    onChange={(e) => setAssists(Number(e.target.value))}
+                                                    placeholder="0"
+                                                />
+                                            </div>
+
+                                            <div className="space-y-1">
+                                                <label className="text-sm font-medium text-yellow-400">
+                                                    Yellow Cards
+                                                </label>
+                                                <Input
+                                                    type="number"
+                                                    min={0}
+                                                    value={yellowCards}
+                                                    onChange={(e) => setYellowCards(Number(e.target.value))}
+                                                    placeholder="0"
+                                                />
+                                            </div>
+
+                                            <div className="space-y-1">
+                                                <label className="text-sm font-medium text-red-400">
+                                                    Red Cards
+                                                </label>
+                                                <Input
+                                                    type="number"
+                                                    min={0}
+                                                    value={redCards}
+                                                    onChange={(e) => setRedCards(Number(e.target.value))}
+                                                    placeholder="0"
+                                                />
+                                            </div>
+                                        </div>
+                                        <Button onClick={handleAddScorer}>Add Player</Button>
                                     </div>) : (
                                         <div className="space-y-3">
                                             {(tournament.topScorers || [])
@@ -800,64 +886,101 @@ function EditTournamentForm({ tournament, onClose }: Props) {
                                                 .map((player, index) => (
                                                     <div
                                                         key={player.id}
-                                                        className="flex items-center justify-between rounded-xl border border-gray-700 bg-[#111827] px-4 py-2 hover:border-[#3B82F6] transition-all"
+                                                        className="rounded-xl border border-gray-700 bg-[#111827] p-4 hover:border-[#3B82F6] transition-all"
                                                     >
-                                                        <div className="flex items-center gap-4">
-                                                            {/* Position */}
-                                                            <div
-                                                                className={`flex items-center justify-center rounded-full font-bold text-xs`}
-                                                            >
-                                                                #{index + 1}
-                                                            </div>
+                                                        {/* Header */}
+                                                        <div className="flex items-center justify-between mb-4">
+                                                            <div className="flex items-center gap-4">
+                                                                <div className="font-bold text-sm text-[#3B82F6]">
+                                                                    #{index + 1}
+                                                                </div>
 
+                                                                <div>
+                                                                    <h3 className="font-semibold text-white">
+                                                                        {player.playerName}
+                                                                    </h3>
 
-
-                                                            {/* Details */}
-                                                            <div>
-                                                                <h3 className="font-semibold text-white">
-                                                                    {player.playerName}
-                                                                </h3>
-
-                                                                <p className="text-xs text-gray-400">
-                                                                    {player.teamName}
-                                                                </p>
+                                                                    <p className="text-xs text-gray-400">
+                                                                        {player.teamName}
+                                                                    </p>
+                                                                </div>
                                                             </div>
                                                         </div>
 
-                                                        <div className="flex items-center gap-3">
-                                                            <span className="text-sm text-gray-400 md:inline hidden">
-                                                                Goals
-                                                            </span>
+                                                        {/* Stats */}
+                                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
 
-                                                            <div className="flex items-center gap-2">
-                                                                <button
-                                                                    onClick={() =>
-                                                                        handleUpdateScorer(
-                                                                            player.id,
-                                                                            "decrement"
-                                                                        )
-                                                                    }
-                                                                    className="flex  items-center justify-center rounded-lg transition"
+                                                            {[
+                                                                {
+                                                                    label: "Goals",
+                                                                    key: "goals",
+                                                                    value: player.goals,
+                                                                },
+                                                                {
+                                                                    label: "Assists",
+                                                                    key: "assists",
+                                                                    value: player.assists ?? 0,
+                                                                },
+                                                                {
+                                                                    label: "Yellow",
+                                                                    key: "yellowCards",
+                                                                    value: player.yellowCards ?? 0,
+                                                                },
+                                                                {
+                                                                    label: "Red",
+                                                                    key: "redCards",
+                                                                    value: player.redCards ?? 0,
+                                                                },
+                                                            ].map((stat) => (
+                                                                <div
+                                                                    key={stat.key}
+                                                                    className="bg-[#0F1115] rounded-lg p-3 border border-gray-700"
                                                                 >
-                                                                    −
-                                                                </button>
+                                                                    <p className="text-xs text-gray-400 mb-2">
+                                                                        {stat.label}
+                                                                    </p>
 
-                                                                <div className="text-center text-lg font-bold text-white bg-[#0F1115] border border-gray-700 rounded-lg px-2 text-sm">
-                                                                    {player.goals}
+                                                                    <div className="flex items-center justify-between">
+                                                                        <button
+                                                                            onClick={() =>
+                                                                                handleUpdatePlayer(
+                                                                                    player.id,
+                                                                                    stat.key as
+                                                                                    | "goals"
+                                                                                    | "assists"
+                                                                                    | "yellowCards"
+                                                                                    | "redCards",
+                                                                                    "decrement"
+                                                                                )
+                                                                            }
+                                                                            className="w-8 h-8 rounded-lg bg-gray-800 hover:bg-gray-700"
+                                                                        >
+                                                                            −
+                                                                        </button>
+
+                                                                        <span className="text-lg font-bold text-white">
+                                                                            {stat.value}
+                                                                        </span>
+
+                                                                        <button
+                                                                            onClick={() =>
+                                                                                handleUpdatePlayer(
+                                                                                    player.id,
+                                                                                    stat.key as
+                                                                                    | "goals"
+                                                                                    | "assists"
+                                                                                    | "yellowCards"
+                                                                                    | "redCards",
+                                                                                    "increment"
+                                                                                )
+                                                                            }
+                                                                            className="w-8 h-8 rounded-lg bg-gray-800 hover:bg-gray-700"
+                                                                        >
+                                                                            +
+                                                                        </button>
+                                                                    </div>
                                                                 </div>
-
-                                                                <button
-                                                                    onClick={() =>
-                                                                        handleUpdateScorer(
-                                                                            player.id,
-                                                                            "increment"
-                                                                        )
-                                                                    }
-                                                                    className="flex items-center justify-center rounded-lg transition"
-                                                                >
-                                                                    +
-                                                                </button>
-                                                            </div>
+                                                            ))}
                                                         </div>
                                                     </div>
                                                 ))}
@@ -888,21 +1011,36 @@ function EditTournamentForm({ tournament, onClose }: Props) {
 
                 <div className="w-full flex items-end justify-end gap-4 py-5 my-10  border-t-[0.1px] border-gray-400">
 
-                    <Button
-                        onClick={() => { deleteTournament(tournament.id); onClose(); }}
-                        variant="secondaryRed"
-                    >
-                        Delete
-                    </Button>
+                    {settings ? <span className="cursor-pointer my-2 hover:scale-105" onClick={() => setSettings(!settings)}><Settings /></span> : <div className="flex items-center gap-2">
 
-                    <Button
+                        <Button
+                            onClick={() => { deleteTournament(tournament.id); onClose(); }}
+                            variant="secondaryRed"
+                        >
+                            Delete
+                        </Button>
+                        <hr className="h-5 w-[0.1px] border-none bg-gray-500" />
+
+                        <span className="cursor-pointer hover:scale-105" onClick={() => setSettings(!settings)}><Settings /></span>
+                    </div>}
+
+                    {/* <Button
                         onClick={saveTeams}
                         variant="primary"
                     >
                         Update
-                    </Button>
+                    </Button> */}
                 </div>
             </motion.aside>
+            <AddPlayersForm
+                isOpen={addPlayers}
+                onClose={() => {
+                    setAddPlayers(false);
+                    setSelectedTeamP(null);
+                }}
+                tournament={tournament}
+                team={selectedTeamP}
+            />
         </div >
     );
 }

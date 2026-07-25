@@ -29,6 +29,19 @@ export type TopScorer = {
     redCards?: number;
 };
 
+export type Player = {
+    id: string;
+    name: string;
+    jerseyNumber?: number;
+    position?:
+    | "Goalkeeper"
+    | "Defender"
+    | "Midfielder"
+    | "Forward";
+    age?: number;
+    captain?: boolean;
+};
+
 export type Team = {
     id: string;
     name: string;
@@ -39,6 +52,7 @@ export type Team = {
     goalsFor?: number;
     goalsAgainst?: number;
     points: number;
+    squad?: Player[];
 };
 
 export type KnockoutSettings = {
@@ -517,9 +531,10 @@ const useTournamentInfo = () => {
             toast.error("Failed");
         }
     };
-    const updateTopScorer = async (
+    const updatePlayerStat = async (
         tournamentId: string,
         scorerId: string,
+        stat: "goals" | "assists" | "yellowCards" | "redCards",
         action: "increment" | "decrement"
     ) => {
         try {
@@ -534,10 +549,10 @@ const useTournamentInfo = () => {
 
                 return {
                     ...player,
-                    goals:
+                    [stat]:
                         action === "increment"
-                            ? player.goals + 1
-                            : Math.max(0, player.goals - 1),
+                            ? (player[stat] ?? 0) + 1
+                            : Math.max(0, (player[stat] ?? 0) - 1),
                 };
             });
 
@@ -546,7 +561,7 @@ const useTournamentInfo = () => {
             });
         } catch (error) {
             console.log(error);
-            toast.error("Failed to update scorer");
+            toast.error("Failed to update player");
         }
     };
     const deleteTopScorer = async (
@@ -632,7 +647,7 @@ const useTournamentInfo = () => {
         filteredTournaments,
 
         addTopScorer,
-        updateTopScorer,
+        updatePlayerStat,
         deleteTopScorer,
     };
 };

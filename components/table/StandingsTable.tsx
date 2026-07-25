@@ -20,9 +20,22 @@ type Props = {
 
 function StandingsTable({ tournament, onClose }: Props) {
     const [activeTab, setActiveTab] = useState<
-        "standings" | "live" | "upcoming" | "past" | "top-scorers"
-    >("standings");
+        "teams" | "standings" | "live" | "upcoming" | "past" | "stats"
+    >("teams");
+    const [statView, setStatView] = useState<
+        "goals" | "assists" | "yellowCards" | "redCards"
+    >("goals");
+    const sortedPlayers = [...(tournament.topScorers || [])]
+        .filter((player) => (player[statView] ?? 0) > 0)
+        .sort((a, b) => (b[statView] ?? 0) - (a[statView] ?? 0));
 
+    const statLabels = {
+        goals: "Goals",
+        assists: "Assists",
+        yellowCards: "Yellow Cards",
+        redCards: "Red Cards",
+    };
+    const [openTeam, setOpenTeam] = useState<string | null>(null);
 
     const {
         matches,
@@ -126,13 +139,14 @@ function StandingsTable({ tournament, onClose }: Props) {
                 </div>
 
                 {/* Tabs */}
-                <div className="flex gap-2 mb-6 border-b border-gray-800 pb-2 text-sm">
+                <div className="flex gap-2 flex-wrap mb-6 border-b border-gray-800 pb-2 text-sm">
                     {[
+                        { key: "teams", label: "Teams" },
                         { key: "standings", label: "Standings" },
                         { key: "upcoming", label: "Upcoming " },
                         { key: "past", label: "Past " },
                         { key: "live", label: "Live " },
-                        { key: "top-scorers", label: "Top Scorers " },
+                        { key: "stats", label: "Stats" },
                     ].map((tab) => (
                         <button
                             key={tab.key}
@@ -151,269 +165,367 @@ function StandingsTable({ tournament, onClose }: Props) {
                 <div className="flex-1 overflow-y-auto">
 
                     {/*  STANDINGS  */}
-                    {activeTab === "standings" ? (
-                        tournament.settings?.format === "league" ? (
-                            <div className="rounded-xl border border-gray-800 overflow-hidden">
-                                <table className="w-full text-sm text-left">
-                                    <thead className="bg-[#0F1115] text-gray-400 text-xs uppercase">
-                                        <tr>
-                                            <th className="p-3">#</th>
-                                            <th className="p-3">Team</th>
-                                            <th className="p-3">MP</th>
-                                            <th className="p-3">W</th>
-                                            <th className="p-3">D</th>
-                                            <th className="p-3">L</th>
-                                            <th className="p-3">GF</th>
-                                            <th className="p-3">GA</th>
-                                            <th className="p-3">Pts</th>
-                                        </tr>
-                                    </thead>
+                    {activeTab === "teams" ?
+                        <div className="space-y-3">
+                            {tournament.teams.map((team) => {
+                                const isOpen = openTeam === team.id;
 
-                                    <tbody>
-                                        {[...tournament.teams]
-                                            .sort((a, b) => {
-                                                if ((b.points ?? 0) !== (a.points ?? 0)) {
-                                                    return (b.points ?? 0) - (a.points ?? 0);
-                                                }
+                                return (
+                                    <div
+                                        key={team.id}
+                                        className="overflow-hidden rounded-xl border border-gray-700 bg-[#111827]"
+                                    >
+                                        <button
+                                            onClick={() =>
+                                                setOpenTeam(isOpen ? null : team.id)
+                                            }
+                                            className="flex w-full items-center justify-between px-4 py-3 text-left transition hover:bg-[#1A2233]"
+                                        >
+                                            <div>
+                                                <h3 className="font-semibold text-white">
+                                                    {team.name}
+                                                </h3>
 
-                                                const bGD =
-                                                    (b.goalsFor ?? 0) - (b.goalsAgainst ?? 0);
-                                                const aGD =
-                                                    (a.goalsFor ?? 0) - (a.goalsAgainst ?? 0);
-
-                                                if (bGD !== aGD) return bGD - aGD;
-
-                                                if ((b.goalsFor ?? 0) !== (a.goalsFor ?? 0)) {
-                                                    return (b.goalsFor ?? 0) - (a.goalsFor ?? 0);
-                                                }
-
-                                                return a.name.localeCompare(b.name);
-                                            })
-                                            .map((team, index) => (
-                                                <tr
-                                                    key={team.id ?? index}
-                                                    className="border-t border-gray-800 hover:bg-white/5"
-                                                >
-                                                    <td className="p-3">{index + 1}</td>
-                                                    <td className="p-3 text-gray-200">{team.name}</td>
-                                                    <td className="p-3">{team.played}</td>
-                                                    <td className="p-3">{team.won ?? "-"}</td>
-                                                    <td className="p-3">{team.drawn ?? "-"}</td>
-                                                    <td className="p-3">{team.lost ?? "-"}</td>
-                                                    <td className="p-3">{team.goalsFor ?? "-"}</td>
-                                                    <td className="p-3">{team.goalsAgainst ?? "-"}</td>
-                                                    <td className="p-3 font-bold">
-                                                        {team.points ?? 0}
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        ) : (
-                            <div className="space-y-6">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <h3 className="text-xl font-semibold text-white">
-                                            Tournament Bracket
-                                        </h3>
-
-                                    </div>
-
-                                    <div className="px-3 py-1 rounded-full bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 text-xs">
-                                        Knockout
-                                    </div>
-                                </div>
-                                <div className=" flex flex-wrap w-full gap-3"> {[...tournament.teams].map((team, index) => (<p key={team.id ?? index} className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#0F1115] border border-gray-700 text-sm text-gray-200">{team.name}</p>))}</div>
-                                <div className="overflow-x-auto pb-4">
-                                    <div className="flex gap-8 min-w-max">
-
-                                        {rounds.map((round) => (
-
-                                            <div
-                                                key={round.title}
-                                                className="w-72 flex-shrink-0"
-                                            >
-                                                <div className="mb-4">
-                                                    <h4 className="text-center font-semibold text-slate-200">
-                                                        {round.title}
-                                                    </h4>
-
-                                                    <div className="mt-2 h-px bg-gray-700" />
-                                                </div>
-
-                                                <div className="space-y-5">
-
-                                                    {(drawByRound[round.title] ?? []).map((match) => (
-
-                                                        <div
-                                                            key={match.id}
-                                                            className="rounded-xl border border-gray-700 bg-[#111827] overflow-hidden shadow-lg"
-                                                        >
-
-                                                            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700">
-
-                                                                <div className="flex items-center gap-3">
-
-                                                                    <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-xs font-semibold">
-                                                                        {match.teamA?.name.charAt(0) ?? "?"}
-                                                                    </div>
-
-                                                                    <span
-                                                                        className={
-                                                                            match.teamA
-                                                                                ? "text-white"
-                                                                                : "text-gray-400"
-                                                                        }
-                                                                    >
-                                                                        {match.teamA?.name ?? "Team TBD"}
-                                                                    </span>
-
-                                                                </div>
-
-                                                                <span className="font-mono text-gray-500">
-                                                                    VS
-                                                                </span>
-
-                                                            </div>
-
-                                                            <div className="flex items-center justify-between px-4 py-3">
-
-                                                                <div className="flex items-center gap-3">
-
-                                                                    <div className="w-8 h-8 rounded-full bg-red-600 flex items-center justify-center text-xs font-semibold">
-                                                                        {match.teamB?.name.charAt(0) ?? "?"}
-                                                                    </div>
-
-                                                                    <span
-                                                                        className={
-                                                                            match.teamB
-                                                                                ? "text-white"
-                                                                                : "text-gray-400"
-                                                                        }
-                                                                    >
-                                                                        {match.teamB?.name ?? "Team TBD"}
-                                                                    </span>
-
-                                                                </div>
-
-                                                                <span className="font-mono text-gray-500">
-                                                                    VS
-                                                                </span>
-
-                                                            </div>
-
-                                                        </div>
-
-                                                    ))}
-
-                                                </div>
+                                                <p className="mt-1 text-sm text-gray-400">
+                                                    {team.squad?.length || 0} Player
+                                                    {(team.squad?.length || 0) !== 1 && "s"}
+                                                </p>
                                             </div>
 
-                                        ))}
+                                            <div
+                                                className={`text-xl text-cyan-400 transition-transform duration-200 ${isOpen ? "rotate-180" : ""
+                                                    }`}
+                                            >
+                                                ▼
+                                            </div>
+                                        </button>
 
+                                        {isOpen && (
+                                            <div className="border-t border-gray-700 bg-[#0F1115] p-4">
+                                                {team.squad?.length ? (
+                                                    <div className="space-y-2">
+                                                        {team.squad.map((player) => (
+                                                            <div
+                                                                key={player.id}
+                                                                className="flex items-center justify-between rounded-lg border border-gray-700 bg-[#111827] px-4 py-3"
+                                                            >
+                                                                <div>
+                                                                    <p className="font-medium text-white">
+                                                                        {player.name}
+                                                                    </p>
+
+                                                                    <p className="text-xs text-gray-400">
+                                                                        {player.position}
+                                                                    </p>
+                                                                </div>
+
+                                                                <span className="rounded-full bg-cyan-500/10 px-3 py-1 text-sm font-semibold text-cyan-400">
+                                                                    #{player.jerseyNumber ?? "--"}
+                                                                </span>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                ) : (
+                                                    <div className="rounded-lg border border-dashed border-gray-700 py-6 text-center text-sm text-gray-500">
+                                                        No players added yet.
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
                                     </div>
+                                );
+                            })}
+                        </div>
+                        : activeTab === "standings" ? (
+                            tournament.settings?.format === "league" ? (
+                                <div className="rounded-xl border border-gray-800 overflow-hidden">
+                                    <table className="w-full text-sm text-left">
+                                        <thead className="bg-[#0F1115] text-gray-400 text-xs uppercase">
+                                            <tr>
+                                                <th className="p-3">#</th>
+                                                <th className="p-3">Team</th>
+                                                <th className="p-3">MP</th>
+                                                <th className="p-3">W</th>
+                                                <th className="p-3">D</th>
+                                                <th className="p-3">L</th>
+                                                <th className="p-3">GF</th>
+                                                <th className="p-3">GA</th>
+                                                <th className="p-3">Pts</th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+                                            {[...tournament.teams]
+                                                .sort((a, b) => {
+                                                    if ((b.points ?? 0) !== (a.points ?? 0)) {
+                                                        return (b.points ?? 0) - (a.points ?? 0);
+                                                    }
+
+                                                    const bGD =
+                                                        (b.goalsFor ?? 0) - (b.goalsAgainst ?? 0);
+                                                    const aGD =
+                                                        (a.goalsFor ?? 0) - (a.goalsAgainst ?? 0);
+
+                                                    if (bGD !== aGD) return bGD - aGD;
+
+                                                    if ((b.goalsFor ?? 0) !== (a.goalsFor ?? 0)) {
+                                                        return (b.goalsFor ?? 0) - (a.goalsFor ?? 0);
+                                                    }
+
+                                                    return a.name.localeCompare(b.name);
+                                                })
+                                                .map((team, index) => (
+                                                    <tr
+                                                        key={team.id ?? index}
+                                                        className="border-t border-gray-800 hover:bg-white/5"
+                                                    >
+                                                        <td className="p-3">{index + 1}</td>
+                                                        <td className="p-3 text-gray-200">{team.name}</td>
+                                                        <td className="p-3">{team.played}</td>
+                                                        <td className="p-3">{team.won ?? "-"}</td>
+                                                        <td className="p-3">{team.drawn ?? "-"}</td>
+                                                        <td className="p-3">{team.lost ?? "-"}</td>
+                                                        <td className="p-3">{team.goalsFor ?? "-"}</td>
+                                                        <td className="p-3">{team.goalsAgainst ?? "-"}</td>
+                                                        <td className="p-3 font-bold">
+                                                            {team.points ?? 0}
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                        </tbody>
+                                    </table>
                                 </div>
-                                <div className="rounded-xl border border-dashed border-gray-700 bg-[#111827]/50 p-5 text-center">
+                            ) : (
+                                <div className="space-y-6">
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <h3 className="text-xl font-semibold text-white">
+                                                Tournament Bracket
+                                            </h3>
 
-                                    <p className="text-gray-300 font-medium">
-                                        Matchups will appear here after the tournament draw.
-                                    </p>
+                                        </div>
 
-                                    <p className="text-sm text-gray-500 mt-2">
-                                        {tournament.teams.length} teams are currently registered and waiting
-                                        to be seeded into the bracket.
-                                    </p>
+                                        <div className="px-3 py-1 rounded-full bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 text-xs">
+                                            Knockout
+                                        </div>
+                                    </div>
+                                    <div className="overflow-x-auto pb-4">
+                                        <div className="flex gap-8 min-w-max">
+
+                                            {rounds.map((round) => (
+
+                                                <div
+                                                    key={round.title}
+                                                    className="w-72 flex-shrink-0"
+                                                >
+                                                    <div className="mb-4">
+                                                        <h4 className="text-center font-semibold text-slate-200">
+                                                            {round.title}
+                                                        </h4>
+
+                                                        <div className="mt-2 h-px bg-gray-700" />
+                                                    </div>
+
+                                                    <div className="space-y-5">
+
+                                                        {(drawByRound[round.title] ?? []).map((match) => (
+
+                                                            <div
+                                                                key={match.id}
+                                                                className="rounded-xl border border-gray-700 bg-[#111827] overflow-hidden shadow-lg"
+                                                            >
+
+                                                                <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700">
+
+                                                                    <div className="flex items-center gap-3">
+
+                                                                        <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-xs font-semibold">
+                                                                            {match.teamA?.name.charAt(0) ?? "?"}
+                                                                        </div>
+
+                                                                        <span
+                                                                            className={
+                                                                                match.teamA
+                                                                                    ? "text-white"
+                                                                                    : "text-gray-400"
+                                                                            }
+                                                                        >
+                                                                            {match.teamA?.name ?? "Team TBD"}
+                                                                        </span>
+
+                                                                    </div>
+
+                                                                    <span className="font-mono text-gray-500">
+                                                                        VS
+                                                                    </span>
+
+                                                                </div>
+
+                                                                <div className="flex items-center justify-between px-4 py-3">
+
+                                                                    <div className="flex items-center gap-3">
+
+                                                                        <div className="w-8 h-8 rounded-full bg-red-600 flex items-center justify-center text-xs font-semibold">
+                                                                            {match.teamB?.name.charAt(0) ?? "?"}
+                                                                        </div>
+
+                                                                        <span
+                                                                            className={
+                                                                                match.teamB
+                                                                                    ? "text-white"
+                                                                                    : "text-gray-400"
+                                                                            }
+                                                                        >
+                                                                            {match.teamB?.name ?? "Team TBD"}
+                                                                        </span>
+
+                                                                    </div>
+
+                                                                    <span className="font-mono text-gray-500">
+                                                                        VS
+                                                                    </span>
+
+                                                                </div>
+
+                                                            </div>
+
+                                                        ))}
+
+                                                    </div>
+                                                </div>
+
+                                            ))}
+
+                                        </div>
+                                    </div>
+                                    <div className="rounded-xl border border-dashed border-gray-700 bg-[#111827]/50 p-5 text-center">
+
+                                        <p className="text-gray-300 font-medium">
+                                            Matchups will appear here after the tournament draw.
+                                        </p>
+
+                                        <p className="text-sm text-gray-500 mt-2">
+                                            {tournament.teams.length} teams are currently registered and waiting
+                                            to be seeded into the bracket.
+                                        </p>
+
+                                    </div>
 
                                 </div>
+                            )
+                        ) : (
+                            <div className="flex flex-col gap-4">
 
-                            </div>
-                        )
-                    ) : (
-                        <div className="flex flex-col gap-4">
+                                {activeTab === "upcoming" && (
+                                    upcomingMatches.length > 0 ? (
+                                        upcomingMatches.map((match) => (
+                                            <MatchCard key={match.id} {...match} />
+                                        ))
+                                    ) : (
+                                        <div className="flex flex-col items-center justify-center py-12 text-center">
+                                            <div className="w-16 h-16 rounded-full bg-slate-800 flex items-center justify-center mb-4">
+                                                <EventBusy className="text-slate-400 !text-4xl" />
+                                            </div>
 
-                            {activeTab === "upcoming" && (
-                                upcomingMatches.length > 0 ? (
-                                    upcomingMatches.map((match) => (
-                                        <MatchCard key={match.id} {...match} />
-                                    ))
-                                ) : (
-                                    <div className="flex flex-col items-center justify-center py-12 text-center">
-                                        <div className="w-16 h-16 rounded-full bg-slate-800 flex items-center justify-center mb-4">
-                                            <EventBusy className="text-slate-400 !text-4xl" />
+                                            <h3 className="text-lg font-semibold text-white">
+                                                No Upcoming Matches
+                                            </h3>
+
+                                            <p className="mt-2 max-w-sm text-sm text-slate-400">
+                                                There are currently no scheduled matches for this tournament.
+                                            </p>
+                                        </div>
+                                    )
+                                )}
+
+                                {activeTab === "past" && (
+                                    pastMatches.length > 0 ? (
+                                        pastMatches.map((match) => (
+                                            <MatchCard key={match.id} {...match} />
+                                        ))
+                                    ) : (
+                                        <div className="flex flex-col items-center justify-center py-12 text-center">
+                                            <div className="w-16 h-16 rounded-full bg-slate-800 flex items-center justify-center mb-4">
+                                                <EventBusy className="text-slate-400 !text-4xl" />
+                                            </div>
+
+                                            <h3 className="text-lg font-semibold text-white">
+                                                No Past Matches
+                                            </h3>
+
+                                            <p className="mt-2 max-w-sm text-sm text-slate-400">
+                                                There are currently no past matches for this tournament.
+                                            </p>
+                                        </div>
+                                    )
+                                )}
+
+                                {activeTab === "live" && (
+                                    liveMatches.length > 0 ? (
+                                        liveMatches.map((match) => (
+                                            <MatchCard key={match.id} {...match} />
+                                        ))
+                                    ) : (
+                                        <div className="flex flex-col items-center justify-center py-12 text-center">
+                                            <div className="w-16 h-16 rounded-full bg-slate-800 flex items-center justify-center mb-4">
+                                                <EventBusy className="text-slate-400 !text-4xl" />
+                                            </div>
+
+                                            <h3 className="text-lg font-semibold text-white">
+                                                No Live Matches
+                                            </h3>
+
+                                            <p className="mt-2 max-w-sm text-sm text-slate-400">
+                                                There are currently no live matches for this tournament.
+                                            </p>
+                                        </div>
+                                    )
+                                )}
+                                {activeTab === "stats" && (
+                                    <>
+                                        <div className="flex items-center justify-between">
+                                            <h2 className="text-lg font-semibold">
+                                                Player Statistics
+                                            </h2>
+
+                                            <span className="text-xs text-gray-400">
+                                                {sortedPlayers.length} Players
+                                            </span>
                                         </div>
 
-                                        <h3 className="text-lg font-semibold text-white">
-                                            No Upcoming Matches
-                                        </h3>
-
-                                        <p className="mt-2 max-w-sm text-sm text-slate-400">
-                                            There are currently no scheduled matches for this tournament.
-                                        </p>
-                                    </div>
-                                )
-                            )}
-
-                            {activeTab === "past" && (
-                                pastMatches.length > 0 ? (
-                                    pastMatches.map((match) => (
-                                        <MatchCard key={match.id} {...match} />
-                                    ))
-                                ) : (
-                                    <div className="flex flex-col items-center justify-center py-12 text-center">
-                                        <div className="w-16 h-16 rounded-full bg-slate-800 flex items-center justify-center mb-4">
-                                            <EventBusy className="text-slate-400 !text-4xl" />
+                                        {/* Filter */}
+                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                                            {[
+                                                { key: "goals", label: "Goals" },
+                                                { key: "assists", label: "Assists" },
+                                                { key: "yellowCards", label: "Yellow card" },
+                                                { key: "redCards", label: "Red Card" },
+                                            ].map((item) => (
+                                                <button
+                                                    key={item.key}
+                                                    onClick={() => setStatView(item.key as typeof statView)}
+                                                    className={`rounded-lg border px-3 py-2 text-sm transition cursor-pointer ${statView === item.key
+                                                        ? "border-[#3B82F6] bg-[#3B82F6]/20 text-white"
+                                                        : "border-gray-700 bg-[#111827] text-gray-400 hover:border-gray-500"
+                                                        }`}
+                                                >
+                                                    {item.label}
+                                                </button>
+                                            ))}
                                         </div>
 
-                                        <h3 className="text-lg font-semibold text-white">
-                                            No Past Matches
-                                        </h3>
-
-                                        <p className="mt-2 max-w-sm text-sm text-slate-400">
-                                            There are currently no past matches for this tournament.
-                                        </p>
-                                    </div>
-                                )
-                            )}
-
-                            {activeTab === "live" && (
-                                liveMatches.length > 0 ? (
-                                    liveMatches.map((match) => (
-                                        <MatchCard key={match.id} {...match} />
-                                    ))
-                                ) : (
-                                    <div className="flex flex-col items-center justify-center py-12 text-center">
-                                        <div className="w-16 h-16 rounded-full bg-slate-800 flex items-center justify-center mb-4">
-                                            <EventBusy className="text-slate-400 !text-4xl" />
-                                        </div>
-
-                                        <h3 className="text-lg font-semibold text-white">
-                                            No Live Matches
-                                        </h3>
-
-                                        <p className="mt-2 max-w-sm text-sm text-slate-400">
-                                            There are currently no live matches for this tournament.
-                                        </p>
-                                    </div>
-                                )
-                            )}
-                            {activeTab === "top-scorers" && (
-                                <>
-                                    <h2 className="text-lg font-semibold">
-                                        Top Scorers
-                                    </h2>
-                                    <div className="space-y-3">
-                                        {(tournament.topScorers?.length ?? 0) > 0 ? (
-                                            tournament.topScorers!
-                                                .sort((a, b) => b.goals - a.goals)
-                                                .map((player, index) => (
+                                        <div className="space-y-3 mt-4">
+                                            {sortedPlayers.length > 0 ? (
+                                                sortedPlayers.map((player, index) => (
                                                     <div
                                                         key={player.id}
-                                                        className="flex items-center justify-between rounded-xl border border-gray-700 bg-[#111827] px-4 py-2 hover:border-[#3B82F6] transition-all"
+                                                        className="flex items-center justify-between rounded-xl border border-gray-700 bg-[#111827] px-4 py-3 hover:border-[#3B82F6] transition"
                                                     >
                                                         <div className="flex items-center gap-4">
-                                                            <div className="flex items-center justify-center rounded-full font-bold text-xs">
-                                                                #{index + 1}
+                                                            <div
+                                                                className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white`}
+                                                            >
+                                                                # {index + 1}
                                                             </div>
 
                                                             <div>
@@ -427,30 +539,30 @@ function StandingsTable({ tournament, onClose }: Props) {
                                                             </div>
                                                         </div>
 
-                                                        <div className="flex items-center gap-3">
-                                                            <span className="text-sm text-gray-400 md:inline hidden">
-                                                                Goals
-                                                            </span>
+                                                        <div className="text-right">
+                                                            <p className="text-xs text-gray-400">
+                                                                {statLabels[statView]}
+                                                            </p>
 
-                                                            <div className="text-center text-lg font-bold text-white bg-[#0F1115] border border-gray-700 rounded-lg px-2 text-sm">
-                                                                {player.goals}
-                                                            </div>
+                                                            <p className="text-xl font-bold text-white">
+                                                                {player[statView] ?? 0}
+                                                            </p>
                                                         </div>
                                                     </div>
                                                 ))
-                                        ) : (
-                                            <div className="rounded-xl border border-dashed border-gray-700 bg-[#111827] p-6 text-center">
-                                                <p className="text-sm text-gray-400">
-                                                    No top scorers yet.
-                                                </p>
-                                            </div>
-                                        )}
-                                    </div>
-                                </>
-                            )}
+                                            ) : (
+                                                <div className="rounded-xl border border-dashed border-gray-700 bg-[#111827] p-8 text-center">
+                                                    <p className="text-gray-400">
+                                                        No player statistics available.
+                                                    </p>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </>
+                                )}
 
-                        </div>
-                    )}
+                            </div>
+                        )}
 
 
                 </div>
