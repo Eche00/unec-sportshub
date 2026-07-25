@@ -42,17 +42,14 @@ export default function AddPlayersForm({
             return;
         }
 
-        if (!currentJersey.trim()) {
-            toast.error("Please enter a jersey number");
-            return;
-        }
-
         setPlayers((prev) => [
             ...prev,
             {
                 id: crypto.randomUUID(),
                 name: currentName.trim(),
-                jerseyNumber: Number(currentJersey),
+                jerseyNumber: currentJersey
+                    ? Number(currentJersey)
+                    : undefined,
                 position: currentPosition,
             },
         ]);
@@ -221,10 +218,7 @@ export default function AddPlayersForm({
                                     {player.name}
                                 </div>
 
-                                <div className="text-sm text-gray-400">
-                                    #{player.jerseyNumber || "--"} •{" "}
-                                    {player.position}
-                                </div>
+                                {player.jerseyNumber ? `#${player.jerseyNumber}` : "--"} • {player.position}
                             </div>
                         ))}
                     </div>
