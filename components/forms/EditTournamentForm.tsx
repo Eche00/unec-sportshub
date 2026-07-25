@@ -449,7 +449,7 @@ function EditTournamentForm({ tournament, onClose }: Props) {
                                 className="shrink-0"
                             >
 
-                                {createScorer ? <span><Add fontSize="small" /> Add Scorer</span> : "Close"}
+                                {!createScorer ? <span><Add fontSize="small" /> Add Scorer</span> : "Close"}
                             </Button>}
                             </div>
                         </div>
