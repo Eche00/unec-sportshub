@@ -33,6 +33,7 @@ const MatchCard: React.FC<MatchCardProps> = ({
     status,
 
     date,
+    time,
     location,
 
     currentHalf,
@@ -122,7 +123,7 @@ const MatchCard: React.FC<MatchCardProps> = ({
                             fontSize="small"
                         />
 
-                        {date}
+                        {date} - {time}
                     </span>
 
                     <span className="flex items-center gap-1 text-right">
