@@ -37,7 +37,8 @@ export type Player = {
     | "Goalkeeper"
     | "Defender"
     | "Midfielder"
-    | "Forward";
+    | "Forward"
+    | "Team";
     age?: number;
     captain?: boolean;
 };
