@@ -27,7 +27,7 @@ export default function AddPlayersForm({
     const [currentName, setCurrentName] = useState("");
     const [currentJersey, setCurrentJersey] = useState("");
     const [currentPosition, setCurrentPosition] =
-        useState<Player["position"]>("Forward");
+        useState<Player["position"]>("Team");
 
     useEffect(() => {
         if (team) {
@@ -56,7 +56,7 @@ export default function AddPlayersForm({
 
         setCurrentName("");
         setCurrentJersey("");
-        setCurrentPosition("Forward");
+        setCurrentPosition("Team");
     };
     const removePlayer = (id: string) => {
         setPlayers((prev) => prev.filter((p) => p.id !== id));
@@ -180,6 +180,7 @@ export default function AddPlayersForm({
                             <option value="Defender">Defender</option>
                             <option value="Midfielder">Midfielder</option>
                             <option value="Forward">Forward</option>
+                            <option value="Team">Team</option>
                         </select>
 
                     </div>
