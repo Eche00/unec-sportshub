@@ -122,7 +122,6 @@ export default function Page() {
                         <div className="space-y-2">
                             {match.events
                                 .slice()
-                                .reverse()
                                 .map((e: any) => (
                                     <div
                                         key={e.id}
