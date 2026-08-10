@@ -10,6 +10,7 @@ import Button from "../ui/Button";
 import Input from "../ui/Input";
 
 import useMatchesInfo from "@/utils/logics/usematchesinfo";
+import { Settings } from "@mui/icons-material";
 
 type MatchStatus =
     | "live"
@@ -18,10 +19,10 @@ type MatchStatus =
     | "halftime";
 
 type MatchEventType =
+    | "commentary"
     | "goal"
     | "yellow"
-    | "red"
-    | "commentary";
+    | "red";
 
 type ManageMatchesProps = {
     matchId: string;
@@ -61,7 +62,7 @@ function FootballManager({
         onClose,
         matchId
     );
-
+    const [settings, setSettings] = React.useState(true);
     if (!match) {
 
         return (
@@ -325,6 +326,9 @@ function FootballManager({
                             }
                             className="p-2 bg-[#0B0F19] border border-gray-700 rounded"
                         >
+                            <option value="commentary">
+                                Commentary
+                            </option>
 
                             <option value="goal">
                                 Goal
@@ -338,9 +342,6 @@ function FootballManager({
                                 Red Card
                             </option>
 
-                            <option value="commentary">
-                                Commentary
-                            </option>
 
                         </select>
 
@@ -482,16 +483,27 @@ function FootballManager({
 
                 {/* SAVE */}
 
-                <div className="w-full flex items-end justify-end gap-4 py-5 mb-10  border-t-[0.1px] border-gray-400">
+                <div className="w-full flex items-center justify-end gap-4 py-5 mb-10  border-t-[0.1px] border-gray-400">
 
-                    <Button
-                        variant="secondaryRed"
-                        onClick={() => handleDeleteMatch(matchId)}
-                        disabled={loading}
-                    >
-                        Delete Match
 
-                    </Button>
+                    <div >
+
+                        {settings ?
+                            <span className="cursor-pointer mb-12 hover:scale-105" onClick={() => setSettings(!settings)}><Settings /></span>
+                            :
+                            <div className="flex items-center gap-2">
+
+                                <Button
+                                    onClick={() => handleDeleteMatch(matchId)}
+                                    variant="secondaryRed"
+                                >
+                                    Delete
+                                </Button>
+                                <hr className="h-5 w-[0.1px] border-none bg-gray-500" />
+
+                                <span className="cursor-pointer hover:scale-105" onClick={() => setSettings(!settings)}><Settings /></span>
+                            </div>}
+                    </div>
                     <Button
                         variant="primary"
                         onClick={handleManageMatch}

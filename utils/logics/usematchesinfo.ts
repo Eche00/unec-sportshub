@@ -132,7 +132,7 @@ const useMatchesInfo = (
 
     const [newEvent, setNewEvent] =
         useState<Partial<MatchEvent>>({
-            type: "goal",
+            type: "commentary",
         });
 
     //  FORM STATES 
@@ -406,108 +406,7 @@ const useMatchesInfo = (
         });
     };
 
-    //  ADD EVENT
 
-    const addEvent = () => {
-
-        if (
-            !newEvent.type ||
-            !match
-        ) return;
-
-        const event: MatchEvent = {
-
-            id:
-                Date.now().toString(),
-
-            type:
-                newEvent.type,
-        };
-
-        //  OPTIONAL FIELDS
-
-        if (
-            newEvent.type !==
-            "commentary"
-        ) {
-
-            if (
-                newEvent.minute !==
-                undefined
-            ) {
-
-                event.minute =
-                    newEvent.minute;
-            }
-
-            if (
-                newEvent.player
-            ) {
-
-                event.player =
-                    newEvent.player;
-            }
-
-            if (
-                newEvent.team
-            ) {
-
-                event.team =
-                    newEvent.team;
-            }
-        }
-
-        if (
-            newEvent.type ===
-            "commentary" &&
-            newEvent.text
-        ) {
-
-            event.text =
-                newEvent.text;
-        }
-
-        let updatedMatch = {
-            ...match,
-        };
-
-        //  AUTO SCORE
-
-        if (
-            event.type === "goal"
-        ) {
-
-            if (
-                event.team === "A"
-            ) {
-
-                updatedMatch.scoreA += 1;
-            }
-
-            if (
-                event.team === "B"
-            ) {
-
-                updatedMatch.scoreB += 1;
-            }
-        }
-
-        const updatedEvents = [
-            event,
-            ...(match.events || []),
-        ];
-
-        updatedMatch.events =
-            updatedEvents;
-
-        setMatch(updatedMatch);
-
-        setEvents(updatedEvents);
-
-        setNewEvent({
-            type: "goal",
-        });
-    };
 
     //  SAVE MANAGED MATCH
 
@@ -555,7 +454,171 @@ const useMatchesInfo = (
                 onClose();
             }
         };
+    //  ADD EVENT
 
+    const addEvent = async () => {
+
+        if (
+            !newEvent.type ||
+            !match
+        ) return;
+
+
+        // VALIDATION
+
+        // COMMENTARY
+        if (
+            newEvent.type === "commentary" &&
+            !newEvent.text?.trim()
+        ) {
+            return;
+        }
+
+
+        // GOAL / CARDS
+        if (
+            newEvent.type === "goal" ||
+            newEvent.type === "yellow" ||
+            newEvent.type === "red"
+        ) {
+
+            // Minute is required
+            if (
+                newEvent.minute === undefined ||
+                newEvent.minute === null ||
+                Number.isNaN(newEvent.minute)
+            ) {
+                return;
+            }
+
+            // Team is required
+            if (!newEvent.team) {
+                return;
+            }
+
+            // Player is required
+            if (!newEvent.player?.trim()) {
+                return;
+            }
+        }
+
+
+        // CREATE EVENT
+        const event: MatchEvent = {
+
+            id:
+                Date.now().toString(),
+
+            type:
+                newEvent.type,
+        };
+
+
+        // NON-COMMENTARY FIELDS
+        if (
+            newEvent.type !==
+            "commentary"
+        ) {
+
+            event.minute =
+                newEvent.minute;
+
+            event.team =
+                newEvent.team;
+
+            event.player =
+                newEvent.player?.trim();
+        }
+
+
+        // COMMENTARY
+        if (
+            newEvent.type ===
+            "commentary"
+        ) {
+
+            event.text =
+                newEvent.text!.trim();
+        }
+
+
+        // CREATE UPDATED MATCH
+        const updatedMatch = {
+            ...match,
+        };
+
+
+        // AUTO SCORE
+        if (
+            event.type === "goal"
+        ) {
+
+            if (
+                event.team === "A"
+            ) {
+
+                updatedMatch.scoreA += 1;
+            }
+
+            if (
+                event.team === "B"
+            ) {
+
+                updatedMatch.scoreB += 1;
+            }
+        }
+
+
+        // ADD EVENT
+        const updatedEvents = [
+            event,
+            ...(match.events || []),
+        ];
+
+        updatedMatch.events =
+            updatedEvents;
+
+
+        // UPDATE LOCAL STATE
+        setMatch(updatedMatch);
+
+        setEvents(updatedEvents);
+
+
+        // RESET FORM
+        setNewEvent({
+            type: "commentary",
+        });
+
+
+        // SAVE UPDATED MATCH TO FIRESTORE
+        await handleUpdateMatch(
+            updatedMatch.id,
+            {
+                scoreA:
+                    updatedMatch.scoreA,
+
+                scoreB:
+                    updatedMatch.scoreB,
+
+                status:
+                    updatedMatch.status,
+
+                currentHalf:
+                    updatedMatch.currentHalf,
+
+                isHalftime:
+                    updatedMatch.isHalftime,
+
+                isLive:
+                    updatedMatch.isLive,
+
+                events:
+                    updatedMatch.events ||
+                    [],
+            }
+        );
+    };
     //  REALTIME SINGLE MATCH
 
     const getMatchById = (
