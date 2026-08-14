@@ -211,7 +211,7 @@ export default function Page() {
                             }
                         )}
 
-                        {/* MATCHES WITHOUT TOURNAMENT */}
+                        {/* MATCHES WITH NO TOURNAMENT */}
                         {groupedMatches.standaloneMatches.length > 0 && (
                             <section className="flex flex-col gap-5">
 
