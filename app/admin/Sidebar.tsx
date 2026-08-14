@@ -49,7 +49,7 @@ function Sidebar() {
 
 
     return (
-        <div className="bg-[#020C17] text-white fixed top-0 left-0 w-67.5 h-screen flex flex-col  py-2 gap-10 z-10">
+        <div className="bg-[#131313] text-white fixed top-0 left-0 w-67.5 h-screen flex flex-col  py-2 gap-10 z-10">
             {/* Sidebar Container */}
             <section className="w-[80%] mx-auto flex flex-col gap-2 relative">
                 {/* Logo Section  */}

@@ -381,7 +381,7 @@ const useMatchesInfo = (
         } else {
 
             router.push(
-                `/Matches/${id}`
+                `/matches/${id}`
             );
         }
     };

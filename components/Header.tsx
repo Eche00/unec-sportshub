@@ -1,113 +1,84 @@
 "use client";
 
-import { publicItems } from "@/utils/routes";
+import useTournamentInfo from "@/utils/logics/usetournamentinfo";
+import { ArrowBackIos, EmojiEvents } from "@mui/icons-material";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import DragHandleIcon from "@mui/icons-material/DragHandle";
-import { useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
-import { Close, DashboardRounded, EmojiEventsRounded, HomeRounded, LeaderboardRounded, SportsSoccerRounded } from "@mui/icons-material";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 function Header() {
-    const pathname = usePathname();
-    const [openMenu, setOpenMenu] = useState<boolean>(false);
+    const pathname = usePathname()
+    const router = useRouter()
+    const {
+        tournaments,
+    } = useTournamentInfo();
+    const images = [
+        "/home.jpg",
+        "/home1.jpg",
+    ];
+    const [currentImage, setCurrentImage] = useState(0);
 
+    useEffect(() => {
+
+        const interval = setInterval(() => {
+
+            setCurrentImage((prev) =>
+                (prev + 1) % images.length
+            );
+
+        }, 10000);
+
+        return () => clearInterval(interval);
+
+    }, [images.length]);
     return (
-        <div className="bg-[#020C17] text-white md:py-3 py-2  fixed md:top-0 top-2 md:left-0 md:right-0 left-2 right-2 md:w-full z-50 md:rounded-none rounded-[28px] ">
-            {/* container  */}
-            <section className="flex items-center justify-between gap-2 md:w-[90%] w-[98%] mx-auto">
-                {/* Logo   */}
-                <div className="flex flex-1 items-center relative ">
-                    <span className="flex items-center md:w-full w-fit rounded-full px-4 md:text-2xl text-xl font-extrabold text-[#3B82F6] tracking-wide md:mx-0 mx-auto">
-                        <Link
-                            href="/"
-                            className=" border-2 border-[#3B82F6] rounded-full p-2 mr-2 flex items-center justify-center"
+        <div className="">
+            <section className="relative w-full h-fit">
+                {pathname.startsWith("/tournaments/") ? (
+                    <div className="flex flex-col gap-7 absolute w-[90%] mx-auto top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2  z-40">
+
+                        <button
+                            onClick={() => router.push('/tournaments')}
+                            className=" bg-[#FFFFFF1A] backdrop-blur-[10px] text-white w-10 h-10 flex items-center justify-center border border-[#FFFFFF4D] rounded-full cursor-pointer"
                         >
-                            <img src="/logo.png" alt="" className=" md:w-8 md:h-8 w-6 h-6 object-cover" />
-                        </Link>
-                    </span>
-                </div>
+                            <ArrowBackIos fontSize="small" />
+                        </button>
 
-                {/* Navigation */}
-                <div className="md:flex hidden flex-1 items-center justify-end">
-                    <nav className="w-fit bg-[#151B23] flex items-center gap-4 py-2 px-6 rounded-full">
-                        {publicItems.map((item) => (
-                            <Link
-                                href={item.link}
-                                key={item.name}
-                                className={
-                                    item.link === pathname
-                                        ? "text-[#3B82F6] text-[16px] font-semibold duration-300"
-                                        : " text-white hover:text-gray-300 duration-100"
-                                }
-                            >
-                                {item.name}
-                            </Link>
-                        ))}
-                    </nav>
-                </div>
+                        <h1 className="absolute top-2 left-1/2 -translate-x-1/2 text-[#FFFFFF] whitespace-nowrap text-[20px] font-medium">
+                            {tournaments.find((tournament) =>
+                                pathname.includes(tournament.id)
+                            )?.name}
+                        </h1>
+                    </div>
 
+                ) : pathname.startsWith("/matches/") ? (<div className="flex flex-col gap-7 absolute w-[90%] mx-auto top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2  z-40">
 
-
-            </section>
-            {/* Mobile menu */}
-            <AnimatePresence>
-                <section
-                    className="fixed bottom-2 left-1/2 -translate-x-1/2 z-50 md:hidden w-fit "
-                >
-                    <motion.aside
-                        initial={{ y: 120, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
-                        exit={{ y: 120, opacity: 0 }}
-                        transition={{ duration: 0.35 }}
-                        onClick={(e) => e.stopPropagation()}
-                        className="relative overflow-hidden rounded-full border border-white/10 bg-[#0B1220]/95 backdrop-blur-2xl shadow-2xl p-1"
+                    <button
+                        onClick={() => router.push('/')}
+                        className=" bg-[#FFFFFF1A] backdrop-blur-[10px] text-white w-10 h-10 flex items-center justify-center border border-[#FFFFFF4D] rounded-full cursor-pointer"
                     >
-                        {/* Glow */}
-                        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-cyan-500/10 pointer-events-none" />
+                        <ArrowBackIos fontSize="small" />
+                    </button>
 
-                        <div className="relative z-10 flex items-center justify-between gap-2">
-
-                            {publicItems.map((item) => {
-
-                                const isActive = pathname === item.link;
-
-                                const icon =
-                                    item.name.toLowerCase() === "home" ? (
-                                        <HomeRounded />
-                                    ) : item.name.toLowerCase() === "matches" ? (
-                                        <SportsSoccerRounded />
-                                    ) : item.name.toLowerCase() === "tournaments" ? (
-                                        <EmojiEventsRounded />
-                                    ) : item.name.toLowerCase() === "standings" ? (
-                                        <LeaderboardRounded />
-                                    ) : (
-                                        <DashboardRounded />
-                                    );
-
-                                return (
-                                    <Link
-                                        href={item.link}
-                                        key={item.name}
-                                        onClick={() => setOpenMenu(false)}
-                                        className={`relative h-12 w-12 rounded-full flex items-center justify-center transition-all duration-300 ${isActive
-                                            ? "bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg shadow-purple-500/30 scale-105"
-                                            : "bg-gray-400/10 text-gray-400 hover:text-white hover:bg-white/5"
-                                            }`}
-                                    >
-                                        {icon}
-
-                                        {/* Active Dot */}
-                                        {/* {isActive && (
-                                            <span className="absolute bottom-1 h-2 w-2 rounded-full bg-white animate-pulse" />
-                                        )} */}
-                                    </Link>
-                                );
-                            })}
+                </div>) : (
+                    <div className="flex flex-col gap-7 absolute w-[90%] mx-auto top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2  z-40">
+                        <div className=" flex flex-1 items-center justify-between">
+                            <span className="">
+                                <Link
+                                    href="/"
+                                    className="bg-white rounded-full flex items-center justify-center"
+                                >
+                                    <img src="/logo.png" alt="" className="w-8 h-8 object-cover" />
+                                </Link>
+                            </span>
+                            <Link href="/tournaments" className=" bg-[#FFFFFF1A] backdrop-blur-[10px] text-white w-10 h-10 flex items-center justify-center border border-[#FFFFFF4D] rounded-full"><EmojiEvents fontSize="small" /></Link>
                         </div>
-                    </motion.aside>
-                </section>
-            </AnimatePresence>
+                        <h1 className=" text-[32px] font-semibold">Unec Sports Hub</h1>
+                    </div>
+                )}
+                <img src={images[currentImage]} alt="" className={`w-full ${pathname.startsWith("/tournaments/") ? "h-44.75" : "h-62.25"} object-bottom object-cover z-10`} />
+                <div className={`absolute top-0 left-0 w-full ${pathname.startsWith("/tournaments/") ? "h-44.75" : "h-62.25"} bg-linear-to-b from-[#0B0B0B00] to-[#0B0B0B] z-30`}></div>
+            </section>
         </div>
     );
 }

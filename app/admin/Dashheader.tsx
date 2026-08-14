@@ -10,7 +10,7 @@ function DashHeader() {
     const pathname = usePathname()
     const [openMenu, setOpenMenu] = useState<boolean>(false)
     return (
-        <div className='bg-[#020C17] text-white sm:py-3 py-2  fixed top-0 left-0 md:left-67.5 right-0 z-10  '>
+        <div className='bg-[#131313] text-white sm:py-3 py-2  fixed top-0 left-0 md:left-67.5 right-0 z-10  '>
 
             {/* Container  */}
             <section className='flex items-center justify-center gap-2 w-[95%] mx-auto'>

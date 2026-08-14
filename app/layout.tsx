@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
+import ScrollToTop from "./ScrollToTop";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,34 +15,38 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://unecsportshub.com"), // Replace later
+  metadataBase: new URL("https://unecsportshub.com"),
 
   title: {
-    default: "UNEC Sports Hub | Tournament & Match Management",
+    default: "UNEC Sports Hub | UNEC Sports Management",
     template: "%s | UNEC Sports Hub",
   },
 
   description:
-    "UNEC Sports Hub is a modern sports tournament management platform for organizing competitions, scheduling fixtures, managing teams, tracking live scores, standings, and match results.",
+    "UNEC Sports Hub is the official platform for managing sports tournaments, matches, teams, fixtures, standings, lineups, results, and live match events at UNEC.",
 
   applicationName: "UNEC Sports Hub",
 
   keywords: [
     "UNEC Sports Hub",
+    "UNEC Sports",
     "UNEC",
-    "Sports",
-    "Tournament Management",
-    "Football Tournament",
-    "Basketball Tournament",
-    "Match Fixtures",
-    "Sports Management",
-    "Live Scores",
-    "Sports Standings",
+    "University of Nigeria Enugu Campus",
+    "UNEC Sports Management",
+    "UNEC Tournaments",
+    "UNEC Matches",
+    "UNEC Football",
+    "UNEC Basketball",
+    "UNEC Sports Events",
+    "UNEC Fixtures",
+    "UNEC Standings",
+    "UNEC Live Scores",
+    "UNEC Teams",
+    "UNEC Lineups",
     "University Sports",
     "Campus Sports",
-    "Tournament Bracket",
-    "Knockout Tournament",
-    "League Management",
+    "Sports Tournament Management",
+    "Match Management",
   ],
 
   authors: [
@@ -61,21 +66,21 @@ export const metadata: Metadata = {
   openGraph: {
     title: "UNEC Sports Hub",
     description:
-      "Manage tournaments, teams, fixtures, standings, and live matches with UNEC Sports Hub.",
+      "The platform for managing and following UNEC sports tournaments, matches, teams, fixtures, standings, lineups, and results.",
 
-    url: "https://unecsportshub.com", // Replace later
+    url: "https://unecsportshub.com",
     siteName: "UNEC Sports Hub",
 
     images: [
       {
-        url: "/favicon.ico",
+        url: "/logo.png",
         width: 1200,
         height: 630,
         alt: "UNEC Sports Hub",
       },
     ],
 
-    locale: "en_US",
+    locale: "en_NG",
     type: "website",
   },
 
@@ -83,7 +88,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "UNEC Sports Hub",
     description:
-      "UNEC Tournament management platform for organizing teams, fixtures, standings, and live matches.",
+      "Follow UNEC tournaments, matches, teams, fixtures, standings, lineups, live scores, and results.",
 
     images: ["/og-image.png"],
   },
@@ -131,7 +136,9 @@ export default function RootLayout({
           },
         }}
       />
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <ScrollToTop />
+        {children}</body>
     </html>
   );
 }

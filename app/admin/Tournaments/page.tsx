@@ -20,8 +20,8 @@ import useMatchesInfo from "@/utils/logics/usematchesinfo";
 import TournamentsSkeleton from "@/components/ui/skeletons/TournamentsSkeleton";
 import TournamentForm from "@/components/forms/TournamentForm";
 import EditTournamentForm from "@/components/forms/EditTournamentForm";
-import StandingsTable from "@/components/table/StandingsTable";
 import Button from "@/components/ui/Button";
+import Link from "next/link";
 
 export default function Page() {
 
@@ -39,9 +39,6 @@ export default function Page() {
     } = useMatchesInfo();
 
     const [createTournament, setCreateTournament] =
-        useState(false);
-
-    const [openTournament, setOpenTournament] =
         useState(false);
 
     const [manageTournament, setManageTournament] =
@@ -211,15 +208,12 @@ export default function Page() {
 
                                             <hr className="h-5 w-[0.5px] bg-gray-500" />
 
-                                            <button
+                                            <Link
                                                 className="group-hover:text-gray-300 transition text-xs cursor-pointer hover:underline"
-                                                onClick={() => {
-                                                    setSelectedTournamentId(tournament.id);
-                                                    setOpenTournament(true);
-                                                }}
+                                                href={`/tournaments/${tournament.id}`}
                                             >
                                                 View Details →
-                                            </button>
+                                            </Link>
                                         </div>
                                     </div>
                                 </div>
@@ -270,20 +264,6 @@ export default function Page() {
                         onClose={() => setCreateTournament(false)}
                     />
                 )}
-
-                {openTournament && selectedTournament && (
-                    <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-
-                        <div className="w-full max-w-lg">
-                            <StandingsTable
-                                tournament={selectedTournament}
-                                onClose={() => setOpenTournament(false)}
-                            />
-                        </div>
-
-                    </div>
-                )}
-
                 {manageTournament && selectedTournament && (
                     <div className="fixed  bg-black/60 z-50">
 

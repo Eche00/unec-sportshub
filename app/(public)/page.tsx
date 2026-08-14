@@ -1,484 +1,246 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-
-import {
-    Extension,
-    SportsBasketball,
-    SportsSoccer,
-    SportsTennis,
-    SportsVolleyball,
-} from "@mui/icons-material";
-
 
 import MatchCard from "@/components/match/MatchCard";
 import Empty from "@/components/ui/Empty";
-import TournamentsSkeleton from "@/components/ui/skeletons/TournamentsSkeleton";
-import StandingsTable from "@/components/table/StandingsTable";
 
-import useMatchesInfo from "@/utils/logics/usematchesinfo";
-import useTournamentInfo, {
-    Tournament,
-} from "@/utils/logics/usetournamentinfo";
+import useMatchesInfo, { Matches } from "@/utils/logics/usematchesinfo";
+import { useMemo, useState } from "react";
+import { ArrowForwardIos } from "@mui/icons-material";
+import Link from "next/link";
+import useTournamentInfo from "@/utils/logics/usetournamentinfo";
+import Loader from "@/components/ui/Loader";
 
-import { AnimatePresence } from "framer-motion";
-import HomeSkeleton from "@/components/ui/skeletons/HomeSkeleton";
-import Button from "@/components/ui/Button";
+type MatchTabs =
+    | "all"
+    | "live"
+    | "upcoming"
+    | "completed";
+
+const tabs: MatchTabs[] = [
+    "all",
+    "live",
+    "upcoming",
+    "completed",
+];
 
 export default function Page() {
+    const { loading, filteredMatches } = useMatchesInfo();
+    const { tournaments } = useTournamentInfo();
+    const [activeTab, setActiveTab] = useState<MatchTabs>("all");
 
-    const [activeTab, setActiveTab] = useState<
-        "matches" | "tournaments"
-    >("matches");
+    // FILTER MATCHES BY TAB
+    const tabFilteredMatches = useMemo(() => {
 
-    const [openTournament, setOpenTournament] =
-        useState(false);
+        let matches = filteredMatches;
 
-    const [selectedTournament, setSelectedTournament] =
-        useState<Tournament | null>(null);
+        // FILTER BY TAB
 
-    /* MATCHES */
-    const {
-        loading,
+        if (activeTab !== "all") {
 
+            matches = filteredMatches.filter((match) => {
+
+                switch (activeTab) {
+
+                    case "live":
+                        return match.status === "live";
+
+                    case "upcoming":
+                        return match.status === "upcoming";
+
+                    case "completed":
+                        return match.status === "finished";
+
+                    default:
+                        return true;
+                }
+
+            });
+        }
+
+        // SORT BY DATE + TIME
+
+        return [...matches].sort((a, b) => {
+
+            const dateTimeA = new Date(
+                `${a.date} ${a.time}`
+            ).getTime();
+
+            const dateTimeB = new Date(
+                `${b.date} ${b.time}`
+            ).getTime();
+
+            return dateTimeA - dateTimeB;
+        });
+
+    }, [
         filteredMatches,
+        activeTab,
+    ]);
 
-        statusStyles,
-    } = useMatchesInfo();
+    // GROUP FILTERED MATCHES
+    const groupedMatches = useMemo(() => {
 
-    /* TOURNAMENTS */
-    const {
-        tournaments,
-        filteredTournaments,
-    } = useTournamentInfo();
+        const tournamentGroups: Record<
+            string,
+            Matches[]
+        > = {};
 
-    /* HERO MATCH */
-    const [currentHeroIndex, setCurrentHeroIndex] = useState(0);
+        const standaloneMatches: Matches[] = [];
 
-    useEffect(() => {
-        if (!filteredMatches?.length) return;
+        tabFilteredMatches.forEach((match) => {
 
-        const interval = setInterval(() => {
-            setCurrentHeroIndex((prev) => (prev + 1) % filteredMatches.length);
-        }, 5000);
+            if (!match.tournamentId) {
 
-        return () => clearInterval(interval);
-    }, [filteredMatches?.length]); // 👈 better dependency
+                standaloneMatches.push(match);
 
-    const heroMatch = useMemo(() => {
-        if (!filteredMatches?.length) return null;
+                return;
+            }
 
-        const safeIndex = currentHeroIndex % filteredMatches.length;
+            if (!tournamentGroups[match.tournamentId]) {
 
-        return filteredMatches[safeIndex];
-    }, [filteredMatches, currentHeroIndex]);
+                tournamentGroups[
+                    match.tournamentId
+                ] = [];
 
-    /* LIMIT */
-    const homeMatches = filteredMatches?.slice(0, 4);
-    const homeTournaments = filteredTournaments?.slice(0, 4);
+            }
 
-    const getTournamentStage = (tournament: Tournament) => {
+            tournamentGroups[
+                match.tournamentId
+            ].push(match);
 
-        const teamCount = tournament.teams?.length || 0;
+        });
 
-        if (teamCount === 0) return "No Teams";
-        if (teamCount <= 4) return "Group Stage";
-        if (teamCount <= 8) return "Knockout Stage";
-        if (teamCount <= 16) return "Quarter Finals";
+        return {
+            tournamentGroups,
+            standaloneMatches,
+        };
 
-        return "Final Stage";
-    };
+    }, [
+        tabFilteredMatches,
+    ]);
 
     if (loading) {
         return (
-            <HomeSkeleton />
+            <Loader />
         );
     }
 
     return (
         <main className="relative min-h-screen text-white overflow-hidden">
 
-            {/* PAGE CONTENT */}
-            <div className="max-w-7xl mx-auto  sm:px-6 sm:pt-28  pb-20">
+            <div className="smLmax-w-7xl max-w-[95%] mx-auto ">
+                {/* MATCHES */}
+                <div>
 
-                {/* HERO CARD */}
-                <section className="relative overflow-hidden sm:pt-7 pt-28 rounded-[30px] border border-white/10 bg-gradient-to-br from-[#182742] via-[#131A28] to-[#3D2166] p-5 sm:p-7 shadow-2xl">
 
-                    {/* BG */}
-                    <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/10 via-transparent to-purple-500/20 pointer-events-none" />
 
-                    {/* TOP */}
-                    <div className="relative z-10 flex items-center gap-2 text-sm text-gray-300 mb-6">
+                    <div className="flex flex-col gap-10 pb-10">
+                        <div className="flex items-center gap-6 border-b border-[#FFFFFF1A]">
+                            {tabs.map((tab) => (
+                                <button
+                                    key={tab}
+                                    type="button"
+                                    onClick={() => setActiveTab(tab)}
+                                    className={`relative pb-2 text-[14px] font-semibold uppercase transition-colors cursor-pointer ${activeTab === tab
+                                        ? "text-white"
+                                        : "text-[#A1A1AA] hover:text-gray-300"
+                                        }`}
+                                >
+                                    {tab.charAt(0).toUpperCase() + tab.slice(1)}
 
-                        <div className="h-2 w-2 rounded-full bg-green-400 animate-pulse" />
-
-                        Live Football Experience
-                    </div>
-
-                    {/* MAIN */}
-                    <div className="relative z-10 grid lg:grid-cols-2 gap-8 items-center">
-
-                        {/* LEFT */}
-                        <div>
-
-                            <p className="text-blue-300 text-sm mb-2 uppercase tracking-[0.3em]">
-                                Featured Match
-                            </p>
-
-                            <h1 className="text-4xl sm:text-6xl font-black leading-tight italic">
-                                LIVE
-                                <br />
-                                Sports
-                            </h1>
-
-                            <p className="mt-5 text-gray-300 max-w-lg text-sm sm:text-base leading-relaxed">
-                                Watch tournaments, follow live matches,
-                                check standings and track every moment
-                                in real time.
-                            </p>
-
-                            {/* LIVE DATA */}
-                            {heroMatch && (
-                                <div className="mt-8 flex items-center gap-4 bg-white/5 border border-white/10 rounded-2xl p-4 backdrop-blur-md w-fit">
-
-                                    <div className="flex items-center gap-3">
-
-                                        <div className="h-12 min-w-12 px-3 rounded-full bg-white/10 flex items-center justify-center text-sm font-bold">
-                                            {String(heroMatch.teamA)
-                                                .slice(0, 3)
-                                                .toUpperCase()}
-                                        </div>
-
-                                        <span className="text-xl font-bold">
-                                            VS
-                                        </span>
-
-                                        <div className="h-12 min-w-12 px-3 rounded-full bg-white/10 flex items-center justify-center text-sm font-bold">
-                                            {String(heroMatch.teamB)
-                                                .slice(0, 3)
-                                                .toUpperCase()}
-                                        </div>
-                                    </div>
-
-                                    <div className="h-10 w-px bg-white/10" />
-
-                                    <div>
-                                        <p className="text-sm font-semibold">
-                                            {heroMatch.date || "Match Day"}
-                                        </p>
-
-                                        <p className="text-xs text-gray-400">
-                                            {heroMatch.time || "TBD"}
-                                        </p>
-                                    </div>
-                                </div>
-                            )}
+                                    {activeTab === tab && (
+                                        <span className="absolute bottom-0 left-0 h-0.75 w-full bg-white rounded-full" />
+                                    )}
+                                </button>
+                            ))}
                         </div>
+                        {/* TOURNAMENT MATCHES */}
+                        {tabFilteredMatches.length > 0 && Object.entries(groupedMatches.tournamentGroups).map(
+                            ([tournamentId, tournamentMatches]) => {
 
-                        {/* RIGHT */}
-                        <div className="relative h-[300px] sm:h-[420px] rounded-3xl overflow-hidden">
+                                const tournament = tournaments.find(
+                                    (t) => t.id === tournamentId
+                                );
 
-                            <img
-                                src="https://images.unsplash.com/photo-1543326727-cf6c39e8f84c?q=80&w=1200&auto=format&fit=crop"
-                                alt="Football"
-                                className="absolute inset-0 h-full w-full object-cover"
-                            />
+                                if (!tournament) return null;
 
-                            <div className="absolute inset-0 bg-gradient-to-t from-[#151B23] via-transparent to-transparent" />
+                                return (
+                                    <section
+                                        key={tournamentId}
+                                        className="flex flex-col gap-5"
+                                    >
 
-                            {/* FLOAT */}
-                            <div className="absolute bottom-5 left-5 right-5 bg-black/40 backdrop-blur-xl border border-white/10 rounded-2xl p-4">
+                                        <div className="flex items-center justify-between">
 
-                                <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-2">
 
-                                    <div>
+                                                <img
+                                                    src="/logo.png"
+                                                    alt=""
+                                                    className="w-8 h-8 object-cover rounded-full bg-white"
+                                                />
 
-                                        <p className="text-sm text-gray-300">
-                                            Featured Match
-                                        </p>
+                                                <h2 className="text-sm font-semibold uppercase">
+                                                    {tournament.name}
+                                                </h2>
 
-                                        <h3 className="font-bold text-lg">
-                                            {heroMatch
-                                                ? `${heroMatch.teamA} vs ${heroMatch.teamB}`
-                                                : "No Match Available"}
-                                        </h3>
-                                    </div>
-
-                                    <div className="h-11 w-11 rounded-full bg-purple-500/30 flex items-center justify-center border border-purple-400/30">
-                                        <SportsSoccer fontSize="small" />
-                                        <SportsBasketball fontSize="small" />
-                                        <SportsVolleyball fontSize="small" />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                {/* TABS */}
-                <section className="mt-10 md:p-0 p-4">
-
-                    <div className="flex items-center gap-3 overflow-x-auto border-b border-white/10 pb-3">
-
-                        <button
-                            onClick={() =>
-                                setActiveTab("matches")
-                            }
-                            className={`px-5 py-3 rounded-full text-sm font-semibold transition whitespace-nowrap cursor-pointer ${activeTab === "matches"
-                                ? "bg-white text-black shadow-lg"
-                                : "bg-white/5 text-gray-400 hover:bg-white/10"
-                                }`}
-                        >
-                            Matches
-                        </button>
-
-                        <button
-                            onClick={() =>
-                                setActiveTab("tournaments")
-                            }
-                            className={`px-5 py-3 rounded-full text-sm font-semibold transition whitespace-nowrap cursor-pointer ${activeTab === "tournaments"
-                                ? "bg-white text-black shadow-lg"
-                                : "bg-white/5 text-gray-400 hover:bg-white/10"
-                                }`}
-                        >
-                            Tournaments
-                        </button>
-                    </div>
-
-                    {/* MATCHES */}
-                    {activeTab === "matches" && (
-                        <div className="mt-8">
-
-                            {!loading && homeMatches.length === 0 && (
-                                <Empty />
-                            )}
-
-                            {homeMatches.length > 0 && (
-                                <>
-                                    <div className="grid gap-4 sm:grid-cols-2">
-
-                                        {homeMatches.map((match) => (
-                                            <MatchCard
-                                                key={match.id}
-                                                id={match.id}
-                                                category={match.category}
-                                                name={match.name}
-                                                teamA={match.teamA}
-                                                teamB={match.teamB}
-                                                scoreA={match.scoreA}
-                                                scoreB={match.scoreB}
-                                                status={match.status}
-                                                date={match.date}
-                                                time={match.time}
-                                                location={match.location}
-                                                tournamentId={match.tournamentId}
-                                            />
-                                        ))}
-                                    </div>
-
-                                    {/* BUTTON */}
-                                    <div className="mt-8 flex justify-center">
-                                        <a href="/Matches">
-                                            <Button variant="primary"
-                                            >
-                                                View All Matches
-                                            </Button>
-                                        </a>
-                                    </div>
-                                </>
-                            )}
-                        </div>
-                    )}
-
-                    {/* TOURNAMENTS */}
-                    {activeTab === "tournaments" && (
-                        <div className="mt-8">
-
-                            {loading && (
-                                <TournamentsSkeleton />
-                            )}
-
-                            <div className="flex flex-col sm:grid sm:grid-cols-2 gap-4">
-
-                                {!loading && homeTournaments.length > 0 ? (
-
-                                    homeTournaments.map((tournament) => {
-
-                                        const stage =
-                                            getTournamentStage(
-                                                tournament
-                                            );
-
-                                        return (
-                                            <div
-                                                key={tournament.id}
-                                                className="relative group bg-gradient-to-b from-[#111827] to-[#0B0F19] rounded-2xl p-6 border border-gray-800 hover:border-purple-400/40 transition overflow-hidden"
-                                            >
-
-                                                {/* Glow */}
-                                                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition bg-linear-to-r from-cyan-500/10 to-purple-500/10 blur-xl" />
-
-                                                {/* TOP */}
-                                                <div className="flex justify-between items-start relative z-10">
-
-                                                    <div className="flex items-center gap-3">
-
-                                                        <div className="p-2 rounded-lg bg-white/5 border border-gray-700">
-                                                            {tournament?.category === "football" && <SportsSoccer className="text-gray-300" />}
-                                                            {tournament?.category === "basketball" && <SportsBasketball className="text-gray-300" />}
-                                                            {tournament?.category === "volleyball" && <SportsVolleyball className="text-gray-300" />}
-                                                            {tournament?.category === "chess" && <Extension className="text-gray-300" />}
-                                                            {tournament?.category === "tennis" && <SportsTennis className="text-gray-300" />}
-                                                        </div>
-
-                                                        <div>
-
-                                                            <span className="text-sm font-medium text-gray-200 block">
-                                                                {tournament.name} - {tournament.category}
-                                                            </span>
-
-                                                            {tournament.location && (
-                                                                <p className="text-xs text-gray-500 mt-1">
-                                                                    {tournament.location}
-                                                                </p>
-                                                            )}
-                                                        </div>
-                                                    </div>
-
-                                                    {/* STATUS */}
-                                                    <span
-                                                        className={`text-xs px-3 py-1 rounded-full border ${statusStyles[tournament.status]} flex items-center gap-2 uppercase`}
-                                                    >
-
-                                                        {tournament?.status === "live" && (
-                                                            <span className="relative flex h-2 w-2">
-                                                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                                                                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-                                                            </span>
-                                                        )}
-
-                                                        {tournament?.status}
-                                                    </span>
-                                                </div>
-
-                                                {/* DIVIDER */}
-                                                <div className="my-4 h-px bg-gray-800" />
-
-                                                {/* BOTTOM */}
-                                                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10 text-gray-400 text-sm">
-
-                                                    <div className="flex items-center gap-6 flex-wrap">
-
-                                                        <div>
-                                                            <p className="text-xs">
-                                                                Stage
-                                                            </p>
-
-                                                            <p className="text-white font-medium">
-                                                                {stage}
-                                                            </p>
-                                                        </div>
-
-                                                        <div>
-                                                            <p className="text-xs">
-                                                                Teams
-                                                            </p>
-
-                                                            <p className="text-white font-medium">
-                                                                {tournament.teams?.length || 0}
-                                                            </p>
-                                                        </div>
-
-                                                        <div>
-                                                            <p className="text-xs">
-                                                                Start Date
-                                                            </p>
-
-                                                            <p className="text-white font-medium">
-                                                                {tournament.startDate || "--"}
-                                                            </p>
-                                                        </div>
-                                                    </div>
-
-                                                    {/* ACTION */}
-                                                    <div className="flex flex-wrap gap-2">
-
-                                                        <hr className="h-5 w-[0.5px] bg-gray-500" />
-
-                                                        <button
-                                                            className="group-hover:text-gray-300 transition text-xs cursor-pointer hover:underline"
-                                                            onClick={() => {
-                                                                setSelectedTournament(
-                                                                    tournament
-                                                                );
-
-                                                                setOpenTournament(
-                                                                    true
-                                                                );
-                                                            }}
-                                                        >
-                                                            View Details →
-                                                        </button>
-                                                    </div>
-                                                </div>
                                             </div>
-                                        );
-                                    })
 
-                                ) : !loading ? (
+                                            <Link
+                                                href={`/tournaments/${tournament.id}`}
+                                            >
+                                                <ArrowForwardIos fontSize="small" />
+                                            </Link>
 
-                                    <div className="sm:col-span-2 flex flex-col items-center justify-center text-center border border-dashed border-gray-700 rounded-xl p-10 bg-[#0F1115] w-full mx-auto min-h-[300px]">
-
-                                        <div className="p-3 rounded-full bg-white/5 border border-gray-700 mb-4">
-                                            <SportsSoccer className="text-gray-300" />
                                         </div>
 
-                                        <h3 className="text-sm font-semibold text-gray-200 mb-1">
-                                            No tournaments yet
-                                        </h3>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
-                                        <p className="text-xs text-gray-400 mb-4 max-w-xs">
-                                            No tournaments have been created yet.
-                                            Come back later.
-                                        </p>
-                                    </div>
+                                            {tournamentMatches.map((match) => (
+                                                <MatchCard
+                                                    key={match.id}
+                                                    {...match}
+                                                />
+                                            ))}
 
-                                ) : null}
-                            </div>
+                                        </div>
 
-                            {/* BUTTON */}
-                            {homeTournaments.length > 0 && (
-                                <div className="mt-8 flex justify-center">
-                                    <a href="/Tournaments">
-                                        <Button variant="primary"
-                                        >
-                                            View All Tournaments
-                                        </Button>
-                                    </a>
+                                    </section>
+                                );
+                            }
+                        )}
+
+                        {/* MATCHES WITHOUT TOURNAMENT */}
+                        {groupedMatches.standaloneMatches.length > 0 && (
+                            <section className="flex flex-col gap-5">
+
+                                <h2 className="text-sm font-semibold uppercase text-gray-400">
+                                    Matches
+                                </h2>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+                                    {groupedMatches.standaloneMatches.map((match) => (
+                                        <MatchCard
+                                            key={match.id}
+                                            {...match}
+                                        />
+                                    ))}
+
                                 </div>
-                            )}
-                        </div>
-                    )}
-                </section>
-            </div>
 
-            {/* MODAL */}
-            <AnimatePresence>
-                {openTournament && selectedTournament && (
-                    <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+                            </section>
+                        )}
 
-                        <div className="w-full max-w-lg">
-
-                            <StandingsTable
-                                tournament={selectedTournament}
-                                onClose={() =>
-                                    setOpenTournament(false)
-                                }
-                            />
-                        </div>
                     </div>
-                )}
-            </AnimatePresence>
+
+                    {/* Empty Tab  */}
+                    {!loading && tabFilteredMatches.length === 0 && (
+                        <Empty />
+                    )}
+                </div>
+            </div>
         </main>
     );
 }

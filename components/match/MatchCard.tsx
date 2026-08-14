@@ -1,18 +1,12 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
-import { useRouter, usePathname } from "next/navigation";
-
-import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
-import RoomIcon from "@mui/icons-material/Room";
+import React from "react";
 
 import { AnimatePresence } from "framer-motion";
 
 import ManageMatches from "../table/ManageMatches";
 
 import useMatchesInfo, { Matches } from "@/utils/logics/usematchesinfo";
-import useTournamentInfo from "@/utils/logics/usetournamentinfo";
-import { SportsBasketball, SportsSoccer, SportsVolleyball } from "@mui/icons-material";
 
 type MatchCardProps = Matches & {
     onAdminClick?: (id: string) => void;
@@ -43,99 +37,75 @@ const MatchCard: React.FC<MatchCardProps> = ({
 
 }) => {
     const {
-        tournaments,
-    } = useTournamentInfo();
-
-    const {
         manageMatches,
         setManageMatches,
-
-        isAdmin,
-
-        statusLabel,
         statusStyles,
-
         handleClick,
     } = useMatchesInfo();
+
     return (
         <>
-            <div
-                onClick={() => handleClick(id)}
-                className="cursor-pointer rounded-2xl border border-gray-800 bg-gradient-to-b from-[#111827] to-[#0B0F19] p-5 transition-all duration-300 hover:border-gray-700"
-            >
+            <div className=" flex flex-col w-full">
 
-                {/* TOP */}
-                <div className="flex justify-between mb-3 text-xs text-gray-400">
+                {/* MAtch Card  */}
+                <section
+                    onClick={() => handleClick(id)}
+                    className="cursor-pointer rounded-xl border border-[#FFFFFF33] bg-[#131313] py-8 px-6 transition-all duration-300 hover:border-gray-700 relative flex flex-col gap-5"
 
+                >
                     <span
-                        className={`text-xs px-3 py-1 rounded-full border ${statusStyles[status]} flex items-center gap-2`}
+                        className={`absolute top-0 left-1/2 -translate-x-1/2 text-[12px] px-3 py-1 rounded-b-sm ${statusStyles[status]} flex items-center gap-2`}
                     >
+                        {status.toUpperCase()}
                         {status === "live" && (
                             <span className="relative flex h-2 w-2">
-                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#EF0107] opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#EF0107]"></span>
                             </span>
                         )}
-                        {status.toUpperCase()}
                     </span>
-                    {tournamentId && tournaments.filter((t) => t.id === tournamentId).map((t) => (
-                        <p className=" text-[10px] text-gray-500 uppercase border-y border-gray-500 h-fit py-1">
-                            {t.name}
-                        </p>))}
 
-                    <div className="flex items-center gap-2 capitalize text-[11px] text-gray-500">{category}
-                        <div className="p-2 rounded-lg bg-white/5 border border-gray-700">
-                            {category === "football" && <SportsSoccer fontSize="small" className="text-gray-300" />}
-                            {category === "basketball" && <SportsBasketball fontSize="small" className="text-gray-300" />}
-                            {category === "volleyball" && <SportsVolleyball fontSize="small" className="text-gray-300" />}
+                    {/* SCORE */}
+                    <div className="relative flex items-center justify-between text-[14px] font-medium">
+
+                        <span className="flex flex-col gap-2">
+                            <img src="/teamA.png" alt="" className=" w-14 h-14  object-cover " />
+                            {teamA}
+                        </span>
+
+                        <div className="absolute left-1/2 -translate-x-1/2 text-xl font-bold text-[32px] font-bold">
+                            {scoreA} : {scoreB}
                         </div>
 
+                        <span className="flex flex-col gap-2">
+                            <img src="/teamB.png" alt="" className=" w-14 h-14  object-cover bg-white rounded-full" />
+                            {teamB}
+                        </span>
+
                     </div>
 
-                </div>
+                    {/* DIVIDER */}
+                    <div className="h-px max-w-75.5 w-full mx-auto bg-[#FFFFFF1A] to-transparent opacity-40 " />
 
-                {/* SCORE */}
-                <div className="flex justify-between items-center">
+                    {/* FOOTER */}
+                    <div className="flex justify-between text-[12px] text-[#A1A1AA] gap-4">
 
-                    <span className="font-medium">
-                        {teamA}
-                    </span>
+                        <span className="flex items-center gap-1">
+                            {new Date(date).toLocaleDateString("en-US", {
+                                weekday: "short",
+                                month: "short",
+                                day: "numeric",
+                            })}{" "}
+                            - {time}
+                        </span>
 
-                    <div className="text-xl font-bold">
+                        <span>
 
-                        {scoreA} : {scoreB}
+                            {location}
+                        </span>
                     </div>
 
-                    <span className="font-medium">
-                        {teamB}
-                    </span>
-                </div>
-
-                {/* DIVIDER */}
-                <div className="mt-4 h-px w-full bg-gradient-to-r from-transparent via-gray-700 to-transparent opacity-40" />
-
-                {/* FOOTER */}
-                <div className="flex justify-between mt-3 text-xs text-gray-500 gap-4">
-
-                    <span className="flex items-center gap-1">
-
-                        <CalendarMonthIcon
-                            fontSize="small"
-                        />
-
-                        {date} - {time}
-                    </span>
-
-                    <span className="flex items-center gap-1 text-right">
-
-                        <RoomIcon
-                            fontSize="small"
-                        />
-
-                        {location}
-                    </span>
-                </div>
-
+                </section>
 
             </div>
 
