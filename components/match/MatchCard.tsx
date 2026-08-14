@@ -77,7 +77,7 @@ const MatchCard: React.FC<MatchCardProps> = ({
                             {scoreA} : {scoreB}
                         </div>
 
-                        <span className="flex flex-col gap-2">
+                        <span className="flex flex-col gap-2 text-right">
                             <img src="/teamB.png" alt="" className=" w-14 h-14  object-cover bg-white rounded-full" />
                             {teamB}
                         </span>

@@ -46,7 +46,7 @@ export default function Page() {
         return <Loader />;
     }
     return (
-        <main className="min-h-screen text-white py-8 absolute top-32 left-1/2 -translate-x-1/2 w-[90%] sm:left-10 sm:right-10 sm:w-auto sm:translate-x-0 z-50">
+        <main className="min-h-screen text-white py-8 absolute top-12 left-1/2 -translate-x-1/2 w-[90%] sm:left-10 sm:right-10 sm:w-auto sm:translate-x-0 z-50">
             <div className=" min-w-[90%] w-full  space-y-6">
 
                 {/* HERO MATCH CARD */}

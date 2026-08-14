@@ -35,7 +35,7 @@ function Header() {
         <div className="">
             <section className="relative w-full h-fit">
                 {pathname.startsWith("/tournaments/") ? (
-                    <div className="flex flex-col gap-7 absolute w-[90%] mx-auto top-5 left-1/2 -translate-x-1/2  z-40">
+                    <div className="flex flex-col gap-7 absolute w-[95%] mx-auto top-5 left-1/2 -translate-x-1/2  z-40">
 
                         <button
                             onClick={() => router.push('/tournaments')}
@@ -51,7 +51,7 @@ function Header() {
                         </h1>
                     </div>
 
-                ) : pathname.startsWith("/matches/") ? (<div className="flex flex-col gap-7 absolute w-[90%] mx-auto top-5 left-1/2 -translate-x-1/2  z-40">
+                ) : pathname.startsWith("/matches/") ? (<div className="flex flex-col gap-7 absolute w-[95%] mx-auto top-5 left-1/2 -translate-x-1/2  z-40">
 
                     <button
                         onClick={() => router.push('/')}
@@ -61,7 +61,7 @@ function Header() {
                     </button>
 
                 </div>) : (
-                    <div className="flex flex-col gap-7 absolute w-[90%] mx-auto top-5 left-1/2 -translate-x-1/2  z-40">
+                    <div className="flex flex-col gap-7 absolute w-[95%] mx-auto top-5 left-1/2 -translate-x-1/2  z-40">
                         <div className=" flex flex-1 items-center justify-between">
                             <span className="">
                                 <Link
