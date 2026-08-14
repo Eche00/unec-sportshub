@@ -215,7 +215,7 @@ function page() {
             className="flex flex-col gap-3 w-[95%] mx-auto"
         >
             {/* Tabs */}
-            <div className="flex gap-3 flex-wrap border-y border-[#FFFFFF1A] p-3 text-[12px] font-medium">
+            <div className="sticky top-0 bg-[#0B0B0B] flex gap-3 flex-wrap border-y border-[#FFFFFF1A] p-3 text-[12px] font-medium">
                 {[
                     { key: "teams", label: "Teams" },
                     { key: "standings", label: "Draw" },

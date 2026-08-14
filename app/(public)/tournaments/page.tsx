@@ -44,7 +44,8 @@ export default function Page() {
                     {!loading && filteredTournaments.length > 0 ? (
                         filteredTournaments.map((tournament) => {
                             return (
-                                <div
+                                <Link
+                                    href={`/tournaments/${tournament.id}`}
                                     key={tournament.id}
                                     className="flex items-center justify-between py-4 px-3 border-b border-[#FFFFFF1A]"
                                 >
@@ -52,8 +53,8 @@ export default function Page() {
                                         {tournament.name} - {tournament.category}
                                     </span>
 
-                                    <Link href={`/tournaments/${tournament.id}`}><ArrowForwardIos fontSize="small" /></Link>
-                                </div>
+                                    <span><ArrowForwardIos fontSize="small" /></span>
+                                </Link>
                             );
                         })
                     ) : !loading ? (

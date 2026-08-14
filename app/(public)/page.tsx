@@ -127,7 +127,7 @@ export default function Page() {
     }
 
     return (
-        <main className="relative min-h-screen text-white overflow-hidden">
+        <main className="relative min-h-screen text-white">
 
             <div className="smLmax-w-7xl max-w-[95%] mx-auto ">
                 {/* MATCHES */}
@@ -136,7 +136,7 @@ export default function Page() {
 
 
                     <div className="flex flex-col gap-10 pb-10">
-                        <div className="flex items-center gap-6 border-b border-[#FFFFFF1A]">
+                        <div className="sticky top-0 z-40 pt-2 flex items-center gap-6 border-b border-[#FFFFFF1A] bg-[#0B0B0B]">
                             {tabs.map((tab) => (
                                 <button
                                     key={tab}
