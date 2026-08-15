@@ -6,8 +6,8 @@ import MatchCard from "@/components/match/MatchCard";
 import useMatchesInfo from "@/utils/logics/usematchesinfo";
 
 import SearchIcon from "@mui/icons-material/Search";
-import MatchesSkeleton from "@/components/ui/skeletons/MatchesSkeleton";
 import Empty from "@/components/ui/Empty";
+import Loader from "@/components/ui/Loader";
 
 export default function Page() {
     const {
@@ -20,11 +20,12 @@ export default function Page() {
         hasMatches,
 
         filteredMatches,
+        getMatchTime,
     } = useMatchesInfo();
 
     if (loading) {
         return (
-            <MatchesSkeleton />
+            <Loader />
         );
     }
 
@@ -71,6 +72,9 @@ export default function Page() {
                                     time={match.time}
                                     location={match.location}
                                     tournamentId={match.tournamentId}
+                                    matchMinute={
+                                        getMatchTime(match)
+                                    }
 
                                 />
                             ))

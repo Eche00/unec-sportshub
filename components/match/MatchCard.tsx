@@ -10,6 +10,7 @@ import useMatchesInfo, { Matches } from "@/utils/logics/usematchesinfo";
 
 type MatchCardProps = Matches & {
     onAdminClick?: (id: string) => void;
+    matchMinute?: string;
 };
 
 const MatchCard: React.FC<MatchCardProps> = ({
@@ -29,11 +30,8 @@ const MatchCard: React.FC<MatchCardProps> = ({
     date,
     time,
     location,
-
-    currentHalf,
-
-    isHalftime,
     tournamentId,
+    matchMinute,
 
 }) => {
     const {
@@ -73,8 +71,11 @@ const MatchCard: React.FC<MatchCardProps> = ({
                             {teamA}
                         </span>
 
-                        <div className="absolute left-1/2 -translate-x-1/2 text-xl font-bold text-[32px] font-bold">
-                            {scoreA} : {scoreB}
+                        <div className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center justify-center">
+                            <div className=" text-xl font-bold text-[32px] font-bold">
+                                {scoreA} : {scoreB}
+                            </div>
+                            {status === "live" && <p className="text-[12px] font-medium text-[#FB831C]">{matchMinute ?? 0}'</p>}
                         </div>
 
                         <span className="flex flex-col gap-2 text-right">
@@ -99,7 +100,7 @@ const MatchCard: React.FC<MatchCardProps> = ({
                             - {time}
                         </span>
 
-                        <span>
+                        <span className=" text-[#FB831C]">
 
                             {location}
                         </span>

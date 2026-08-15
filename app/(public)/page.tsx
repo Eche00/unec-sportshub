@@ -25,7 +25,7 @@ const tabs: MatchTabs[] = [
 ];
 
 export default function Page() {
-    const { loading, filteredMatches } = useMatchesInfo();
+    const { loading, filteredMatches, getMatchTime } = useMatchesInfo();
     const { tournaments } = useTournamentInfo();
     const [activeTab, setActiveTab] = useState<MatchTabs>("all");
 
@@ -150,7 +150,7 @@ export default function Page() {
                                     {tab.charAt(0).toUpperCase() + tab.slice(1)}
 
                                     {activeTab === tab && (
-                                        <span className="absolute bottom-0 left-0 h-0.75 w-full bg-white rounded-full" />
+                                        <span className="absolute bottom-0 left-0 h-0.75 w-full bg-[#FB831C] rounded-full" />
                                     )}
                                 </button>
                             ))}
@@ -201,6 +201,7 @@ export default function Page() {
                                                 <MatchCard
                                                     key={match.id}
                                                     {...match}
+                                                    matchMinute={getMatchTime(match)}
                                                 />
                                             ))}
 
@@ -225,6 +226,7 @@ export default function Page() {
                                         <MatchCard
                                             key={match.id}
                                             {...match}
+                                            matchMinute={getMatchTime(match)}
                                         />
                                     ))}
 

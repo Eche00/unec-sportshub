@@ -17,7 +17,7 @@ export default function Page() {
     const {
         match,
         statusStyles,
-        getMatchById,
+        getMatchById, getMatchTime
     } = useMatchesInfo();
     const {
         tournaments,
@@ -74,8 +74,11 @@ export default function Page() {
                             {match.teamA}
                         </span>
 
-                        <div className="absolute left-1/2 -translate-x-1/2 text-xl font-bold text-[32px] font-bold">
-                            {match.scoreA} : {match.scoreB}
+                        <div className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center justify-center">
+                            <div className=" text-xl font-bold text-[32px] font-bold">
+                                {match.scoreA} : {match.scoreB}
+                            </div>
+                            {match.status === "live" && <p className="text-[12px] font-medium text-[#FB831C]"> {getMatchTime(match)}'</p>}
                         </div>
 
                         <span className="flex flex-col gap-2">
@@ -100,7 +103,7 @@ export default function Page() {
                             - {match.time}
                         </span>
 
-                        <span>
+                        <span className=" text-[#FB831C]">
 
                             {match.location}
                         </span>

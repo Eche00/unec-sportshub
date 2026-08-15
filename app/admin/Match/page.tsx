@@ -9,16 +9,16 @@ import Button from "@/components/ui/Button";
 
 import useMatchesInfo from "@/utils/logics/usematchesinfo";
 import Empty from "@/components/ui/Empty";
-import MatchesSkeleton from "@/components/ui/skeletons/MatchesSkeleton";
+import Loader from "@/components/ui/Loader";
 
 export default function Page() {
 
-    const { filteredMatches, loading, createMatch, setCreateMatch, isEmpty, search, setSearch } = useMatchesInfo();
+    const { filteredMatches, loading, createMatch, setCreateMatch, isEmpty, search, setSearch, getMatchTime } = useMatchesInfo();
 
     const hasMatches = filteredMatches.length > 0;
     if (loading) {
         return (
-            <MatchesSkeleton />
+            <Loader />
         );
     }
     return (
@@ -76,6 +76,9 @@ export default function Page() {
                             time={match.time}
                             location={match.location}
                             tournamentId={match.tournamentId}
+                            matchMinute={
+                                getMatchTime(match)
+                            }
                         />
                     ))}
                 </div>
