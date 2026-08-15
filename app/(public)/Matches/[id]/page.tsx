@@ -78,7 +78,7 @@ export default function Page() {
                             <div className=" text-xl font-bold text-[32px] font-bold">
                                 {match.scoreA} : {match.scoreB}
                             </div>
-                            {match.status === "live" && <p className="text-[12px] font-medium text-[#FB831C]"> {getMatchTime(match)}'</p>}
+                           
                         </div>
 
                         <span className="flex flex-col gap-2">
