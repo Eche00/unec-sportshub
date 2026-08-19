@@ -15,7 +15,6 @@ import {
     deleteDoc,
     onSnapshot,
     Timestamp,
-    serverTimestamp,
 } from "firebase/firestore";
 
 import toast from "react-hot-toast";
@@ -1105,15 +1104,47 @@ const useMatchesInfo = (
         }
     };
     //  HANDLE START
-
     const handleStartMatch = async () => {
         if (!match) return;
 
-        await startMatch(match.id);
+        try {
+            setLoading(true);
+
+            const ref = doc(db, "matches", match.id);
+
+            const now = new Date();
+
+            await updateDoc(ref, {
+                status: "live",
+                isLive: true,
+                isHalftime: false,
+                currentHalf: match.currentHalf || 1,
+                timerStartedAt: now,
+            });
+
+            setMatch((prev) =>
+                prev
+                    ? {
+                        ...prev,
+                        status: "live",
+                        isLive: true,
+                        isHalftime: false,
+                        currentHalf: prev.currentHalf || 1,
+                        timerStartedAt: now,
+                    }
+                    : prev
+            );
+
+            toast.success("Match started");
+        } catch (error) {
+            console.error(error);
+            toast.error("Failed to start match");
+        } finally {
+            setLoading(false);
+        }
     };
 
     //  HANDLE HALFTIME
-
     const handleHalftime = async () => {
         if (!match) return;
 
@@ -1155,11 +1186,42 @@ const useMatchesInfo = (
     };
 
     //  HANDLE CONTINUE
-
     const handleContinueMatch = async () => {
         if (!match) return;
 
-        await continueMatch(match.id);
+        try {
+            setLoading(true);
+
+            const ref = doc(db, "matches", match.id);
+
+            const now = new Date();
+
+            await updateDoc(ref, {
+                status: "live",
+                isLive: true,
+                isHalftime: false,
+                timerStartedAt: now,
+            });
+
+            setMatch((prev) =>
+                prev
+                    ? {
+                        ...prev,
+                        status: "live",
+                        isLive: true,
+                        isHalftime: false,
+                        timerStartedAt: now,
+                    }
+                    : prev
+            );
+
+            toast.success("Match continued");
+        } catch (error) {
+            console.error(error);
+            toast.error("Failed to continue match");
+        } finally {
+            setLoading(false);
+        }
     };
 
     //  HANDLE END
@@ -1167,7 +1229,41 @@ const useMatchesInfo = (
     const handleEndMatch = async () => {
         if (!match) return;
 
-        await endMatch(match.id);
+        try {
+            setLoading(true);
+
+            const ref = doc(db, "matches", match.id);
+
+            const finalElapsed = matchElapsedSeconds;
+
+            await updateDoc(ref, {
+                status: "ended",
+                isLive: false,
+                isHalftime: false,
+                elapsedSeconds: finalElapsed,
+                timerStartedAt: null,
+            });
+
+            setMatch((prev) =>
+                prev
+                    ? {
+                        ...prev,
+                        status: "finished",
+                        isLive: false,
+                        isHalftime: false,
+                        elapsedSeconds: finalElapsed,
+                        timerStartedAt: null,
+                    }
+                    : prev
+            );
+
+            toast.success("Match ended");
+        } catch (error) {
+            console.error(error);
+            toast.error("Failed to end match");
+        } finally {
+            setLoading(false);
+        }
     };
 
     //  FORM SUBMIT
