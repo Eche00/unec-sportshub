@@ -79,7 +79,7 @@ export default function AddPlayersForm({
     };
     return (
         <div
-            className="fixed inset-0 bg-black/60 z-50 flex justify-end"
+            className="fixed inset-0 bg-black/80 z-50 flex justify-end"
             onClick={onClose}
         >
 
@@ -108,7 +108,7 @@ export default function AddPlayersForm({
                     e.stopPropagation()
                 }
 
-                className="bg-[#0F172A] sm:w-[650px] mt-16 mb-10  w-full h-[90vh]  border-l border-gray-800 rounded-tl-2xl rounded-bl-2xl p-5 sm:p-6 overflow-y-auto flex flex-col"
+                className="bg-[#0B0B0B] sm:w-[650px] mt-16 mb-10  w-full h-[90vh] rounded-tl-2xl rounded-bl-2xl p-5 sm:p-6 overflow-y-auto flex flex-col"
             >
                 <div className="mb-6 flex items-center justify-between">
                     <div>
@@ -132,7 +132,7 @@ export default function AddPlayersForm({
                         {players.map((player) => (
                             <div
                                 key={player.id}
-                                className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#0F1115] border border-gray-700 text-sm"
+                                className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-black border border-gray-700 text-sm"
                             >
                                 <span>
                                     {player.name}
@@ -174,7 +174,7 @@ export default function AddPlayersForm({
                                     e.target.value as Player["position"]
                                 )
                             }
-                            className="rounded-lg border border-gray-700 bg-[#111827] p-3 text-white"
+                            className="rounded-lg border border-gray-700 bg-black p-2 text-white"
                         >
                             <option value="Goalkeeper">Goalkeeper</option>
                             <option value="Defender">Defender</option>
@@ -209,13 +209,13 @@ export default function AddPlayersForm({
                         Squad ({team.squad?.length || 0})
                     </h3>
 
-                    <div className="space-y-2">
+                    <div className="flex flex-wrap items-start justify-center gap-4">
                         {(team.squad || []).map((player) => (
                             <div
                                 key={player.id}
-                                className="rounded-lg bg-[#111827] p-3"
+                                className="max-w-[180px] w-full rounded-xl border border-[#FFFFFF33] bg-[#131313] p-4 transition-all duration-300 hover:border-gray-700"
                             >
-                                <div className="font-medium text-white">
+                                <div className="font-medium text-sm text-white">
                                     {player.name}
                                 </div>
 

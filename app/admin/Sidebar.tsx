@@ -54,8 +54,8 @@ function Sidebar() {
             <section className="w-[80%] mx-auto flex flex-col gap-2 relative">
                 {/* Logo Section  */}
                 <div className="flex items-center relative pb-6">
-                    <span className="flex items-center w-full rounded-lg px-4 text-2xl font-extrabold text-[#3B82F6] tracking-wide">
-                        <Link href='/' className=' border-2 border-[#3B82F6] rounded-full p-2 mr-2 flex items-center justify-center'><img src="/logo.png" alt="" className=' w-8 h-8 object-cover' /></Link>
+                    <span className="flex items-center w-full rounded-lg px-4 text-2xl font-extrabold text-[#FB831C] tracking-wide">
+                        <Link href='/' className=' border-2 border-[#FB831C]  rounded-full p-2 mr-2 flex items-center justify-center'><img src="/logo.png" alt="" className=' w-8 h-8 object-cover' /></Link>
                         <p className="text-white md:flex hidden ">S.</p>Hub
                     </span>
                 </div>
@@ -63,11 +63,11 @@ function Sidebar() {
 
                 {/* Link Section  */}
                 {adminSidebar.map((item) =>
-                    <Link href={item.link} key={item.name} className={pathname === item.link ? 'text-white font-bold bg-[#3B82F6] py-3 px-4 rounded-lg flex items-center gap-3' : 'text-gray-400 py-3 px-4 rounded-lg hover:bg-[#3B82F6]/10 flex items-center gap-3'}>{item.icon} {item.name}</Link>)
+                    <Link href={item.link} key={item.name} className={pathname === item.link ? 'text-white font-bold bg-[#FB831C] py-3 px-4 rounded-lg flex items-center gap-3' : 'text-gray-400 py-3 px-4 rounded-lg hover:bg-[#FB831C]/10 flex items-center gap-3'}>{item.icon} {item.name}</Link>)
                 }
                 <hr className=' w-full h-[0.1px] bg-gray-600 border-none' />
                 {adminSecondary.map((item) =>
-                    <Link href={item.link} key={item.name} className={pathname === item.link ? 'text-white font-bold bg-[#3B82F6] py-3 px-4 rounded-lg flex items-center gap-3' : 'text-gray-400 py-3 px-4 rounded-lg hover:bg-[#3B82F6]/10 flex items-center gap-3'}>{item.icon} {item.name}</Link>)
+                    <Link href={item.link} key={item.name} className={pathname === item.link ? 'text-white font-bold bg-[#FB831C] py-3 px-4 rounded-lg flex items-center gap-3' : 'text-gray-400 py-3 px-4 rounded-lg hover:bg-[#FB831C]/10 flex items-center gap-3'}>{item.icon} {item.name}</Link>)
                 }
 
 

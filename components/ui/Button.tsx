@@ -14,11 +14,11 @@ function Button({
     ...props
 }: ButtonProps) {
     const base =
-        "px-5 py-2 rounded-2xl font-semibold transition w-fit cursor-pointer text-nowrap";
+        "px-5 py-1.5 rounded-md text-sm font-semibold transition w-fit cursor-pointer text-nowrap";
 
     const variants = {
         primary:
-            "bg-[#3B82F6] text-black hover:opacity-90",
+            "bg-[#FB831C] text-white hover:opacity-90",
         secondary:
             "border border-gray-600 text-white hover:border-white",
         secondaryRed:

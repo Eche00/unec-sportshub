@@ -343,7 +343,7 @@ function EditTournamentForm({ tournament, onClose }: Props) {
 
     return (
         <div
-            className="fixed inset-0 bg-black/60 z-50 flex justify-end"
+            className="fixed inset-0 bg-black/80 z-50 flex justify-end"
             onClick={onClose}
         >
 
@@ -372,7 +372,7 @@ function EditTournamentForm({ tournament, onClose }: Props) {
                     e.stopPropagation()
                 }
 
-                className="bg-[#0F172A] sm:w-[650px] mt-16 mb-10  w-full h-[90vh]  border-l border-gray-800 rounded-tl-2xl rounded-bl-2xl p-5 sm:p-6 overflow-y-auto flex flex-col"
+                className="bg-[#0B0B0B] sm:w-[650px] mt-16 mb-10  w-full h-[90vh] rounded-tl-2xl rounded-bl-2xl p-5 sm:p-6 overflow-y-auto flex flex-col"
             >
                 {/* HEADER */}
                 <div className="mt-8 flex justify-between items-center mb-4">
@@ -389,7 +389,7 @@ function EditTournamentForm({ tournament, onClose }: Props) {
 
                 <>
                     {/* CONTROLS */}
-                    <div className="sticky top-0 z-20 bg-[#0F172A] pb-4">
+                    <div className="sticky -top-6 z-20 bg-[#0B0B0B] py-2">
                         <div className="flex md:flex-row flex-col items-center justify-between gap-3">
 
 
@@ -424,11 +424,11 @@ function EditTournamentForm({ tournament, onClose }: Props) {
                                     Create Match
                                 </Button>
                             ) : tab === "standings" ? (
-                                <div className="flex items-center gap-1 bg-[#111827] border border-gray-800 p-1.5 rounded-lg">
+                                <div className="flex items-center gap-1 bg-black border border-gray-800 p-1.5 rounded-lg">
                                     <button
                                         onClick={() => updateTournamentStatus(tournament.id, "live")}
                                         className={`px-3 py-1.5 text-sm rounded-lg transition cursor-pointer ${tournament.status === "live"
-                                            ? "bg-[#3B82F6] text-black"
+                                            ? "bg-[#FB831C] text-black"
                                             : "text-gray-400 hover:text-white"
                                             }`}
                                     >
@@ -438,7 +438,7 @@ function EditTournamentForm({ tournament, onClose }: Props) {
                                     <button
                                         onClick={() => updateTournamentStatus(tournament.id, "finished")}
                                         className={`px-3 py-1.5 text-sm rounded-lg transition cursor-pointer ${tournament.status === "finished"
-                                            ? "bg-[#3B82F6] text-black"
+                                            ? "bg-[#FB831C] text-black"
                                             : "text-gray-400 hover:text-white"
                                             }`}
                                     >
@@ -460,7 +460,7 @@ function EditTournamentForm({ tournament, onClose }: Props) {
                         {tournament.teams.map((t) => (
                             <div
                                 key={t.id}
-                                className="rounded-xl flex items-center justify-between border border-gray-700 bg-[#111827] p-4 transition hover:border-cyan-500"
+                                className=" flex items-center justify-between rounded-xl border border-[#FFFFFF33] bg-[#131313] py-8 px-6 transition-all duration-300 hover:border-gray-700 transition hover:border-cyan-500"
                             >
                                 <div className="flex items-center justify-between">
                                     <div>
@@ -504,7 +504,7 @@ function EditTournamentForm({ tournament, onClose }: Props) {
 
                                         <div
                                             key={match.id}
-                                            className="rounded-lg border border-gray-700 p-4 bg-[#111827]"
+                                            className="rounded-xl border border-[#FFFFFF33] bg-[#131313] py-8 px-6 transition-all duration-300 hover:border-gray-700"
                                         >
 
                                             <p className="text-xs text-gray-500 mb-3">
@@ -529,7 +529,7 @@ function EditTournamentForm({ tournament, onClose }: Props) {
                                                         )
                                                     }
 
-                                                    className="bg-[#0F172A] border border-gray-700 rounded-lg p-2"
+                                                    className="bg-black border border-gray-700 rounded-lg p-2"
 
                                                 >
 
@@ -569,7 +569,7 @@ function EditTournamentForm({ tournament, onClose }: Props) {
                                                         )
                                                     }
 
-                                                    className="bg-[#0F172A] border border-gray-700 rounded-lg p-2"
+                                                    className="bg-black border border-gray-700 rounded-lg p-2"
 
                                                 >
 
@@ -617,7 +617,7 @@ function EditTournamentForm({ tournament, onClose }: Props) {
                         <div className="rounded-xl border border-gray-800 overflow-scroll">
                             <div className="overflow-auto">
                                 <table className="min-w-[800px] w-full text-sm text-left text-nowrap">
-                                    <thead className="bg-[#0F1115] text-gray-400 text-xs uppercase">
+                                    <thead className="bg-black text-gray-400 text-xs uppercase">
                                         <tr>
                                             <th className="p-3">#</th>
                                             <th className="p-3">Team</th>
@@ -800,7 +800,7 @@ function EditTournamentForm({ tournament, onClose }: Props) {
                                                 setSelectedTeam(e.target.value);
                                                 setPlayerName(""); // reset player when team changes
                                             }}
-                                            className="w-full bg-[#0F1115] border border-gray-700 rounded-lg p-2 text-sm"
+                                            className="w-full bg-black border border-gray-700 rounded-lg p-2 text-sm"
                                         >
                                             <option value="">Select Team</option>
 
@@ -814,7 +814,7 @@ function EditTournamentForm({ tournament, onClose }: Props) {
                                             value={playerName}
                                             onChange={(e) => setPlayerName(e.target.value)}
                                             disabled={!selectedTeam}
-                                            className="w-full bg-[#0F1115] border border-gray-700 rounded-lg p-2 text-sm"
+                                            className="w-full bg-black border border-gray-700 rounded-lg p-2 text-sm"
                                         >
                                             <option value="">Select Player</option>
 
@@ -886,12 +886,12 @@ function EditTournamentForm({ tournament, onClose }: Props) {
                                                 .map((player, index) => (
                                                     <div
                                                         key={player.id}
-                                                        className="rounded-xl border border-gray-700 bg-[#111827] p-4 hover:border-[#3B82F6] transition-all"
+                                                        className="rounded-xl rounded-xl border border-[#FFFFFF33] bg-[#131313] py-8 px-6 transition-all duration-300 hover:border-gray-700 hover:border-[#FB831C] transition-all"
                                                     >
                                                         {/* Header */}
                                                         <div className="flex items-center justify-between mb-4">
                                                             <div className="flex items-center gap-4">
-                                                                <div className="font-bold text-sm text-[#3B82F6]">
+                                                                <div className="font-bold text-sm text-[#FB831C]">
                                                                     #{index + 1}
                                                                 </div>
 
@@ -934,7 +934,7 @@ function EditTournamentForm({ tournament, onClose }: Props) {
                                                             ].map((stat) => (
                                                                 <div
                                                                     key={stat.key}
-                                                                    className="bg-[#0F1115] rounded-lg p-3 border border-gray-700"
+                                                                    className="bg-black rounded-lg p-3 border border-gray-700"
                                                                 >
                                                                     <p className="text-xs text-gray-400 mb-2">
                                                                         {stat.label}

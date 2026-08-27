@@ -66,7 +66,7 @@ function TeamForm({
                         ) => (
                             <div
                                 key={index}
-                                className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#0F1115] border border-gray-700 text-sm"
+                                className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-black border border-gray-700 text-sm"
                             >
 
                                 <span className="text-gray-200">
@@ -82,7 +82,7 @@ function TeamForm({
                                             index
                                         )
                                     }
-                                    className="text-gray-400 hover:text-red-400 transition text-xs"
+                                    className="text-gray-400 hover:text-red-400 transition text-xs cursor-pointer"
                                 >
                                     ✕
                                 </button>

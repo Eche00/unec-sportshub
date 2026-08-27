@@ -17,7 +17,7 @@ function Input({ label, className = "", ...props }: InputProps) {
 
             <input
                 {...props}
-                className={`w-full bg-[#0F1115] border border-gray-700 rounded-lg p-2 text-sm outline-none focus:border-blue-500 transition ${className}`}
+                className={`w-full bg-black border border-gray-700 rounded-lg p-2 text-sm outline-none focus:border-[#FB831C] transition ${className}`}
             />
         </div>
     );

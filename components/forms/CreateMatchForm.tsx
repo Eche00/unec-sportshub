@@ -60,7 +60,7 @@ function CreateMatchForm({ onClose, tournamentId }: CreateMatchFormProps) {
     return (
         <form
             onSubmit={handleSubmit}
-            className="fixed inset-0 top-16.5 bg-black/60 z-50 flex justify-end"
+            className="fixed inset-0 top-16.5 bg-black/80 z-50 flex justify-end"
             onClick={() => {
                 if (!loading) {
                     onClose();
@@ -73,20 +73,17 @@ function CreateMatchForm({ onClose, tournamentId }: CreateMatchFormProps) {
                 exit={{ x: 200, opacity: 0 }}
                 transition={{ duration: 0.3 }}
                 onClick={(e) => e.stopPropagation()}
-                className="bg-[#0F172A] sm:w-[540px] w-full h-full border-l border-gray-800 rounded-tl-2xl rounded-bl-2xl p-6 overflow-y-auto flex flex-col"
+                className="bg-[#0B0B0B] sm:w-[540px] w-full h-full rounded-tl-2xl rounded-bl-2xl p-5 sm:p-6 overflow-y-auto flex flex-col"
+
             >
                 {/* HEADER */}
                 <div className="mb-6">
                     <h2 className="text-2xl font-semibold flex items-center justify-between">
                         Create Match
 
-                        <button
-                            onClick={onClose}
-                            type="button"
-                            className="p-2 rounded-lg hover:bg-white/5 transition"
-                        >
-                            <Close />
-                        </button>
+                        <Button variant="secondary" onClick={onClose}>
+                            Close
+                        </Button>
                     </h2>
 
                     <p className="text-sm text-gray-400 mt-1">
@@ -106,7 +103,7 @@ function CreateMatchForm({ onClose, tournamentId }: CreateMatchFormProps) {
                                 <select
                                     value={teamA}
                                     onChange={(e) => setTeamA(e.target.value)}
-                                    className="w-full bg-[#0F1115] border border-gray-700 rounded-lg p-2 text-sm"
+                                    className="w-full bg-black border border-gray-700 rounded-lg p-2 text-sm"
                                 >
                                     <option value="">Select Team A</option>
 
@@ -126,7 +123,7 @@ function CreateMatchForm({ onClose, tournamentId }: CreateMatchFormProps) {
                                 <select
                                     value={teamB}
                                     onChange={(e) => setTeamB(e.target.value)}
-                                    className="w-full bg-[#0F1115] border border-gray-700 rounded-lg p-2 text-sm"
+                                    className="w-full bg-black border border-gray-700 rounded-lg p-2 text-sm"
                                 >
                                     <option value="">Select Team B</option>
 
@@ -196,7 +193,7 @@ function CreateMatchForm({ onClose, tournamentId }: CreateMatchFormProps) {
                         onChange={(e) =>
                             setStatus(e.target.value as "live" | "finished" | "upcoming")
                         }
-                        className="w-full bg-[#0F1115] border border-gray-700 rounded-lg p-2 text-sm"
+                        className="w-full bg-black border border-gray-700 rounded-lg p-2 text-sm"
                     >
                         <option value="upcoming">Upcoming</option>
                         <option value="live">Live</option>
@@ -221,7 +218,7 @@ function CreateMatchForm({ onClose, tournamentId }: CreateMatchFormProps) {
                                     | "chess"
                                 )
                             }
-                            className="w-full bg-[#0F1115] border border-gray-700 rounded-lg p-2 text-sm"
+                            className="w-full bg-black border border-gray-700 rounded-lg p-2 text-sm"
                         >
                             <option value="football">Football</option>
                             <option value="basketball">Basketball</option>
@@ -238,7 +235,7 @@ function CreateMatchForm({ onClose, tournamentId }: CreateMatchFormProps) {
                             Category
                         </label>
 
-                        <div className="bg-[#0F1115] border border-gray-700 rounded-lg p-2 text-sm capitalize">
+                        <div className="bg-black border border-gray-700 rounded-lg p-2 text-sm capitalize">
                             {selectedTournament.category}
                         </div>
                     </div>
@@ -266,7 +263,7 @@ function CreateMatchForm({ onClose, tournamentId }: CreateMatchFormProps) {
                                 !isTournamentLocked && setSelectedTournamentId(e.target.value)
                             }
                             disabled={isTournamentLocked}
-                            className={`w-full border rounded-lg p-2 text-sm bg-[#0F1115] ${isTournamentLocked
+                            className={`w-full border rounded-lg p-2 text-sm bg-black ${isTournamentLocked
                                 ? "border-gray-700 text-gray-400 cursor-not-allowed opacity-70"
                                 : "border-gray-700 text-white"
                                 }`}

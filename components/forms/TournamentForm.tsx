@@ -70,7 +70,7 @@ function TournamentForm({
     return (
         <form
             onSubmit={handleSubmit}
-            className="fixed inset-0 top-16.5 bg-black/60 z-50 flex justify-end"
+            className="fixed inset-0 top-16.5 bg-black/80 z-50 flex justify-end"
             onClick={() => {
                 if (!creating) {
                     onClose();
@@ -96,7 +96,8 @@ function TournamentForm({
                 onClick={(e) =>
                     e.stopPropagation()
                 }
-                className="bg-[#0F172A] sm:w-[540px] w-[100%] h-full border-l border-gray-800 rounded-tl-2xl rounded-bl-2xl p-6 overflow-y-auto flex flex-col"
+                className="bg-[#0B0B0B] sm:w-[540px] w-full h-full rounded-tl-2xl rounded-bl-2xl p-5 sm:p-6 overflow-y-auto flex flex-col"
+
             >
 
                 {/* Header */}
@@ -106,14 +107,9 @@ function TournamentForm({
 
                         Create Tournament
 
-                        <button
-                            type="button"
-                            onClick={onClose}
-                            disabled={creating}
-                            className="p-2 rounded-lg hover:bg-white/5 transition cursor-pointer disabled:opacity-50"
-                        >
-                            <Close />
-                        </button>
+                        <Button variant="secondary" onClick={onClose} disabled={creating}>
+                            Close
+                        </Button>
                     </h2>
 
                     <p className="text-sm text-gray-400 mt-1">
@@ -166,7 +162,7 @@ function TournamentForm({
                                 | "chess"
                             )
                         }
-                        className="w-full bg-[#0F1115] border border-gray-700 rounded-lg p-2 text-sm"
+                        className="w-full bg-black border border-gray-700 rounded-lg p-2 text-sm"
                     >
                         <option value="football">
                             Football
@@ -226,7 +222,7 @@ function TournamentForm({
                                     e.target.value
                                 )
                             }
-                            className="w-full bg-[#0F1115] border border-gray-700 rounded-lg p-2 text-sm"
+                            className="w-full bg-black border border-gray-700 rounded-lg p-2 text-sm"
                         >
                             <option value="knockout">
                                 Knockout
@@ -258,7 +254,7 @@ function TournamentForm({
                                     )
                                 )
                             }
-                            className="w-full bg-[#0F1115] border border-gray-700 rounded-lg p-2 text-sm"
+                            className="w-full bg-black border border-gray-700 rounded-lg p-2 text-sm"
                         >
                             {[4, 8, 16, 32].map(
                                 (num) => (
@@ -291,7 +287,7 @@ function TournamentForm({
                                 )
                             }
                             className={`flex-1 p-3 rounded-lg border transition ${autoMatchups
-                                ? "border-blue-500 bg-blue-500/10"
+                                ? "border-[#FB831C] bg-[#FB831C]/10"
                                 : "border-gray-700"
                                 }`}
                         >
@@ -313,7 +309,7 @@ function TournamentForm({
                                 )
                             }
                             className={`flex-1 p-3 rounded-lg border transition ${!autoMatchups
-                                ? "border-blue-500 bg-blue-500/10"
+                                ? "border-[#FB831C] bg-[#FB831C]/10"
                                 : "border-gray-700"
                                 }`}
                         >

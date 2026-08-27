@@ -101,7 +101,7 @@ export default function Page() {
                         placeholder="Search by name or status..."
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        className="w-full pl-10 pr-4 py-3 rounded-xl bg-[#1F2933] border border-gray-800 text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                        className="w-full pl-10 pr-4 py-3 rounded-xl bg-[#1F2933] border border-gray-800 text-gray-200 placeholder-gray-500 outline-none ring-2 ring-[#FB831C] transition"
                     />
                 </div>
                 {/* LIST */}
@@ -115,11 +115,9 @@ export default function Page() {
                             return (
                                 <div
                                     key={tournament.id}
-                                    className="relative group bg-gradient-to-b from-[#111827] to-[#0B0F19] rounded-2xl p-6 border border-gray-800 hover:border-purple-400/40 transition overflow-hidden"
+                                    className="relative group rounded-xl border border-[#FFFFFF33] bg-[#131313] py-8 px-6 transition-all duration-300 hover:border-gray-700 transition overflow-hidden"
                                 >
 
-                                    {/* Glow */}
-                                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition bg-linear-to-r from-cyan-500/10 to-purple-500/10 blur-xl" />
 
                                     {/* TOP */}
                                     <div className="flex justify-between items-start relative z-10">
@@ -246,7 +244,7 @@ export default function Page() {
                             {isSearching && (
                                 <button
                                     onClick={() => setSearch("")}
-                                    className="text-xs text-blue-400  cursor-pointer"
+                                    className="text-xs text-[#FB831C]  cursor-pointer"
                                 >
                                     Clear search
                                 </button>

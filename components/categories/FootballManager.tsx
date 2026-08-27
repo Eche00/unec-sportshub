@@ -10,7 +10,8 @@ import Button from "../ui/Button";
 import Input from "../ui/Input";
 
 import useMatchesInfo from "@/utils/logics/usematchesinfo";
-import { Settings } from "@mui/icons-material";
+import { Settings, SportsSoccer } from "@mui/icons-material";
+import Empty from "../ui/Empty";
 
 type MatchStatus =
     | "live"
@@ -65,27 +66,11 @@ function FootballManager({
     const [settings, setSettings] = React.useState(true);
     if (!match) {
 
-        return (
-            <div className="fixed inset-0 bg-black/60 z-50 flex justify-end">
-
-                <div className="bg-[#0F172A] sm:w-[650px] mt-16 w-full h-full flex items-center justify-center">
-
-                    <p className="text-gray-400">
-
-                        {loading
-                            ? "Loading match..."
-                            : "Match not found"}
-
-                    </p>
-
-                </div>
-
-            </div>
-        );
+        return <Empty />
     }
 
     return (
-        <div className="fixed inset-0 bg-black/60 z-50 flex justify-end" onClick={onClose}>
+        <div className="fixed inset-0 bg-black/80 z-50 flex justify-end" onClick={onClose}>
             <motion.aside
 
                 initial={{
@@ -111,7 +96,7 @@ function FootballManager({
                     e.stopPropagation()
                 }
 
-                className="bg-[#0F172A] sm:w-[650px] mt-16 mb-10  w-full h-full border-l border-gray-800 rounded-tl-2xl rounded-bl-2xl p-5 sm:p-6 overflow-y-auto flex flex-col"
+                className="bg-[#0B0B0B] sm:w-[650px] mt-16 mb-10  w-full h-[90vh] rounded-tl-2xl rounded-bl-2xl p-5 sm:p-6 overflow-y-auto flex flex-col"
             >
 
                 {/* HEADER */}
@@ -171,21 +156,9 @@ function FootballManager({
 
                     </div>
 
-                    <button onClick={onClose}>
-                        <CloseIcon />
-                    </button>
-
-                </div>
-
-                {/* TEAMS */}
-
-                <div className="flex justify-between text-gray-300 mb-4">
-
-                    <span>{match.teamA}</span>
-
-                    <span>VS</span>
-
-                    <span>{match.teamB}</span>
+                    <Button variant="secondary" onClick={onClose}>
+                        Close
+                    </Button>
 
                 </div>
 
@@ -206,7 +179,6 @@ function FootballManager({
                             )
                         }
                     />
-
                     <Input
                         type="number"
                         label={match.teamB}
@@ -233,7 +205,7 @@ function FootballManager({
                             e.target.value as MatchStatus
                         )
                     }
-                    className="p-2 bg-[#0B0F19] border border-gray-700 rounded mb-4"
+                    className="p-2 bg-black border border-gray-700 rounded mb-4"
                 >
 
                     <option value="live">
@@ -324,7 +296,7 @@ function FootballManager({
                                     type: e.target.value as MatchEventType,
                                 }))
                             }
-                            className="p-2 bg-[#0B0F19] border border-gray-700 rounded"
+                            className="p-2 bg-black border border-gray-700 rounded"
                         >
                             <option value="commentary">
                                 Commentary
@@ -378,7 +350,7 @@ function FootballManager({
                                         team: e.target.value as "A" | "B",
                                     }))
                                 }
-                                className="p-2 bg-[#0B0F19] border border-gray-700 rounded"
+                                className="p-2 bg-black border border-gray-700 rounded"
                             >
 
                                 <option value="">
@@ -430,7 +402,7 @@ function FootballManager({
                                         text: e.target.value,
                                     }))
                                 }
-                                className="p-2 bg-[#0B0F19] border border-gray-700 rounded"
+                                className="p-2 bg-black border border-gray-700 rounded"
                             />
 
                         )}
@@ -451,7 +423,7 @@ function FootballManager({
 
                         <div
                             key={e.id}
-                            className="text-sm bg-[#0B0F19] p-3 rounded border border-gray-700"
+                            className="text-sm rounded-xl border border-[#FFFFFF33] bg-[#131313] py-3 px-4 transition-all duration-300 hover:border-gray-700"
                         >
 
                             {e.minute && (
@@ -461,10 +433,11 @@ function FootballManager({
                             )}{" "}
 
                             {e.type === "goal" &&
-                                `⚽ ${e.player} (${e.team === "A"
-                                    ? match.teamA
-                                    : match.teamB
-                                })`}
+                                <span className="flex gap-3 items-center text-nowrap">
+                                    <SportsSoccer fontSize="small" /> {e.player} ({e.team === "A"
+                                        ? match.teamA
+                                        : match.teamB
+                                    }) </span>}
 
                             {e.type === "yellow" &&
                                 `🟨 ${e.player}`}
@@ -473,7 +446,15 @@ function FootballManager({
                                 `🟥 ${e.player}`}
 
                             {e.type === "commentary" &&
-                                `💬 ${e.text}`}
+                                <span className="flex gap-3 items-center text-wrap">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M12 2C9.79086 2 8 3.79086 8 6V11C8 13.2091 9.79086 15 12 15C14.2091 15 16 13.2091 16 11V10" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                        <path d="M12 18V22M12 22H15M12 22H9" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                        <path d="M19 12C18.7174 15.3914 15.8824 18 12.4792 18H11.5208C8.11765 18 5.28262 15.3914 5 12" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                        <path d="M15 4V7.5L17 6H19C19.9428 6 20.4142 6 20.7071 5.70711C21 5.41421 21 4.94281 21 4C21 3.05719 21 2.58579 20.7071 2.29289C20.4142 2 19.9428 2 19 2H17C16.0572 2 15.5858 2 15.2929 2.29289C15 2.58579 15 3.05719 15 4Z" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                    {e.text}
+                                </span>}
 
                         </div>
 
