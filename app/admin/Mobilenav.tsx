@@ -14,6 +14,7 @@ import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
+import { useUserInfo } from "@/utils/logics/userinfo";
 
 // Sidebar type
 type SideBarItem = {
@@ -35,7 +36,7 @@ export const adminSidebar: SideBarItem[] = [
         icon: <EmojiEventsIcon />,
     },
     {
-        name: "Create Match",
+        name: "Matches",
         link: "/admin/Match",
         icon: <SportsSoccerIcon />,
     },
@@ -52,6 +53,7 @@ export const adminSecondary: SideBarItem[] = [
 function Mobilenav({ setOpenMenu }: mobileNavProps) {
     const pathname = usePathname();
     const menuRef = useRef<HTMLDivElement>(null);
+    const userInfo = useUserInfo();
 
     // effect to handle closing nav on page.
     useEffect(() => {
@@ -74,7 +76,7 @@ function Mobilenav({ setOpenMenu }: mobileNavProps) {
             exit={{ x: 50, opacity: 0 }}
             transition={{ delay: 0.5, duration: 0.3 }}
             ref={menuRef}
-            className="bg-[#0F172A] absolute top-13 right-0 w-40 flex flex-col  flex-none  items-end  justify-end  border-[0.1px] border-gray-700 rounded-lg py-2 z-20"
+            className="bg-[#131313] absolute top-13 right-0 w-40 flex flex-col  flex-none  items-end  justify-end  border-[0.1px] border-gray-700 rounded-lg py-2 z-20"
         >
             <section className="w-[90%] mx-auto flex flex-col gap-2 text-[10px]">
                 {/* Link Section  */}
@@ -85,13 +87,26 @@ function Mobilenav({ setOpenMenu }: mobileNavProps) {
                         onClick={() => setOpenMenu(false)}
                         className={
                             pathname === item.link
-                                ? "text-white font-bold bg-[#3B82F6] py-3 px-4  rounded-full flex items-center gap-2"
-                                : "text-gray-400 py-3 px-4  rounded-full hover:bg-[#3B82F6]/10 flex items-center gap-2"
+                                ? "text-white font-bold bg-[#FB831C] py-3 px-4  rounded-xl flex items-center gap-2"
+                                : "text-gray-400 py-3 px-4  rounded-xl hover:bg-[#FB831C]/10 flex items-center gap-2"
                         }
                     >
                         {item.icon} {item.name}
                     </Link>
                 ))}
+                {userInfo?.role === "superadmin" && (
+                    <Link
+                        href="/admin/settings"
+                        onClick={() => setOpenMenu(false)}
+                        className={
+                            pathname === "/admin/settings"
+                                ? "text-white font-bold bg-[#FB831C] py-3 px-4  rounded-xl flex items-center gap-2"
+                                : "text-gray-400 py-3 px-4  rounded-xl hover:bg-[#FB831C]/10 flex items-center gap-2"
+                        }
+                    >
+                        <AdminPanelSettingsIcon /> Settings
+                    </Link>
+                )}
 
                 <hr className=" w-full h-[0.1px] bg-gray-600 border-none" />
                 {adminSecondary.map((item) => (
@@ -101,8 +116,8 @@ function Mobilenav({ setOpenMenu }: mobileNavProps) {
                         onClick={() => setOpenMenu(false)}
                         className={
                             pathname === item.link
-                                ? "text-white font-bold bg-[#3B82F6] py-3 px-4  rounded-full flex items-center gap-2"
-                                : "text-gray-400 py-3 px-4  rounded-full hover:bg-[#3B82F6]/10 flex items-center gap-2"
+                                ? "text-white font-bold bg-[#FB831C] py-3 px-4  rounded-xl flex items-center gap-2"
+                                : "text-gray-400 py-3 px-4  rounded-xl hover:bg-[#FB831C]/10 flex items-center gap-2"
                         }
                     >
                         {item.icon} {item.name}

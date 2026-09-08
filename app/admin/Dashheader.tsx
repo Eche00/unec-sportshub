@@ -17,7 +17,7 @@ function DashHeader() {
 
                 {/* Logo */}
                 <div className="md:hidden flex flex-1  items-center  md:w-1/4">
-                    <Link href='/' className=' border-2 border-[#3B82F6] rounded-full p-2 mr-2 flex items-center justify-center'><img src="/logo.png" alt="" className=' w-8 h-8 object-cover' /></Link>
+                    <Link href='/' className=' border-2 border-[#FB831C] rounded-full p-2 mr-2 flex items-center justify-center'><img src="/logo.png" alt="" className=' w-8 h-8 object-cover' /></Link>
                 </div>
 
 
@@ -53,7 +53,7 @@ function DashHeader() {
                                 animate={{ opacity: 1 }}
                                 exit={{ x: 50, opacity: 0 }}
                                 transition={{ duration: 0.3 }}
-                                className='border-[0.1px] border-gray-700 rounded-full py-2 px-6 flex items-center gap-2 transition-all duration-300 uppercase font-extrabold'
+                                className='border-[0.1px] border-gray-700 rounded-xl py-2 px-6 flex items-center gap-2 transition-all duration-300 uppercase font-extrabold'
                                 onClick={() => setOpenMenu(true)}
                             >
                                 {pathname.split('/').pop()?.replace('-', ' ') || 'Dashboard'}

@@ -24,7 +24,7 @@ import Link from "next/link";
 import Loader from "@/components/ui/Loader";
 import { useUserInfo } from "@/utils/logics/userinfo";
 
-export default function Page() {
+export default function Tournaments() {
 
     const {
         filteredTournaments,
@@ -66,39 +66,12 @@ export default function Page() {
         return "Final Stage";
     };
     const isSearching = search.trim().length > 0;
-    const filteredTournamentss = useMemo(() => {
-        if (!userInfo?.uid) {
-            return [];
-        }
-
-        return filteredTournaments.filter(
-            (tournament) => tournament.createdBy === userInfo.uid
-        );
-    }, [filteredTournaments, userInfo?.uid]);
 
     if (loading) return <Loader />;
     return (
         <div className="min-h-screen text-white space-y-6">
-
-            {/* HEADER */}
-            <div className="flex items-center justify-between gap-2">
-
-                <h1 className="text-2xl font-semibold flex items-center gap-2">
-                    Tournament Control
-                </h1>
-
-                <Button
-                    variant="primary"
-                    onClick={() =>
-                        setCreateTournament(true)
-                    }
-                >
-                    + Create
-                </Button>
-            </div>
-
             {/* OVERVIEW */}
-            <section className="space-y-4 pt-6 border-t border-gray-800">
+            <section className="space-y-4 pt-6 ">
                 {/*  Search Bar */}
                 <div className="relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -113,8 +86,8 @@ export default function Page() {
                 {/* LIST */}
                 <div className="flex flex-col md:grid md:grid-cols-2 gap-4">
 
-                    {!loading && filteredTournamentss.length > 0 ? (
-                        filteredTournamentss.map((tournament) => {
+                    {!loading && filteredTournaments.length > 0 ? (
+                        filteredTournaments.map((tournament) => {
 
                             const stage = getTournamentStage(tournament);
 
@@ -243,7 +216,7 @@ export default function Page() {
                             <p className="text-xs text-gray-400 mb-4 max-w-xs">
                                 {isSearching
                                     ? `No tournaments match "${search}". Try a different keyword.`
-                                    : "You have no tournaments created yet. Come back later."}
+                                    : "No tournaments created yet. Come back later."}
                             </p>
 
                             {/* OPTIONAL RESET */}

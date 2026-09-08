@@ -21,6 +21,7 @@ import toast from "react-hot-toast";
 
 import { db } from "@/lib/firebase";
 import useTournamentInfo from "./usetournamentinfo";
+import { useUserInfo } from "./userinfo";
 
 //  TYPES 
 export type CreateMatchFormProps = {
@@ -31,7 +32,7 @@ export interface Matches {
     id: string;
 
     name: string;
-
+    createdBy: string;
     category: "football" | "basketball" | "volleyball" | "tennis" | "chess";
 
     teamA: string;
@@ -101,7 +102,7 @@ const useMatchesInfo = (
     matchId?: string
 ) => {
     const { tournaments } = useTournamentInfo();
-
+    const userInfo = useUserInfo();
     const router = useRouter();
 
     const pathname = usePathname();
@@ -773,6 +774,7 @@ const useMatchesInfo = (
         Omit<
             Matches,
             | "id"
+            | "createdBy"
             | "scoreA"
             | "scoreB"
             | "isLive"
@@ -792,22 +794,27 @@ const useMatchesInfo = (
 
                 setLoading(true);
 
+                if (!userInfo?.uid) {
+                    toast.error("You must be logged in to create a match");
+                    return;
+                }
+
                 await addDoc(
                     matchesRef,
-
                     {
-
                         ...matchData,
+
+                        createdBy: userInfo.uid,
+
                         tournamentId: matchData.tournamentId || null,
+
                         scoreA: 0,
-
                         scoreB: 0,
-
                         isLive: false,
-
                         currentHalf: 1,
-
                         isHalftime: false,
+
+                        createdAt: Date.now(),
                     }
                 );
 

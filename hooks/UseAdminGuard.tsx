@@ -25,7 +25,7 @@ export const UseAdminGuard = () => {
 
             const data = snap.data();
 
-            if (data.role !== "admin") {
+            if (data.role !== "admin" && data.role !== "superadmin") {
                 router.push("/");
             }
         });

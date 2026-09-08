@@ -8,6 +8,7 @@ import HomeIcon from "@mui/icons-material/OtherHouses";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
+import { useUserInfo } from '@/utils/logics/userinfo';
 
 
 // Sidebar type
@@ -46,7 +47,7 @@ export const adminSecondary: SideBarItem[] = [
 ];
 function Sidebar() {
     const pathname = usePathname()
-
+    const userInfo = useUserInfo();
 
     return (
         <div className="bg-[#131313] text-white fixed top-0 left-0 w-67.5 h-screen flex flex-col  py-2 gap-10 z-10">
@@ -65,6 +66,11 @@ function Sidebar() {
                 {adminSidebar.map((item) =>
                     <Link href={item.link} key={item.name} className={pathname === item.link ? 'text-white font-bold bg-[#FB831C] py-3 px-4 rounded-lg flex items-center gap-3' : 'text-gray-400 py-3 px-4 rounded-lg hover:bg-[#FB831C]/10 flex items-center gap-3'}>{item.icon} {item.name}</Link>)
                 }
+                {userInfo?.role === "superadmin" && (
+                    <Link href="/admin/settings" className={pathname === "/admin/settings" ? 'text-white font-bold bg-[#FB831C] py-3 px-4 rounded-lg flex items-center gap-3' : 'text-gray-400 py-3 px-4 rounded-lg hover:bg-[#FB831C]/10 flex items-center gap-3'}>
+                        <AdminPanelSettingsIcon /> Settings
+                    </Link>
+                )}
                 <hr className=' w-full h-[0.1px] bg-gray-600 border-none' />
                 {adminSecondary.map((item) =>
                     <Link href={item.link} key={item.name} className={pathname === item.link ? 'text-white font-bold bg-[#FB831C] py-3 px-4 rounded-lg flex items-center gap-3' : 'text-gray-400 py-3 px-4 rounded-lg hover:bg-[#FB831C]/10 flex items-center gap-3'}>{item.icon} {item.name}</Link>)

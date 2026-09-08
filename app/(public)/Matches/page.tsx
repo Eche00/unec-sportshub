@@ -70,6 +70,7 @@ export default function Page() {
                                     status={match.status}
                                     date={match.date}
                                     time={match.time}
+                                    createdBy={match.createdBy}
                                     location={match.location}
                                     tournamentId={match.tournamentId}
                                     matchMinute={

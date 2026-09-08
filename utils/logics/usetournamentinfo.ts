@@ -16,6 +16,7 @@ import {
 
 import toast from "react-hot-toast";
 import { db } from "@/lib/firebase";
+import { useUserInfo } from "./userinfo";
 
 /* TYPES */
 export type TopScorer = {
@@ -109,6 +110,8 @@ export type TournamentSettings = {
 export type Tournament = {
     id: string;
     name: string;
+    createdBy: string;
+
     description?: string;
     location?: string;
     startDate?: string;
@@ -127,6 +130,7 @@ export type Tournament = {
 
 export type Matches = {
     id: string;
+    createdBy: string;
     tournamentId?: string;
     name?: string;
     teamA?: string;
@@ -174,6 +178,8 @@ type CreateTournamentPayload = {
 /* HOOK */
 
 const useTournamentInfo = () => {
+    const userInfo = useUserInfo();
+
     const [loading, setLoading] = useState(false);
     const [creating, setCreating] = useState(false);
     const [updating, setUpdating] = useState(false);
@@ -181,6 +187,7 @@ const useTournamentInfo = () => {
     const [tournaments, setTournaments] = useState<Tournament[]>([]);
     const [tournament, setTournament] = useState<Tournament | null>(null);
     const [search, setSearch] = useState("");
+
     /* MATCH STATE (ADDED) */
     const [matches, setMatches] = useState<Matches[]>([]);
 
@@ -203,11 +210,13 @@ const useTournamentInfo = () => {
     const matchesRef = collection(db, "matches");
 
     /* REALTIME LIST (TOURNAMENTS) */
-
     useEffect(() => {
         setLoading(true);
 
-        const q = query(tournamentRef, orderBy("createdAt", "desc"));
+        const q = query(
+            tournamentRef,
+            orderBy("createdAt", "desc")
+        );
 
         const unsubscribe = onSnapshot(
             q,
@@ -233,7 +242,6 @@ const useTournamentInfo = () => {
 
         return () => unsubscribe();
     }, []);
-
     const filteredTournaments = tournaments.filter((tournament) => {
         const query = search.toLowerCase();
 
@@ -379,7 +387,10 @@ const useTournamentInfo = () => {
     const createTournament = async (payload?: CreateTournamentPayload) => {
         try {
             setCreating(true);
-
+            if (!userInfo?.uid) {
+                toast.error("You must be logged in to create a tournament");
+                return;
+            }
             const body = {
                 name: payload?.name || name,
                 description: payload?.description || description,
@@ -387,6 +398,7 @@ const useTournamentInfo = () => {
                 startDate: payload?.startDate || startDate,
                 endDate: payload?.endDate || endDate,
                 category: payload?.category || category,
+                createdBy: userInfo?.uid,
                 status: "upcoming",
                 settings:
                     payload?.settings || {

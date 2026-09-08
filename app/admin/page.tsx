@@ -2,18 +2,14 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import {
-    Add,
     EmojiEvents,
     SportsSoccer,
     TrendingUp,
-    AccessTime,
-    ArrowOutward,
     Logout,
-    Stadium,
+    Person,
 } from "@mui/icons-material";
 
 import { handleSignOut, useUserInfo } from "@/utils/logics/userinfo";
@@ -21,29 +17,35 @@ import { handleSignOut, useUserInfo } from "@/utils/logics/userinfo";
 import useTournamentInfo from "@/utils/logics/usetournamentinfo";
 import useMatchesInfo from "@/utils/logics/usematchesinfo";
 
-export default function Page() {
+import MatchCard from "@/components/match/MatchCard";
 
+export default function Page() {
     const router = useRouter();
 
     const userInfo = useUserInfo();
 
     const {
         tournaments,
-        filteredTournaments,
     } = useTournamentInfo();
 
     const {
         filteredMatches,
+        getMatchTime,
     } = useMatchesInfo();
 
-    // Featured match 
+    // Featured match
     const [currentHeroIndex, setCurrentHeroIndex] = useState(0);
 
     useEffect(() => {
-        if (!filteredMatches?.length) return;
+        if (!filteredMatches?.length) {
+            setCurrentHeroIndex(0);
+            return;
+        }
 
         const interval = setInterval(() => {
-            setCurrentHeroIndex((prev) => (prev + 1) % filteredMatches.length);
+            setCurrentHeroIndex(
+                (prev) => (prev + 1) % filteredMatches.length
+            );
         }, 5000);
 
         return () => clearInterval(interval);
@@ -52,13 +54,14 @@ export default function Page() {
     const featuredMatch = useMemo(() => {
         if (!filteredMatches?.length) return null;
 
-        const safeIndex = currentHeroIndex % filteredMatches.length;
+        const safeIndex =
+            currentHeroIndex % filteredMatches.length;
 
         return filteredMatches[safeIndex];
     }, [filteredMatches, currentHeroIndex]);
 
     return (
-        <main className="text-white ">
+        <main className="text-white">
 
             {/* HERO */}
             <section className="relative overflow-hidden rounded-xl border border-[#FFFFFF33] bg-[#131313] py-8 px-6">
@@ -70,28 +73,31 @@ export default function Page() {
 
                         <div className="flex items-center gap-3 mb-6">
 
-                            <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-cyan-400 to-purple-500 flex items-center justify-center text-black font-black text-xl shadow-xl">
-                                {userInfo?.fullName?.charAt(0)}
+                            <div className="h-12 w-12 rounded-xl bg-[#FB831C] flex items-center justify-center text-black font-black text-xl shadow-xl">
+                                <Person
+                                    className="text-white"
+                                    fontSize="medium"
+                                />
                             </div>
 
                             <div>
                                 <div className="flex items-center gap-2 mb-1">
 
-                                    <span className="text-xs uppercase tracking-[0.3em] text-cyan-300">
+                                    <span className="text-xs uppercase tracking-[0.3em] text-[#FB831C]">
                                         Dashboard
                                     </span>
 
-                                    <span className="px-2 py-1 rounded-full text-[10px] border border-cyan-400/20 bg-cyan-400/10 text-cyan-300 uppercase">
+                                    <span className="px-2 py-1 rounded-full text-[10px] border border-[#FB831C]/20 bg-[#FB831C]/10 text-[#FB831C] uppercase">
                                         {userInfo?.role}
                                     </span>
+
                                 </div>
 
-                                <h1 className="text-2xl sm:text-3xl font-black leading-tight">
-                                    Welcome back,
-                                    <br />
-                                    {userInfo?.fullName}
+                                <h1 className="text-xl sm:text-3xl font-black leading-tight">
+                                    Welcome, {userInfo?.fullName}
                                 </h1>
                             </div>
+
                         </div>
 
                         <p className="text-gray-300 max-w-xl leading-relaxed">
@@ -101,25 +107,25 @@ export default function Page() {
                         </p>
 
                         <button
-                            onClick={() =>
-                                handleSignOut(router)
-                            }
-                            className="flex items-center gap-2 rounded-2xl border border-red-500/20 bg-red-500/10 text-red-400 px-6 py-4 font-semibold hover:bg-red-500/20 transition cursor-pointer mt-4"
+                            onClick={() => handleSignOut(router)}
+                            className="flex items-center gap-2 rounded-lg border border-red-500/20 bg-red-500/10 text-red-400 px-6 py-2 font-semibold hover:bg-red-500/20 transition cursor-pointer mt-4"
                         >
                             <Logout />
                             Sign Out
                         </button>
+
                     </div>
 
                     {/* RIGHT HERO CARD */}
                     <div className="relative w-full xl:max-w-md">
 
-                        <div className="relative overflow-hidden rounded-[32px] border border-white/10 bg-black/30 backdrop-blur-xl p-5">
+                        <div className="relative overflow-hidden sm:rounded-xl sm:border border-white/10 sm:bg-black/30 backdrop-blur-xl sm:p-5">
 
-                            <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent pointer-events-none" />
+                            <div className="absolute inset-0 sm:bg-gradient-to-b sm:from-white/5 sm:to-transparent pointer-events-none" />
 
                             <div className="relative z-10">
 
+                                {/* HEADER */}
                                 <div className="flex items-center justify-between mb-6">
 
                                     <div>
@@ -127,78 +133,58 @@ export default function Page() {
                                             Featured Match
                                         </p>
 
-                                        <h3 className="text-xl font-black mt-2">
-                                            {featuredMatch?.teamA} vs{" "}
-                                            {featuredMatch?.teamB}
+                                        <h3 className="text-xl font-black ">
+                                            {!featuredMatch && "No featured match"}
                                         </h3>
                                     </div>
 
-                                    <div className="h-12 w-12 rounded-2xl bg-purple-500/20 border border-purple-400/20 flex items-center justify-center">
-                                        <SportsSoccer className="text-purple-300" />
-                                    </div>
+
                                 </div>
 
-                                {/* SCORE */}
-                                <div className="rounded-3xl bg-white/5 border border-white/10 p-6">
-
-                                    <div className="flex items-center justify-between">
-
+                                {/* MATCH */}
+                                {featuredMatch ? (
+                                    <MatchCard
+                                        key={featuredMatch.id}
+                                        id={featuredMatch.id}
+                                        name={featuredMatch.name}
+                                        category={featuredMatch.category}
+                                        teamA={featuredMatch.teamA}
+                                        teamB={featuredMatch.teamB}
+                                        scoreA={featuredMatch.scoreA}
+                                        scoreB={featuredMatch.scoreB}
+                                        status={featuredMatch.status}
+                                        date={featuredMatch.date}
+                                        time={featuredMatch.time}
+                                        location={featuredMatch.location}
+                                        createdBy={featuredMatch.createdBy}
+                                        tournamentId={
+                                            featuredMatch.tournamentId
+                                        }
+                                        matchMinute={getMatchTime(
+                                            featuredMatch
+                                        )}
+                                    />
+                                ) : (
+                                    <div className="flex min-h-[220px] items-center justify-center rounded-xl border border-dashed border-gray-700 bg-[#0F1115]">
                                         <div className="text-center">
-                                            <div className="h-16 w-16 rounded-full bg-white/10 flex items-center justify-center text-xl font-black">
-                                                {String(
-                                                    featuredMatch?.teamA || "A"
-                                                )
-                                                    .charAt(0)
-                                                    .toUpperCase()}
+                                            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-white/5 border border-gray-700">
+                                                <SportsSoccer className="text-gray-400" />
                                             </div>
 
-                                            <p className="mt-3 font-semibold">
-                                                {featuredMatch?.teamA}
+                                            <p className="text-sm font-semibold text-gray-300">
+                                                No matches yet
                                             </p>
-                                        </div>
 
-                                        <div className="text-center">
-                                            <h1 className="text-5xl font-black">
-                                                {featuredMatch?.scoreA}:
-                                                {featuredMatch?.scoreB}
-                                            </h1>
-
-                                            <span className="inline-flex mt-3 px-3 py-1 rounded-full text-xs uppercase bg-green-500/10 border border-green-500/20 text-green-400">
-                                                {featuredMatch?.status}
-                                            </span>
-                                        </div>
-
-                                        <div className="text-center">
-                                            <div className="h-16 w-16 rounded-full bg-white/10 flex items-center justify-center text-xl font-black">
-                                                {String(
-                                                    featuredMatch?.teamB || "B"
-                                                )
-                                                    .charAt(0)
-                                                    .toUpperCase()}
-                                            </div>
-
-                                            <p className="mt-3 font-semibold">
-                                                {featuredMatch?.teamB}
+                                            <p className="mt-1 text-xs text-gray-500">
+                                                Create a match to feature it here.
                                             </p>
                                         </div>
                                     </div>
-                                </div>
+                                )}
 
-                                {/* DETAILS */}
-                                <div className="flex items-center justify-between mt-5 text-sm text-gray-400">
-
-                                    <div className="flex items-center gap-2">
-                                        <AccessTime className="text-[18px]!" />
-                                        {featuredMatch?.time}
-                                    </div>
-
-                                    <div className="flex items-center gap-2">
-                                        <Stadium className="text-[18px]!" />
-                                        {featuredMatch?.location}
-                                    </div>
-                                </div>
                             </div>
                         </div>
+
                     </div>
                 </div>
             </section>
@@ -212,14 +198,13 @@ export default function Page() {
                     icon={<EmojiEvents />}
                     glow="from-cyan-500/20 to-blue-500/10"
                 />
+
                 <StatCard
                     title="Matches"
                     value={String(filteredMatches.length)}
                     icon={<TrendingUp />}
                     glow="from-orange-500/20 to-yellow-500/10"
                 />
-
-
 
             </section>
 
@@ -260,6 +245,7 @@ function StatCard({
                 <h2 className="text-3xl font-black mt-2">
                     {value}
                 </h2>
+
             </div>
         </div>
     );

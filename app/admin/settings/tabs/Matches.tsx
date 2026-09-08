@@ -10,26 +10,13 @@ import Button from "@/components/ui/Button";
 import useMatchesInfo from "@/utils/logics/usematchesinfo";
 import Empty from "@/components/ui/Empty";
 import Loader from "@/components/ui/Loader";
-import { useUserInfo } from "@/utils/logics/userinfo";
-import { useMemo } from "react";
 import { SportsSoccer } from "@mui/icons-material";
 
-export default function Page() {
+export default function Matches() {
     const { filteredMatches, loading, createMatch, setCreateMatch, isEmpty, search, setSearch, getMatchTime } = useMatchesInfo();
-    const userInfo = useUserInfo();
-
     const isSearching = search.trim().length > 0;
-    const filteredMatchess = useMemo(() => {
-        if (!userInfo?.uid) {
-            return [];
-        }
 
-        return filteredMatches.filter(
-            (match) => match.createdBy === userInfo.uid
-        );
-    }, [filteredMatches, userInfo?.uid]);
-
-    const hasMatches = filteredMatchess.length > 0;
+    const hasMatches = filteredMatches.length > 0;
     if (loading) {
         return (
             <Loader />
@@ -37,24 +24,6 @@ export default function Page() {
     }
     return (
         <div className="space-y-6">
-
-            {/* HEADER */}
-            <div className="flex items-center justify-between">
-                <h1 className="text-2xl font-semibold">
-                    Match Control
-                </h1>
-
-                <Button
-                    variant="primary"
-                    onClick={() => setCreateMatch(true)}
-                >
-                    + Create
-                </Button>
-            </div>
-
-            <hr className="border-gray-800" />
-
-
             {/* SEARCH BAR */}
             <div className="relative">
                 <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -75,7 +44,7 @@ export default function Page() {
             {/* MATCHES GRID */}
             {!loading && hasMatches ? (
                 <div className="grid gap-4 lg:grid-cols-2">
-                    {filteredMatchess.map((match) => (
+                    {filteredMatches.map((match) => (
                         <MatchCard
                             key={match.id}
                             id={match.id}
@@ -91,9 +60,7 @@ export default function Page() {
                             location={match.location}
                             createdBy={match.createdBy}
                             tournamentId={match.tournamentId}
-                            matchMinute={
-                                getMatchTime(match)
-                            }
+                            matchMinute={getMatchTime(match)}
                         />
                     ))}
                 </div>
@@ -117,7 +84,7 @@ export default function Page() {
                     <p className="text-xs text-gray-400 mb-4 max-w-xs">
                         {isSearching
                             ? `No matches match "${search}". Try a different keyword.`
-                            : "You have no matches created yet. Come back later."}
+                            : "No matches created yet. Come back later."}
                     </p>
 
                     {/* OPTIONAL RESET */}
