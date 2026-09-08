@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import EmailRoundedIcon from "@mui/icons-material/EmailRounded";
 import LockRoundedIcon from "@mui/icons-material/LockRounded";
 import SecurityRoundedIcon from "@mui/icons-material/SecurityRounded";
@@ -11,8 +11,25 @@ import { useAuth } from "@/utils/logics/auth";
 import Input from "@/components/ui/Input";
 import { Person } from "@mui/icons-material";
 import Button from "@/components/ui/Button";
+import { useRouter } from "next/navigation";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "@/lib/firebase";
 
 function Page() {
+    const router = useRouter();
+
+
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                router.push("/admin");
+                return;
+            }
+        });
+
+        return () => unsubscribe();
+    }, [router]);
+
     const {
         handleLogin,
         handleSignup,
