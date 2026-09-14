@@ -201,7 +201,6 @@ export default function Page() {
                                                 <MatchCard
                                                     key={match.id}
                                                     {...match}
-                                                    createdBy={match.createdBy}
                                                     matchMinute={getMatchTime(match)}
                                                 />
                                             ))}
@@ -227,7 +226,6 @@ export default function Page() {
                                         <MatchCard
                                             key={match.id}
                                             {...match}
-                                            createdBy={match.createdBy}
                                             matchMinute={getMatchTime(match)}
                                         />
                                     ))}

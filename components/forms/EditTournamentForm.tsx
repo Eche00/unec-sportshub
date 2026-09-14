@@ -781,6 +781,7 @@ function EditTournamentForm({ tournament, onClose }: Props) {
                                         category={match.category}
                                         location={match.location}
                                         tournamentId={match.tournamentId}
+                                        createdBy={match.createdBy}
                                     />
                                 ))}
                         </div>
