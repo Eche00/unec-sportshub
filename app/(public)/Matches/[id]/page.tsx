@@ -42,6 +42,15 @@ export default function Page() {
     const teamB = tournament?.teams?.find(
         (team) => team.name === match?.teamB
     );
+    const teamAScorers =
+        match?.events?.filter(
+            (event: any) => event.type === "goal" && event.team === "A"
+        ) || [];
+
+    const teamBScorers =
+        match?.events?.filter(
+            (event: any) => event.type === "goal" && event.team === "B"
+        ) || [];
     if (!match) {
         return <Loader />;
     }
@@ -67,27 +76,82 @@ export default function Page() {
                     </span>
 
                     {/* SCORE */}
-                    <div className="relative flex items-center justify-between text-[14px] font-medium">
+                    <div className="relative flex items-start justify-between text-[14px] font-medium">
 
-                        <span className="flex flex-col gap-2">
-                            <img src="/teamA.png" alt="" className=" w-14 h-14  object-cover " />
-                            {match.teamA}
-                        </span>
+                        {/* TEAM A */}
+                        <div className="flex flex-col items-center gap-2 w-[35%] text-center">
+                            <img
+                                src="/teamA.png"
+                                alt={match.teamA}
+                                className="w-14 h-14 object-cover"
+                            />
 
-                        <div className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center justify-center">
-                            <div className=" text-xl font-bold text-[32px] font-bold">
-                                {match.scoreA} : {match.scoreB}
-                            </div>
-                           
+                            <span>{match.teamA}</span>
+
+                            {/* SCORERS */}
+                            {teamAScorers.length > 0 && (
+                                <div className="items-start justify-start  gap-1 mt-1">
+                                    {teamAScorers.map((scorer: any, index: number) => (
+                                        <span
+                                            key={scorer.id ?? index}
+                                            className="text-[11px] text-[#A1A1AA] flex items-center gap-1"
+                                        >
+                                            <SportsSoccer
+                                                sx={{ fontSize: 13 }}
+                                            />
+                                            {scorer.player}
+                                            {scorer.minute && (
+                                                <span className="text-[#71717A]">
+                                                    '{scorer.minute}'
+                                                </span>
+                                            )}
+                                        </span>
+                                    ))}
+                                </div>
+                            )}
                         </div>
 
-                        <span className="flex flex-col gap-2">
-                            <img src="/teamB.png" alt="" className=" w-14 h-14  object-cover bg-white rounded-full" />
-                            {match.teamB}
-                        </span>
+                        {/* SCORE */}
+                        <div className="flex flex-col items-center justify-center pt-5">
+                            <div className="text-[32px] font-bold">
+                                {match.scoreA} : {match.scoreB}
+                            </div>
+                        </div>
+
+                        {/* TEAM B */}
+                        <div className="flex flex-col items-center gap-2 w-[35%] text-center">
+                            <img
+                                src="/teamB.png"
+                                alt={match.teamB}
+                                className="w-14 h-14 object-cover bg-white rounded-full"
+                            />
+
+                            <span>{match.teamB}</span>
+
+                            {/* SCORERS */}
+                            {teamBScorers.length > 0 && (
+                                <div className="flex flex-col items-start justify-start gap-1 mt-1">
+                                    {teamBScorers.map((scorer: any, index: number) => (
+                                        <span
+                                            key={scorer.id ?? index}
+                                            className="text-[11px] text-[#A1A1AA] flex items-center gap-1"
+                                        >
+                                            <SportsSoccer
+                                                sx={{ fontSize: 13 }}
+                                            />
+                                            {scorer.player}
+                                            {scorer.minute && (
+                                                <span className="text-[#71717A]">
+                                                    '{scorer.minute}'
+                                                </span>
+                                            )}
+                                        </span>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
 
                     </div>
-
                     {/* DIVIDER */}
                     <div className="h-px max-w-75.5 w-full mx-auto bg-[#FFFFFF1A] to-transparent opacity-40 " />
 
