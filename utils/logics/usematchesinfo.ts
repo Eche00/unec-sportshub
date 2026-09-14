@@ -28,6 +28,35 @@ export type CreateMatchFormProps = {
     onClose: () => void;
     tournamentId?: string;
 };
+export type FootballFormation =
+    | "4-4-2"
+    | "4-4-1-1"
+    | "4-3-3"
+    | "4-3-1-2"
+    | "4-3-2-1"
+    | "4-2-3-1"
+    | "4-2-2-2"
+    | "4-2-4"
+    | "4-1-4-1"
+    | "4-1-3-2"
+    | "4-1-2-1-2"
+    | "4-5-1"
+    | "3-5-2"
+    | "3-4-3"
+    | "3-4-2-1"
+    | "3-4-1-2"
+    | "3-3-4"
+    | "3-3-3-1"
+    | "3-2-4-1"
+    | "5-3-2"
+    | "5-4-1"
+    | "5-2-3"
+    | "5-2-2-1"
+    | "5-3-1-1"
+    | "6-3-1"
+    | "6-2-2"
+    | "4-6-0";
+
 export interface Matches {
     id: string;
 
@@ -37,6 +66,9 @@ export interface Matches {
 
     teamA: string;
     teamB: string;
+
+    formationA?: FootballFormation;
+    formationB?: FootballFormation;
 
     location: string;
 
@@ -114,6 +146,11 @@ const useMatchesInfo = (
 
     const [matches, setMatches] =
         useState<Matches[]>([]);
+    const [formationA, setFormationA] =
+        useState<FootballFormation | "">("");
+
+    const [formationB, setFormationB] =
+        useState<FootballFormation | "">("");
 
     const [loading, setLoading] = useState(true);
     const [timerNow, setTimerNow] = useState(Date.now());
@@ -490,31 +527,18 @@ const useMatchesInfo = (
             await handleUpdateMatch(
                 match.id,
                 {
+                    scoreA: match.scoreA,
+                    scoreB: match.scoreB,
+                    status: match.status,
+                    currentHalf: match.currentHalf,
+                    isHalftime: match.isHalftime,
+                    isLive: match.isLive,
+                    events: match.events || [],
 
-                    scoreA:
-                        match.scoreA,
-
-                    scoreB:
-                        match.scoreB,
-
-                    status:
-                        match.status,
-
-                    currentHalf:
-                        match.currentHalf,
-
-                    isHalftime:
-                        match.isHalftime,
-
-                    isLive:
-                        match.isLive,
-
-                    events:
-                        match.events ||
-                        [],
+                    formationA: match.formationA,
+                    formationB: match.formationB,
                 }
             );
-
             if (onClose) {
 
                 onClose();
@@ -1321,6 +1345,9 @@ const useMatchesInfo = (
 
                 teamB,
 
+                formationA: formationA || undefined,
+                formationB: formationB || undefined,
+
                 location,
 
                 date,
@@ -1352,6 +1379,8 @@ const useMatchesInfo = (
                 "upcoming"
             );
             setCategory("football");
+            setFormationA("");
+            setFormationB("");
         };
     const getMatchTime = (match: Matches) => {
         const storedElapsed = match.elapsedSeconds ?? 0;
@@ -1400,6 +1429,11 @@ const useMatchesInfo = (
 
         match,
         setMatch,
+        formationA,
+        setFormationA,
+
+        formationB,
+        setFormationB,
         matchElapsedSeconds,
         getMatchTime,
         matches,

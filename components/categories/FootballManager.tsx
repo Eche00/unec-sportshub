@@ -9,7 +9,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import Button from "../ui/Button";
 import Input from "../ui/Input";
 
-import useMatchesInfo from "@/utils/logics/usematchesinfo";
+import useMatchesInfo, { FootballFormation } from "@/utils/logics/usematchesinfo";
 import { Settings, SportsSoccer } from "@mui/icons-material";
 import Empty from "../ui/Empty";
 
@@ -194,7 +194,142 @@ function FootballManager({
                     />
 
                 </div>
+                {/* FORMATIONS */}
 
+                <div className="border-t border-gray-800 pt-4 mb-4">
+
+                    <h2 className="text-sm mb-3 text-gray-400">
+                        Formations
+                    </h2>
+
+                    <div className="grid grid-cols-2 gap-4">
+
+                        {/* TEAM A */}
+
+                        <select
+                            value={match.formationA || ""}
+                            onChange={(e) =>
+                                handleManageChange(
+                                    "formationA",
+                                    e.target.value
+                                        ? e.target.value as FootballFormation
+                                        : undefined
+                                )
+                            }
+                            className="p-2 bg-black border border-gray-700 rounded"
+                        >
+
+                            <option value="">
+                                Select formation
+                            </option>
+
+                            <option value="4-4-2">
+                                4-4-2
+                            </option>
+
+                            <option value="4-3-3">
+                                4-3-3
+                            </option>
+
+                            <option value="4-2-3-1">
+                                4-2-3-1
+                            </option>
+
+                            <option value="4-3-2-1">
+                                4-3-2-1
+                            </option>
+
+                            <option value="4-5-1">
+                                4-5-1
+                            </option>
+
+                            <option value="3-5-2">
+                                3-5-2
+                            </option>
+
+                            <option value="3-4-3">
+                                3-4-3
+                            </option>
+
+                            <option value="3-4-2-1">
+                                3-4-2-1
+                            </option>
+
+                            <option value="5-3-2">
+                                5-3-2
+                            </option>
+
+                            <option value="5-4-1">
+                                5-4-1
+                            </option>
+
+                        </select>
+
+
+                        {/* TEAM B */}
+
+                        <select
+                            value={match.formationB || ""}
+                            onChange={(e) =>
+                                handleManageChange(
+                                    "formationB",
+                                    e.target.value
+                                        ? e.target.value as FootballFormation
+                                        : undefined
+                                )
+                            }
+                            className="p-2 bg-black border border-gray-700 rounded"
+                        >
+
+                            <option value="">
+                                Select formation
+                            </option>
+
+                            <option value="4-4-2">
+                                4-4-2
+                            </option>
+
+                            <option value="4-3-3">
+                                4-3-3
+                            </option>
+
+                            <option value="4-2-3-1">
+                                4-2-3-1
+                            </option>
+
+                            <option value="4-3-2-1">
+                                4-3-2-1
+                            </option>
+
+                            <option value="4-5-1">
+                                4-5-1
+                            </option>
+
+                            <option value="3-5-2">
+                                3-5-2
+                            </option>
+
+                            <option value="3-4-3">
+                                3-4-3
+                            </option>
+
+                            <option value="3-4-2-1">
+                                3-4-2-1
+                            </option>
+
+                            <option value="5-3-2">
+                                5-3-2
+                            </option>
+
+                            <option value="5-4-1">
+                                5-4-1
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
                 {/* STATUS */}
 
                 <select
