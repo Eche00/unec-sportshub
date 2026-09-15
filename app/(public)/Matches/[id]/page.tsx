@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 
 import useMatchesInfo from "@/utils/logics/usematchesinfo";
-import { Person, Person2, SportsSoccer } from "@mui/icons-material";
+import { Person, Person2, SportsMma, SportsSoccer } from "@mui/icons-material";
 import Loader from "@/components/ui/Loader";
 import Empty from "@/components/ui/Empty";
 import useTournamentInfo from "@/utils/logics/usetournamentinfo";
@@ -28,9 +28,11 @@ export default function Page() {
             getMatchById(id);
         }
     }, [id]);
-    const tabs = ["Lineups", "Formation", "Events"];
+    const tabs = match?.tournamentId
+        ? ["Lineups", "Formation", "Events"]
+        : ["Formation", "Events"];
 
-    const [activeTab, setActiveTab] = useState("Lineups");
+    const [activeTab, setActiveTab] = useState("Formation");
     const tournament = tournaments.find(
         (tournament) => tournament.id === match?.tournamentId
     );
@@ -51,8 +53,34 @@ export default function Page() {
         match?.events?.filter(
             (event: any) => event.type === "goal" && event.team === "B"
         ) || [];
-    const teamASquad = teamA?.squad ?? [];
-    const teamBSquad = teamB?.squad ?? [];
+    const matchMinute = match ? getMatchTime(match) : "";
+
+    const allPlayers = [
+        { id: "a1", name: "Player A1", position: "GK", jerseyNumber: 1 },
+        { id: "a2", name: "Player A2", position: "DF", jerseyNumber: 2 },
+        { id: "a3", name: "Player A3", position: "DF", jerseyNumber: 3 },
+        { id: "a4", name: "Player A4", position: "DF", jerseyNumber: 4 },
+        { id: "a5", name: "Player A5", position: "DF", jerseyNumber: 5 },
+        { id: "a6", name: "Player A6", position: "MF", jerseyNumber: 6 },
+        { id: "a7", name: "Player A7", position: "MF", jerseyNumber: 7 },
+        { id: "a8", name: "Player A8", position: "MF", jerseyNumber: 8 },
+        { id: "a9", name: "Player A9", position: "FW", jerseyNumber: 9 },
+        { id: "a10", name: "Player A10", position: "FW", jerseyNumber: 10 },
+        { id: "a11", name: "Player A11", position: "FW", jerseyNumber: 11 },
+    ];
+    const allPlayersB = [
+        { id: "b1", name: "Player B1", position: "GK", jerseyNumber: 1 },
+        { id: "b2", name: "Player B2", position: "DF", jerseyNumber: 2 },
+        { id: "b3", name: "Player B3", position: "DF", jerseyNumber: 3 },
+        { id: "b4", name: "Player B4", position: "DF", jerseyNumber: 4 },
+        { id: "b5", name: "Player B5", position: "DF", jerseyNumber: 5 },
+        { id: "b6", name: "Player B6", position: "MF", jerseyNumber: 6 },
+        { id: "b7", name: "Player B7", position: "MF", jerseyNumber: 7 },
+        { id: "b8", name: "Player B8", position: "MF", jerseyNumber: 8 },
+        { id: "b9", name: "Player B9", position: "FW", jerseyNumber: 9 },
+        { id: "b10", name: "Player B10", position: "FW", jerseyNumber: 10 },
+        { id: "b11", name: "Player B11", position: "FW", jerseyNumber: 11 },
+    ];
     if (!match) {
         return <Loader />;
     }
@@ -115,6 +143,11 @@ export default function Page() {
 
                         {/* SCORE */}
                         <div className="flex flex-col items-center justify-center pt-5">
+                            {match.status === "live" && (
+                                <span className="text-[#FB831C] text-xs font-medium mb-1">
+                                    {matchMinute || "0′"}
+                                </span>
+                            )}
                             <div className="text-[32px] font-bold">
                                 {match.scoreA} : {match.scoreB}
                             </div>
@@ -424,7 +457,7 @@ export default function Page() {
                                             .map(Number)
                                             .filter((n) => !Number.isNaN(n));
 
-                                        const players = [...teamASquad];
+                                        const players = allPlayers;
 
                                         const getPositionType = (position?: string) => {
 
@@ -689,14 +722,25 @@ export default function Page() {
                                     border-2 border-orange-300
                                 "
                                                     >
-                                                        <Person
-                                                            sx={{
-                                                                fontSize: {
-                                                                    xs: 18,
-                                                                    sm: 24,
-                                                                },
-                                                            }}
-                                                        />
+                                                        {getPositionType(player.position) === "goalkeeper" ? (
+                                                            <SportsMma
+                                                                sx={{
+                                                                    fontSize: {
+                                                                        xs: 14,
+                                                                        sm: 20,
+                                                                    },
+                                                                }}
+                                                            />
+                                                        ) : (
+                                                            <Person
+                                                                sx={{
+                                                                    fontSize: {
+                                                                        xs: 18,
+                                                                        sm: 24,
+                                                                    },
+                                                                }}
+                                                            />
+                                                        )}
                                                     </div>
 
                                                 </div>
@@ -805,7 +849,7 @@ export default function Page() {
                                             .map(Number)
                                             .filter((n) => !Number.isNaN(n));
 
-                                        const players = [...teamBSquad];
+                                        const players = allPlayersB;
 
                                         const getPositionType = (
                                             position?: string
@@ -1115,14 +1159,25 @@ export default function Page() {
                                     border-2 border-gray-300
                                 "
                                                     >
-                                                        <Person2
-                                                            sx={{
-                                                                fontSize: {
-                                                                    xs: 18,
-                                                                    sm: 24,
-                                                                },
-                                                            }}
-                                                        />
+                                                        {getPositionType(player.position) === "goalkeeper" ? (
+                                                            <SportsMma
+                                                                sx={{
+                                                                    fontSize: {
+                                                                        xs: 14,
+                                                                        sm: 20,
+                                                                    },
+                                                                }}
+                                                            />
+                                                        ) : (
+                                                            <Person2
+                                                                sx={{
+                                                                    fontSize: {
+                                                                        xs: 18,
+                                                                        sm: 24,
+                                                                    },
+                                                                }}
+                                                            />
+                                                        )}
                                                     </div>
 
                                                 </div>

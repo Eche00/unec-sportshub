@@ -1342,23 +1342,24 @@ const useMatchesInfo = (
                 category: selectedTournament?.category ?? category,
 
                 teamA,
-
                 teamB,
 
-                formationA: formationA || undefined,
-                formationB: formationB || undefined,
-
                 location,
-
                 date,
-
                 time,
-
                 status,
 
                 tournamentId: useTournament
                     ? selectedTournamentId
                     : undefined,
+
+                ...(formationA
+                    ? { formationA }
+                    : {}),
+
+                ...(formationB
+                    ? { formationB }
+                    : {}),
             };
 
             await handleCreateMatch(

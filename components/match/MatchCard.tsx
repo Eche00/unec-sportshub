@@ -72,10 +72,15 @@ const MatchCard: React.FC<MatchCardProps> = ({
                         </span>
 
                         <div className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center justify-center">
+                            {status === "live" && (
+                                <span className="text-[#FB831C] text-xs font-medium mb-1">
+                                    {matchMinute || "0′"}
+                                </span>
+                            )}
                             <div className=" text-xl font-bold text-[32px] font-bold">
                                 {scoreA} : {scoreB}
                             </div>
-                           
+
                         </div>
 
                         <span className="flex flex-col gap-2 text-right">

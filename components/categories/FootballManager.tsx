@@ -57,13 +57,15 @@ function FootballManager({
         handleContinueMatch,
         handleEndMatch,
 
-        handleDeleteMatch
+        handleDeleteMatch,
+        getMatchTime
 
     } = useMatchesInfo(
         onClose,
         matchId
     );
     const [settings, setSettings] = React.useState(true);
+    const matchMinute = match ? getMatchTime(match) : "";
     if (!match) {
 
         return <Empty />
@@ -115,7 +117,7 @@ function FootballManager({
 
                             {match.status === "live" && (
 
-                                <span className="text-xs text-green-400">
+                                <div className="text-xs text-green-400 flex flex-col items-start ">
 
                                     LIVE • {
 
@@ -124,8 +126,12 @@ function FootballManager({
                                             : "Second Half"
 
                                     }
-
-                                </span>
+                                    {match.status === "live" && (
+                                        <span className="text-[#FB831C] text-xs font-medium mb-1">
+                                            {matchMinute || "0′"}
+                                        </span>
+                                    )}
+                                </div>
                             )}
 
                             {match.status === "halftime" && (
@@ -331,8 +337,7 @@ function FootballManager({
 
                 </div>
                 {/* STATUS */}
-
-                <select
+                {/* <select
                     value={match.status}
                     onChange={(e) =>
                         handleManageChange(
@@ -359,7 +364,7 @@ function FootballManager({
                         Upcoming
                     </option>
 
-                </select>
+                </select> */}
 
                 {/* LIVE CONTROLS */}
 
