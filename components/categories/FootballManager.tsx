@@ -563,17 +563,13 @@ function FootballManager({
 
                         <div
                             key={e.id}
-                            className="text-sm rounded-xl border border-[#FFFFFF33] bg-[#131313] py-3 px-4 transition-all duration-300 hover:border-gray-700"
+                            className="text-sm text-wrap rounded-xl border border-[#FFFFFF33] bg-[#131313] py-3 px-4 transition-all duration-300 hover:border-gray-700"
                         >
 
-                            {e.minute && (
-                                <strong>
-                                    {e.minute}'
-                                </strong>
-                            )}{" "}
+
 
                             {e.type === "goal" &&
-                                <span className="flex gap-3 items-center text-nowrap">
+                                <span>
                                     <SportsSoccer fontSize="small" /> {e.player} ({e.team === "A"
                                         ? match.teamA
                                         : match.teamB
@@ -585,16 +581,22 @@ function FootballManager({
                             {e.type === "red" &&
                                 `🟥 ${e.player}`}
 
+
                             {e.type === "commentary" &&
-                                <span className="flex gap-3 items-center text-wrap">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <div className="flex gap-3 items-center text-wrap">
+                                    <span><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <path d="M12 2C9.79086 2 8 3.79086 8 6V11C8 13.2091 9.79086 15 12 15C14.2091 15 16 13.2091 16 11V10" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
                                         <path d="M12 18V22M12 22H15M12 22H9" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
                                         <path d="M19 12C18.7174 15.3914 15.8824 18 12.4792 18H11.5208C8.11765 18 5.28262 15.3914 5 12" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
                                         <path d="M15 4V7.5L17 6H19C19.9428 6 20.4142 6 20.7071 5.70711C21 5.41421 21 4.94281 21 4C21 3.05719 21 2.58579 20.7071 2.29289C20.4142 2 19.9428 2 19 2H17C16.0572 2 15.5858 2 15.2929 2.29289C15 2.58579 15 3.05719 15 4Z" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                                    </svg>
+                                    </svg></span>
                                     {e.text}
-                                </span>}
+                                </div>}
+                            {" "} {e.minute && (
+                                <strong>
+                                    '{e.minute}'
+                                </strong>
+                            )}
 
                         </div>
 
