@@ -8,55 +8,22 @@ import { Close } from "@mui/icons-material";
 import useMatchesInfo, { CreateMatchFormProps } from "@/utils/logics/usematchesinfo";
 import useTournamentInfo from "@/utils/logics/usetournamentinfo";
 
-
-
 function CreateMatchForm({ onClose, tournamentId }: CreateMatchFormProps) {
     const { tournaments } = useTournamentInfo();
 
-    const {
-        loading,
-        // form states
-        teamA,
-        setTeamA,
+    const { loading, teamA, setTeamA, teamB, setTeamB, category, setCategory, location, setLocation, date, setDate, time, setTime, status, setStatus, useTournament, setUseTournament, selectedTournamentId, setSelectedTournamentId, handleSubmit } = useMatchesInfo(onClose);
 
-        teamB,
-        setTeamB,
-
-        category,
-        setCategory,
-
-        location,
-        setLocation,
-
-        date,
-        setDate,
-
-        time,
-        setTime,
-
-        status,
-        setStatus,
-
-        useTournament,
-        setUseTournament,
-        selectedTournamentId,
-        setSelectedTournamentId,
-        // submit handler
-        handleSubmit,
-
-
-    } = useMatchesInfo(onClose);
     useEffect(() => {
         if (tournamentId) {
             setUseTournament(true);
             setSelectedTournamentId(tournamentId);
         }
     }, [tournamentId]);
+
     const isTournamentLocked = Boolean(selectedTournamentId);
 
-    const selectedTournament = tournaments.find(
-        (t) => t.id === selectedTournamentId
-    );
+    const selectedTournament = tournaments.find((t) => t.id === selectedTournamentId);
+
     return (
         <form
             onSubmit={handleSubmit}
@@ -74,16 +41,13 @@ function CreateMatchForm({ onClose, tournamentId }: CreateMatchFormProps) {
                 transition={{ duration: 0.3 }}
                 onClick={(e) => e.stopPropagation()}
                 className="bg-[#0B0B0B] sm:w-[540px] w-full h-full rounded-tl-2xl rounded-bl-2xl p-5 sm:p-6 overflow-y-auto flex flex-col"
-
             >
-                {/* HEADER */}
+                {/* header */}
                 <div className="mb-6">
                     <h2 className="text-2xl font-semibold flex items-center justify-between">
                         Create Match
 
-                        <Button variant="secondary" onClick={onClose}>
-                            Close
-                        </Button>
+                        <Button variant="secondary" onClick={onClose}>Close</Button>
                     </h2>
 
                     <p className="text-sm text-gray-400 mt-1">
@@ -91,14 +55,12 @@ function CreateMatchForm({ onClose, tournamentId }: CreateMatchFormProps) {
                     </p>
                 </div>
 
-                {/* TEAMS */}
+                {/* teams */}
                 <div className="grid grid-cols-2 gap-4 mb-6">
                     {useTournament && selectedTournament ? (
                         <>
                             <div>
-                                <label className="text-sm text-gray-300 mb-1 block">
-                                    Team A
-                                </label>
+                                <label className="text-sm text-gray-300 mb-1 block">Team A</label>
 
                                 <select
                                     value={teamA}
@@ -108,17 +70,13 @@ function CreateMatchForm({ onClose, tournamentId }: CreateMatchFormProps) {
                                     <option value="">Select Team A</option>
 
                                     {selectedTournament.teams.map((team) => (
-                                        <option key={team.id} value={team.name}>
-                                            {team.name}
-                                        </option>
+                                        <option key={team.id} value={team.name}>{team.name}</option>
                                     ))}
                                 </select>
                             </div>
 
                             <div>
-                                <label className="text-sm text-gray-300 mb-1 block">
-                                    Team B
-                                </label>
+                                <label className="text-sm text-gray-300 mb-1 block">Team B</label>
 
                                 <select
                                     value={teamB}
@@ -130,33 +88,20 @@ function CreateMatchForm({ onClose, tournamentId }: CreateMatchFormProps) {
                                     {selectedTournament.teams
                                         .filter((team) => team.name !== teamA)
                                         .map((team) => (
-                                            <option key={team.id} value={team.name}>
-                                                {team.name}
-                                            </option>
+                                            <option key={team.id} value={team.name}>{team.name}</option>
                                         ))}
                                 </select>
                             </div>
                         </>
                     ) : (
                         <>
-                            <Input
-                                label="Team A"
-                                placeholder="Enter Team A"
-                                value={teamA}
-                                onChange={(e) => setTeamA(e.target.value)}
-                            />
-
-                            <Input
-                                label="Team B"
-                                placeholder="Enter Team B"
-                                value={teamB}
-                                onChange={(e) => setTeamB(e.target.value)}
-                            />
+                            <Input label="Team A" placeholder="Enter Team A" value={teamA} onChange={(e) => setTeamA(e.target.value)} />
+                            <Input label="Team B" placeholder="Enter Team B" value={teamB} onChange={(e) => setTeamB(e.target.value)} />
                         </>
                     )}
                 </div>
 
-                {/* LOCATION */}
+                {/* location */}
                 <div className="mb-6">
                     <Input
                         label="Match Location"
@@ -166,33 +111,19 @@ function CreateMatchForm({ onClose, tournamentId }: CreateMatchFormProps) {
                     />
                 </div>
 
-                {/* DATE & TIME */}
+                {/* date & time */}
                 <div className="grid grid-cols-2 gap-4 mb-6">
-                    <Input
-                        label="Match Date"
-                        type="date"
-                        value={date}
-                        onChange={(e) => setDate(e.target.value)}
-                    />
-
-                    <Input
-                        label="Kick-off Time"
-                        type="time"
-                        value={time}
-                        onChange={(e) => setTime(e.target.value)}
-                    />
+                    <Input label="Match Date" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+                    <Input label="Kick-off Time" type="time" value={time} onChange={(e) => setTime(e.target.value)} />
                 </div>
 
-                {/* STATUS */}
+                {/* status */}
                 <div className="mb-6">
-                    <label className="text-sm text-gray-300 mb-1 block">
-                        Match Status
-                    </label>
+                    <label className="text-sm text-gray-300 mb-1 block">Match Status</label>
+
                     <select
                         value={status}
-                        onChange={(e) =>
-                            setStatus(e.target.value as "live" | "finished" | "upcoming")
-                        }
+                        onChange={(e) => setStatus(e.target.value as "live" | "finished" | "upcoming")}
                         className="w-full bg-black border border-gray-700 rounded-lg p-2 text-sm"
                     >
                         <option value="upcoming">Upcoming</option>
@@ -200,11 +131,10 @@ function CreateMatchForm({ onClose, tournamentId }: CreateMatchFormProps) {
                         <option value="finished">Finished</option>
                     </select>
                 </div>
+
                 {!useTournament && (
                     <div className="mb-6">
-                        <label className="text-sm text-gray-300 mb-1 block">
-                            Match Category
-                        </label>
+                        <label className="text-sm text-gray-300 mb-1 block">Match Category</label>
 
                         <select
                             value={category}
@@ -231,21 +161,17 @@ function CreateMatchForm({ onClose, tournamentId }: CreateMatchFormProps) {
 
                 {useTournament && selectedTournament && (
                     <div className="mb-6">
-                        <label className="text-sm text-gray-300 mb-1 block">
-                            Category
-                        </label>
+                        <label className="text-sm text-gray-300 mb-1 block">Category</label>
 
                         <div className="bg-black border border-gray-700 rounded-lg p-2 text-sm capitalize">
                             {selectedTournament.category}
                         </div>
                     </div>
                 )}
+
                 <div className="mb-4 flex items-center gap-2">
-                    <input
-                        type="checkbox"
-                        checked={useTournament}
-                        onChange={(e) => setUseTournament(e.target.checked)}
-                    />
+                    <input type="checkbox" checked={useTournament} onChange={(e) => setUseTournament(e.target.checked)} />
+
                     <label className="text-sm text-gray-300">
                         Associate with tournament
                     </label>
@@ -253,27 +179,21 @@ function CreateMatchForm({ onClose, tournamentId }: CreateMatchFormProps) {
 
                 {useTournament && (
                     <div className="mb-6">
-                        <label className="text-sm text-gray-300 mb-1 block">
-                            Tournament
-                        </label>
+                        <label className="text-sm text-gray-300 mb-1 block">Tournament</label>
 
                         <select
                             value={selectedTournamentId}
-                            onChange={(e) =>
-                                !isTournamentLocked && setSelectedTournamentId(e.target.value)
-                            }
+                            onChange={(e) => !isTournamentLocked && setSelectedTournamentId(e.target.value)}
                             disabled={isTournamentLocked}
                             className={`w-full border rounded-lg p-2 text-sm bg-black ${isTournamentLocked
-                                ? "border-gray-700 text-gray-400 cursor-not-allowed opacity-70"
-                                : "border-gray-700 text-white"
+                                    ? "border-gray-700 text-gray-400 cursor-not-allowed opacity-70"
+                                    : "border-gray-700 text-white"
                                 }`}
                         >
                             <option value="">Select tournament</option>
 
                             {tournaments.map((t) => (
-                                <option key={t.id} value={t.id}>
-                                    {t.name}
-                                </option>
+                                <option key={t.id} value={t.id}>{t.name}</option>
                             ))}
                         </select>
 
@@ -284,19 +204,15 @@ function CreateMatchForm({ onClose, tournamentId }: CreateMatchFormProps) {
                         )}
                     </div>
                 )}
-                {/* FOOTER */}
+
+                {/* footer */}
                 <div className="mt-auto flex gap-3 pt-4 border-t border-gray-800">
-                    <Button type="button" variant="secondary" onClick={onClose}
-                        disabled={loading}>
+                    <Button type="button" variant="secondary" onClick={onClose} disabled={loading}>
                         Cancel
                     </Button>
 
                     <Button type="submit" variant="primary" disabled={loading}>
-                        {
-                            loading
-                                ? "Creating..."
-                                : "Create Match"
-                        }
+                        {loading ? "Creating..." : "Create Match"}
                     </Button>
                 </div>
             </motion.aside>

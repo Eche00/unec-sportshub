@@ -10,12 +10,8 @@ import {
     SportsTennis,
     Extension,
 } from "@mui/icons-material";
-
 import { AnimatePresence } from "framer-motion";
-
-import useTournamentInfo, {
-    Tournament,
-} from "@/utils/logics/usetournamentinfo";
+import useTournamentInfo, { Tournament } from "@/utils/logics/usetournamentinfo";
 import useMatchesInfo from "@/utils/logics/usematchesinfo";
 import TournamentForm from "@/components/forms/TournamentForm";
 import EditTournamentForm from "@/components/forms/EditTournamentForm";
@@ -25,37 +21,15 @@ import Loader from "@/components/ui/Loader";
 import { useUserInfo } from "@/utils/logics/userinfo";
 
 export default function Page() {
-
-    const {
-        filteredTournaments,
-        tournaments,
-        loading,
-        search,
-        setSearch
-    } = useTournamentInfo();
-
-    const {
-        statusStyles,
-
-    } = useMatchesInfo();
-
-    const [createTournament, setCreateTournament] =
-        useState(false);
+    const { filteredTournaments, tournaments, loading, search, setSearch } = useTournamentInfo();
+    const { statusStyles } = useMatchesInfo();
+    const [createTournament, setCreateTournament] = useState(false);
     const userInfo = useUserInfo();
-
-    const [manageTournament, setManageTournament] =
-        useState(false);
-
-
-    const [selectedTournamentId, setSelectedTournamentId] =
-        useState<string | null>(null);
-
-    const selectedTournament =
-        tournaments.find(t => t.id === selectedTournamentId) ?? null;
-
+    const [manageTournament, setManageTournament] = useState(false);
+    const [selectedTournamentId, setSelectedTournamentId] = useState<string | null>(null);
+    const selectedTournament = tournaments.find(t => t.id === selectedTournamentId) ?? null;
 
     const getTournamentStage = (tournament: Tournament) => {
-
         const teamCount = tournament.teams?.length || 0;
 
         if (teamCount === 0) return "No Teams";
@@ -65,11 +39,11 @@ export default function Page() {
 
         return "Final Stage";
     };
+
     const isSearching = search.trim().length > 0;
+
     const filteredTournamentss = useMemo(() => {
-        if (!userInfo?.uid) {
-            return [];
-        }
+        if (!userInfo?.uid) return [];
 
         return filteredTournaments.filter(
             (tournament) => tournament.createdBy === userInfo.uid
@@ -77,29 +51,23 @@ export default function Page() {
     }, [filteredTournaments, userInfo?.uid]);
 
     if (loading) return <Loader />;
+
     return (
         <div className="min-h-screen text-white space-y-6">
-
-            {/* HEADER */}
+            {/* header */}
             <div className="flex items-center justify-between gap-2">
-
                 <h1 className="text-2xl font-semibold flex items-center gap-2">
                     Tournament Control
                 </h1>
 
-                <Button
-                    variant="primary"
-                    onClick={() =>
-                        setCreateTournament(true)
-                    }
-                >
+                <Button variant="primary" onClick={() => setCreateTournament(true)}>
                     + Create
                 </Button>
             </div>
 
-            {/* OVERVIEW */}
+            {/* overview */}
             <section className="space-y-4 pt-6 border-t border-gray-800">
-                {/*  Search Bar */}
+                {/* search bar */}
                 <div className="relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                     <input
@@ -110,12 +78,11 @@ export default function Page() {
                         className="w-full pl-10 pr-4 py-3 rounded-xl bg-[#1F2933] border border-gray-800 text-gray-200 placeholder-gray-500 outline-none ring-2 ring-[#FB831C] transition"
                     />
                 </div>
-                {/* LIST */}
-                <div className="flex flex-col md:grid md:grid-cols-2 gap-4">
 
+                {/* list */}
+                <div className="flex flex-col md:grid md:grid-cols-2 gap-4">
                     {!loading && filteredTournamentss.length > 0 ? (
                         filteredTournamentss.map((tournament) => {
-
                             const stage = getTournamentStage(tournament);
 
                             return (
@@ -123,13 +90,9 @@ export default function Page() {
                                     key={tournament.id}
                                     className="relative group rounded-xl border border-[#FFFFFF33] bg-[#131313] py-8 px-6 transition-all duration-300 hover:border-gray-700 transition overflow-hidden"
                                 >
-
-
-                                    {/* TOP */}
+                                    {/* top */}
                                     <div className="flex justify-between items-start relative z-10">
-
                                         <div className="flex items-center gap-3">
-
                                             <div className="p-2 rounded-lg bg-white/5 border border-gray-700">
                                                 {tournament?.category === "football" && <SportsSoccer className="text-gray-300" />}
                                                 {tournament?.category === "basketball" && <SportsBasketball className="text-gray-300" />}
@@ -144,17 +107,13 @@ export default function Page() {
                                                 </span>
 
                                                 {tournament.location && (
-                                                    <p className="text-xs text-gray-500 mt-1">
-                                                        {tournament.location}
-                                                    </p>
+                                                    <p className="text-xs text-gray-500 mt-1">{tournament.location}</p>
                                                 )}
                                             </div>
                                         </div>
 
-                                        {/* STATUS */}
-                                        <span
-                                            className={`text-xs px-3 py-1 rounded-full border ${statusStyles[tournament.status]} flex items-center gap-2 uppercase`}
-                                        >
+                                        {/* status */}
+                                        <span className={`text-xs px-3 py-1 rounded-full border ${statusStyles[tournament.status]} flex items-center gap-2 uppercase`}>
                                             {tournament?.status === "live" && (
                                                 <span className="relative flex h-2 w-2">
                                                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
@@ -165,40 +124,30 @@ export default function Page() {
                                         </span>
                                     </div>
 
-                                    {/* DIVIDER */}
+                                    {/* divider */}
                                     <div className="my-4 h-[1px] bg-gray-800" />
 
-                                    {/* BOTTOM */}
+                                    {/* bottom */}
                                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10 text-gray-400 text-sm">
-
                                         <div className="flex items-center gap-6 flex-wrap">
-
                                             <div>
                                                 <p className="text-xs">Stage</p>
-                                                <p className="text-white font-medium">
-                                                    {stage}
-                                                </p>
+                                                <p className="text-white font-medium">{stage}</p>
                                             </div>
 
                                             <div>
                                                 <p className="text-xs">Teams</p>
-                                                <p className="text-white font-medium">
-                                                    {tournament.teams?.length || 0}
-                                                </p>
+                                                <p className="text-white font-medium">{tournament.teams?.length || 0}</p>
                                             </div>
 
                                             <div>
                                                 <p className="text-xs">Start Date</p>
-                                                <p className="text-white font-medium">
-                                                    {tournament.startDate || "--"}
-                                                </p>
+                                                <p className="text-white font-medium">{tournament.startDate || "--"}</p>
                                             </div>
-
                                         </div>
 
-                                        {/* ACTIONS */}
+                                        {/* actions */}
                                         <div className="flex flex-wrap gap-2">
-
                                             <button
                                                 className="group-hover:text-gray-300 transition text-xs cursor-pointer hover:underline flex items-center gap-1"
                                                 onClick={() => {
@@ -224,33 +173,29 @@ export default function Page() {
                             );
                         })
                     ) : !loading ? (
-
-                        /* EMPTY/SEARCH STATE */
+                        /* empty/search state */
                         <div className="sm:col-span-2 flex flex-col items-center justify-center text-center border border-dashed border-gray-700 rounded-xl p-10 bg-[#0F1115] w-full mx-auto min-h-[300px]">
-
                             <div className="p-3 rounded-full bg-white/5 border border-gray-700 mb-4">
                                 <SportsSoccer className="text-gray-300" />
                             </div>
 
-                            {/* DYNAMIC TITLE */}
+                            {/* dynamic title */}
                             <h3 className="text-sm font-semibold text-gray-200 mb-1">
-                                {isSearching
-                                    ? "No tournaments found"
-                                    : "No tournaments yet"}
+                                {isSearching ? "No tournaments found" : "No tournaments yet"}
                             </h3>
 
-                            {/* DYNAMIC MESSAGE */}
+                            {/* dynamic message */}
                             <p className="text-xs text-gray-400 mb-4 max-w-xs">
                                 {isSearching
                                     ? `No tournaments match "${search}". Try a different keyword.`
                                     : "You have no tournaments created yet. Come back later."}
                             </p>
 
-                            {/* OPTIONAL RESET */}
+                            {/* optional reset */}
                             {isSearching && (
                                 <button
                                     onClick={() => setSearch("")}
-                                    className="text-xs text-[#FB831C]  cursor-pointer"
+                                    className="text-xs text-[#FB831C] cursor-pointer"
                                 >
                                     Clear search
                                 </button>
@@ -260,28 +205,22 @@ export default function Page() {
                 </div>
             </section>
 
-            {/* MODALS */}
+            {/* modals */}
             <AnimatePresence>
-
                 {createTournament && (
-                    <TournamentForm
-                        onClose={() => setCreateTournament(false)}
-                    />
+                    <TournamentForm onClose={() => setCreateTournament(false)} />
                 )}
+
                 {manageTournament && selectedTournament && (
-                    <div className="fixed  bg-black/60 z-50">
-
+                    <div className="fixed bg-black/60 z-50">
                         <div className="w-full">
-
                             <EditTournamentForm
                                 tournament={selectedTournament}
                                 onClose={() => setManageTournament(false)}
                             />
-
                         </div>
                     </div>
                 )}
-
             </AnimatePresence>
         </div>
     );

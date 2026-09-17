@@ -29,42 +29,26 @@ export default function AdminPage() {
         return () => clearTimeout(timer);
     }, [userInfo, router]);
 
-    if (loading) {
-        return <Loader />;
-    }
+    if (loading) return <Loader />;
 
     const tabs = [
-        {
-            id: "users" as AdminTab,
-            label: "Users",
-        },
-        {
-            id: "tournaments" as AdminTab,
-            label: "Tournaments",
-        },
-        {
-            id: "matches" as AdminTab,
-            label: "Matches",
-        },
+        { id: "users" as AdminTab, label: "Users" },
+        { id: "tournaments" as AdminTab, label: "Tournaments" },
+        { id: "matches" as AdminTab, label: "Matches" },
     ];
 
     return (
-        <div className="w-full space-y-6 ">
-            {/* HEADER */}
-            <div className="flex items-center justify-between gap-2 ">
-
+        <div className="w-full space-y-6">
+            {/* header */}
+            <div className="flex items-center justify-between gap-2">
                 <h1 className="text-2xl font-semibold flex items-center gap-2">
                     Admin Management
                 </h1>
 
-                <Button
-                    variant="primary"
-                >
-                    USH
-                </Button>
+                <Button variant="primary">USH</Button>
             </div>
 
-            {/* Tabs */}
+            {/* tabs */}
             <div className="sticky top-0 z-40 pt-2 flex items-center gap-6 border-b border-[#FFFFFF1A] bg-[#0B0B0B]">
                 {tabs.map((tab) => (
                     <button
@@ -85,19 +69,11 @@ export default function AdminPage() {
                 ))}
             </div>
 
-            {/* Tab Content */}
+            {/* tab content */}
             <div>
-                {activeTab === "users" && (
-                    <Users />
-                )}
-
-                {activeTab === "tournaments" && (
-                    <Tournaments />
-                )}
-
-                {activeTab === "matches" && (
-                    <Matches />
-                )}
+                {activeTab === "users" && <Users />}
+                {activeTab === "tournaments" && <Tournaments />}
+                {activeTab === "matches" && <Matches />}
             </div>
         </div>
     );

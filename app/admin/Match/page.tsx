@@ -38,7 +38,7 @@ export default function Page() {
     return (
         <div className="space-y-6">
 
-            {/* HEADER */}
+            {/* header */}
             <div className="flex items-center justify-between">
                 <h1 className="text-2xl font-semibold">
                     Match Control
@@ -55,7 +55,7 @@ export default function Page() {
             <hr className="border-gray-800" />
 
 
-            {/* SEARCH BAR */}
+            {/* search bar */}
             <div className="relative">
                 <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
 
@@ -67,12 +67,12 @@ export default function Page() {
                     className="w-full pl-10 pr-4 py-3 rounded-xl bg-[#1F2933] border border-gray-800 text-gray-200 placeholder-gray-500 outline-none ring-2 ring-[#FB831C] transition"
                 />
             </div>
-            {/* EMPTY STATE */}
+            {/* empty state */}
             {isEmpty && (
                 <Empty />
             )}
 
-            {/* MATCHES GRID */}
+            {/* matches grid */}
             {!loading && hasMatches ? (
                 <div className="grid gap-4 lg:grid-cols-2">
                     {filteredMatchess.map((match) => (
@@ -99,28 +99,28 @@ export default function Page() {
                 </div>
             ) : !loading ? (
 
-                /* EMPTY/SEARCH STATE */
+                /* empty/search state */
                 <div className="sm:col-span-2 flex flex-col items-center justify-center text-center border border-dashed border-gray-700 rounded-xl p-10 bg-[#0F1115] w-full mx-auto min-h-[300px]">
 
                     <div className="p-3 rounded-full bg-white/5 border border-gray-700 mb-4">
                         <SportsSoccer className="text-gray-300" />
                     </div>
 
-                    {/* DYNAMIC TITLE */}
+                    {/* dynamic title */}
                     <h3 className="text-sm font-semibold text-gray-200 mb-1">
                         {isSearching
                             ? "No matches found"
                             : "No matches yet"}
                     </h3>
 
-                    {/* DYNAMIC MESSAGE */}
+                    {/* dynamic message */}
                     <p className="text-xs text-gray-400 mb-4 max-w-xs">
                         {isSearching
                             ? `No matches match "${search}". Try a different keyword.`
                             : "You have no matches created yet. Come back later."}
                     </p>
 
-                    {/* OPTIONAL RESET */}
+                    {/* optional reset */}
                     {isSearching && (
                         <button
                             onClick={() => setSearch("")}
@@ -132,7 +132,7 @@ export default function Page() {
                 </div>
             ) : null}
 
-            {/* CREATE MODAL */}
+            {/* create modal */}
             <AnimatePresence>
                 {createMatch && (
                     <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">

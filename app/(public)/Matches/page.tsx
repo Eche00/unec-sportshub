@@ -1,43 +1,22 @@
 "use client";
 
-
 import MatchCard from "@/components/match/MatchCard";
-
 import useMatchesInfo from "@/utils/logics/usematchesinfo";
-
 import SearchIcon from "@mui/icons-material/Search";
 import Empty from "@/components/ui/Empty";
 import Loader from "@/components/ui/Loader";
 
 export default function Page() {
-    const {
-        loading,
+    const { loading, search, setSearch, isEmpty, hasMatches, filteredMatches, getMatchTime } = useMatchesInfo();
 
-        search,
-        setSearch,
-
-        isEmpty,
-        hasMatches,
-
-        filteredMatches,
-        getMatchTime,
-    } = useMatchesInfo();
-
-    if (loading) {
-        return (
-            <Loader />
-        );
-    }
+    if (loading) return <Loader />;
 
     return (
         <div className="min-h-screen sm:p-6 mt-22">
-
             <div className="max-w-[90%] mx-auto space-y-6">
-
-                {/* SEARCH BAR */}
+                {/* search bar */}
                 <div className="relative">
                     <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-
                     <input
                         type="text"
                         placeholder="Search teams..."
@@ -47,13 +26,10 @@ export default function Page() {
                     />
                 </div>
 
+                {/* empty state */}
+                {isEmpty && <Empty />}
 
-                {/* EMPTY STATE */}
-                {!loading && isEmpty && (
-                    <Empty />
-                )}
-
-                {/* MATCHES GRID */}
+                {/* matches */}
                 {hasMatches && (
                     <div className="grid gap-4 sm:grid-cols-2">
                         {filteredMatches.length > 0 ? (
@@ -73,10 +49,7 @@ export default function Page() {
                                     createdBy={match.createdBy}
                                     location={match.location}
                                     tournamentId={match.tournamentId}
-                                    matchMinute={
-                                        getMatchTime(match)
-                                    }
-
+                                    matchMinute={getMatchTime(match)}
                                 />
                             ))
                         ) : (
@@ -86,8 +59,6 @@ export default function Page() {
                         )}
                     </div>
                 )}
-
-
             </div>
         </div>
     );

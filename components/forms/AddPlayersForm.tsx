@@ -7,7 +7,6 @@ import Input from "../ui/Input";
 import useTournamentInfo, { Player, Team, Tournament } from "@/utils/logics/usetournamentinfo";
 import toast from "react-hot-toast";
 
-
 type Props = {
     isOpen: boolean;
     onClose: () => void;
@@ -15,25 +14,19 @@ type Props = {
     team: Team | null;
 };
 
-export default function AddPlayersForm({
-    isOpen,
-    onClose,
-    tournament,
-    team,
-}: Props) {
+export default function AddPlayersForm({ isOpen, onClose, tournament, team }: Props) {
     const { editTournament } = useTournamentInfo();
     const [players, setPlayers] = useState<Player[]>([]);
-
     const [currentName, setCurrentName] = useState("");
     const [currentJersey, setCurrentJersey] = useState("");
-    const [currentPosition, setCurrentPosition] =
-        useState<Player["position"]>("Team");
+    const [currentPosition, setCurrentPosition] = useState<Player["position"]>("Team");
 
     useEffect(() => {
         if (team) {
             setPlayers(team.squad || []);
         }
     }, [team]);
+
     if (!isOpen || !team) return null;
 
     const handleAddPlayer = () => {
@@ -47,9 +40,7 @@ export default function AddPlayersForm({
             {
                 id: crypto.randomUUID(),
                 name: currentName.trim(),
-                jerseyNumber: currentJersey
-                    ? Number(currentJersey)
-                    : undefined,
+                jerseyNumber: currentJersey ? Number(currentJersey) : undefined,
                 position: currentPosition,
             },
         ]);
@@ -58,9 +49,11 @@ export default function AddPlayersForm({
         setCurrentJersey("");
         setCurrentPosition("Team");
     };
+
     const removePlayer = (id: string) => {
         setPlayers((prev) => prev.filter((p) => p.id !== id));
     };
+
     const handleSavePlayers = async () => {
         const updatedTeams = tournament.teams.map((t) =>
             t.id === team.id
@@ -77,67 +70,34 @@ export default function AddPlayersForm({
 
         onClose();
     };
+
     return (
-        <div
-            className="fixed inset-0 bg-black/80 z-50 flex justify-end"
-            onClick={onClose}
-        >
-
+        <div className="fixed inset-0 bg-black/80 z-50 flex justify-end" onClick={onClose}>
             <motion.aside
-
-                initial={{
-                    x: 300,
-                    opacity: 0,
-                }}
-
-                animate={{
-                    x: 0,
-                    opacity: 1,
-                }}
-
-                exit={{
-                    x: 300,
-                    opacity: 0,
-                }}
-
-                transition={{
-                    duration: 0.3,
-                }}
-
-                onClick={(e) =>
-                    e.stopPropagation()
-                }
-
-                className="bg-[#0B0B0B] sm:w-[650px] mt-16 mb-10  w-full h-[90vh] rounded-tl-2xl rounded-bl-2xl p-5 sm:p-6 overflow-y-auto flex flex-col"
+                initial={{ x: 300, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: 300, opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                onClick={(e) => e.stopPropagation()}
+                className="bg-[#0B0B0B] sm:w-[650px] mt-16 mb-10 w-full h-[90vh] rounded-tl-2xl rounded-bl-2xl p-5 sm:p-6 overflow-y-auto flex flex-col"
             >
                 <div className="mb-6 flex items-center justify-between">
                     <div>
-                        <h2 className="text-xl font-bold text-white">
-                            {team.name}
-                        </h2>
-
-                        <p className="text-sm text-gray-400">
-                            Add Player
-                        </p>
+                        <h2 className="text-xl font-bold text-white">{team.name}</h2>
+                        <p className="text-sm text-gray-400">Add Player</p>
                     </div>
 
-                    <Button variant="secondary" onClick={onClose}>
-                        Close
-                    </Button>
+                    <Button variant="secondary" onClick={onClose}>Close</Button>
                 </div>
 
                 <div className="space-y-4">
-
                     <div className="flex flex-wrap gap-2">
                         {players.map((player) => (
                             <div
                                 key={player.id}
                                 className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-black border border-gray-700 text-sm"
                             >
-                                <span>
-                                    {player.name}
-                                    {player.jerseyNumber && ` #${player.jerseyNumber}`}
-                                </span>
+                                <span>{player.name}{player.jerseyNumber && ` #${player.jerseyNumber}`}</span>
 
                                 <button
                                     type="button"
@@ -150,30 +110,19 @@ export default function AddPlayersForm({
                         ))}
                     </div>
 
-                    <Input
-                        placeholder="Player name"
-                        value={currentName}
-                        onChange={(e) => setCurrentName(e.target.value)}
-                    />
+                    <Input placeholder="Player name" value={currentName} onChange={(e) => setCurrentName(e.target.value)} />
 
                     <div className="grid grid-cols-2 gap-3">
-
                         <Input
                             placeholder="Jersey No."
                             type="number"
                             value={currentJersey}
-                            onChange={(e) =>
-                                setCurrentJersey(e.target.value)
-                            }
+                            onChange={(e) => setCurrentJersey(e.target.value)}
                         />
 
                         <select
                             value={currentPosition}
-                            onChange={(e) =>
-                                setCurrentPosition(
-                                    e.target.value as Player["position"]
-                                )
-                            }
+                            onChange={(e) => setCurrentPosition(e.target.value as Player["position"])}
                             className="rounded-lg border border-gray-700 bg-black p-2 text-white"
                         >
                             <option value="Goalkeeper">Goalkeeper</option>
@@ -182,25 +131,14 @@ export default function AddPlayersForm({
                             <option value="Forward">Forward</option>
                             <option value="Team">Team</option>
                         </select>
-
                     </div>
 
                     <div className="flex items-center justify-end gap-4">
-                        <Button
-                            type="button"
-                            variant="secondary"
-                            onClick={handleAddPlayer}
-                            disabled={!currentName.trim()}
-                        >
+                        <Button type="button" variant="secondary" onClick={handleAddPlayer} disabled={!currentName.trim()}>
                             Add Player
                         </Button>
 
-                        <Button
-                            onClick={handleSavePlayers}
-                        >
-                            Save Squad
-                        </Button>
-
+                        <Button onClick={handleSavePlayers}>Save Squad</Button>
                     </div>
                 </div>
 
@@ -215,10 +153,7 @@ export default function AddPlayersForm({
                                 key={player.id}
                                 className="max-w-[180px] w-full rounded-xl border border-[#FFFFFF33] bg-[#131313] p-4 transition-all duration-300 hover:border-gray-700"
                             >
-                                <div className="font-medium text-sm text-white">
-                                    {player.name}
-                                </div>
-
+                                <div className="font-medium text-sm text-white">{player.name}</div>
                                 {player.jerseyNumber ? `#${player.jerseyNumber}` : "--"} • {player.position}
                             </div>
                         ))}
@@ -226,6 +161,5 @@ export default function AddPlayersForm({
                 </div>
             </motion.aside>
         </div>
-
     );
 }

@@ -1,139 +1,71 @@
 "use client";
 
 import React, { useState } from "react";
-
 import Input from "../ui/Input";
 import Button from "../ui/Button";
-
 import { Team } from "@/utils/logics/usetournamentinfo";
 
 type TeamFormProps = {
     teams: Team[];
-
-    addTeam: (
-        name: string
-    ) => void;
-
-    removeTeam: (
-        index: number
-    ) => void;
-
+    addTeam: (name: string) => void;
+    removeTeam: (index: number) => void;
     teamCount: number;
 };
 
-function TeamForm({
-    teams,
-    addTeam,
-    removeTeam,
-    teamCount,
-}: TeamFormProps) {
+function TeamForm({ teams, addTeam, removeTeam, teamCount }: TeamFormProps) {
+    const [current, setCurrent] = useState("");
 
-    const [current, setCurrent] =
-        useState("");
-
-    // ---------------- ADD TEAM ----------------
+    // add team
     const handleAddTeam = () => {
-
         addTeam(current);
-
         setCurrent("");
     };
 
-    // ---------------- KEYDOWN ----------------
-    const handleKeyDown = (
-        e: React.KeyboardEvent
-    ) => {
-
+    // keydown
+    const handleKeyDown = (e: React.KeyboardEvent) => {
         if (e.key === "Enter") {
-
             e.preventDefault();
-
             handleAddTeam();
         }
     };
 
     return (
         <div className="flex flex-col gap-4">
-
-            {/* TEAMS */}
+            {/* teams */}
             <div className="flex flex-wrap gap-2">
+                {teams.map((team, index) => (
+                    <div key={index} className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-black border border-gray-700 text-sm">
+                        <span className="text-gray-200">{team.name}</span>
 
-                {
-                    teams.map(
-                        (
-                            team,
-                            index
-                        ) => (
-                            <div
-                                key={index}
-                                className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-black border border-gray-700 text-sm"
-                            >
-
-                                <span className="text-gray-200">
-                                    {
-                                        team.name
-                                    }
-                                </span>
-
-                                <button
-                                    type="button"
-                                    onClick={() =>
-                                        removeTeam(
-                                            index
-                                        )
-                                    }
-                                    className="text-gray-400 hover:text-red-400 transition text-xs cursor-pointer"
-                                >
-                                    ✕
-                                </button>
-                            </div>
-                        )
-                    )
-                }
+                        <button type="button" onClick={() => removeTeam(index)} className="text-gray-400 hover:text-red-400 transition text-xs cursor-pointer">
+                            ✕
+                        </button>
+                    </div>
+                ))}
             </div>
 
-            {/* INPUT */}
+            {/* input */}
             <div className="flex gap-2 items-center">
-
                 <Input
                     placeholder="Enter team name"
                     value={current}
-                    onChange={(e) =>
-                        setCurrent(
-                            e.target.value
-                        )
-                    }
-                    onKeyDown={
-                        handleKeyDown
-                    }
+                    onChange={(e) => setCurrent(e.target.value)}
+                    onKeyDown={handleKeyDown}
                 />
 
                 <Button
                     type="button"
-                    onClick={
-                        handleAddTeam
-                    }
+                    onClick={handleAddTeam}
                     variant="secondary"
-                    disabled={
-                        !current.trim() ||
-                        teams.length >=
-                        teamCount
-                    }
+                    disabled={!current.trim() || teams.length >= teamCount}
                 >
                     Add
                 </Button>
             </div>
 
-            {/* FOOTER */}
+            {/* footer */}
             <p className="text-xs text-gray-500">
-
-                {
-                    teams.length
-                }
-                /
-                {
-                    teamCount
-                } teams added
+                {teams.length}/{teamCount} teams added
             </p>
         </div>
     );

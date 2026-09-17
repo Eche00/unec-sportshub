@@ -13,39 +13,14 @@ type MatchCardProps = Matches & {
     matchMinute?: string;
 };
 
-const MatchCard: React.FC<MatchCardProps> = ({
-
-    id,
-
-    category,
-
-    teamA,
-    teamB,
-
-    scoreA,
-    scoreB,
-
-    status,
-
-    date,
-    time,
-    location,
-    tournamentId,
-    matchMinute,
-
-}) => {
-    const {
-        manageMatches,
-        setManageMatches,
-        statusStyles,
-        handleClick,
-    } = useMatchesInfo();
+const MatchCard: React.FC<MatchCardProps> = ({ id, teamA, teamB, scoreA, scoreB, status, date, time, location, tournamentId, matchMinute }) => {
+    const { manageMatches, setManageMatches, statusStyles, handleClick, } = useMatchesInfo();
 
     return (
         <>
             <div className=" flex flex-col w-full">
 
-                {/* MAtch Card  */}
+                {/* match card */}
                 <section
                     onClick={() => handleClick(id)}
                     className="cursor-pointer rounded-xl border border-[#FFFFFF33] bg-[#131313] py-8 px-6 transition-all duration-300 hover:border-gray-700 relative flex flex-col gap-5"
@@ -63,7 +38,7 @@ const MatchCard: React.FC<MatchCardProps> = ({
                         )}
                     </span>
 
-                    {/* SCORE */}
+                    {/* score */}
                     <div className="relative flex items-center justify-between text-[14px] font-medium">
 
                         <span className="flex flex-col gap-2">
@@ -90,10 +65,10 @@ const MatchCard: React.FC<MatchCardProps> = ({
 
                     </div>
 
-                    {/* DIVIDER */}
+                    {/* divider */}
                     <div className="h-px max-w-75.5 w-full mx-auto bg-[#FFFFFF1A] to-transparent opacity-40 " />
 
-                    {/* FOOTER */}
+                    {/* footer */}
                     <div className="flex justify-between text-[12px] text-[#A1A1AA] gap-4">
 
                         <span className="flex items-center gap-1">

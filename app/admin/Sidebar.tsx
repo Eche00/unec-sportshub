@@ -19,31 +19,15 @@ type SideBarItem = {
 };
 
 
-export const adminSidebar: SideBarItem[] = [
-    {
-        name: "Dashboard",
-        link: "/admin",
-        icon: <AdminPanelSettingsIcon />,
-    },
-    {
-        name: "Tournaments",
-        link: "/admin/Tournaments",
-        icon: <EmojiEventsIcon />,
-    },
-    {
-        name: "Matches",
-        link: "/admin/Match",
-        icon: <SportsSoccerIcon />,
-    },
+export const adminSidebar: SideBarItem[] = [{ name: "Dashboard", link: "/admin", icon: <AdminPanelSettingsIcon />, }, { name: "Tournaments", link: "/admin/Tournaments", icon: <EmojiEventsIcon />, }, { name: "Matches", link: "/admin/Match", icon: <SportsSoccerIcon />, },
 ];
 
 //  OPTIONAL EXTRA (future expansion)
-export const adminSecondary: SideBarItem[] = [
-    {
-        name: "Home",
-        link: "/",
-        icon: <HomeIcon />,
-    },
+export const adminSecondary: SideBarItem[] = [{
+    name: "Home",
+    link: "/",
+    icon: <HomeIcon />,
+},
 ];
 function Sidebar() {
     const pathname = usePathname()

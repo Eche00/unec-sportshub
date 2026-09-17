@@ -1,66 +1,20 @@
 "use client";
 
 import React from "react";
-
 import Input from "../ui/Input";
 import Button from "../ui/Button";
-
 import { motion } from "framer-motion";
-
 import TeamForm from "./TeamForm";
-
 import { Close } from "@mui/icons-material";
-
 import useTournamentInfo from "@/utils/logics/usetournamentinfo";
 
-function TournamentForm({
-    onClose,
-}: {
-    onClose: () => void;
-}) {
+function TournamentForm({ onClose }: { onClose: () => void }) {
+    const { createTournament, creating, name, setName, location, setLocation, category, setCategory, format, setFormat, teamCount, setTeamCount, autoMatchups, setAutoMatchups, startDate, setStartDate, endDate, setEndDate, teams, addTeam, removeTeam, } = useTournamentInfo();
 
-    const {
-
-        createTournament,
-        creating,
-
-        name,
-        setName,
-
-        location,
-        setLocation,
-
-        category,
-        setCategory,
-
-        format,
-        setFormat,
-
-        teamCount,
-        setTeamCount,
-
-        autoMatchups,
-        setAutoMatchups,
-
-        startDate,
-        setStartDate,
-
-        endDate,
-        setEndDate,
-
-        teams,
-        addTeam,
-        removeTeam,
-    } = useTournamentInfo();
-
-    const handleSubmit = async (
-        e: React.FormEvent
-    ) => {
-
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        const res =
-            await createTournament();
+        const res = await createTournament();
 
         if (res) {
             onClose();
@@ -78,33 +32,16 @@ function TournamentForm({
             }}
         >
             <motion.aside
-                initial={{
-                    x: 200,
-                    opacity: 0,
-                }}
-                animate={{
-                    x: 0,
-                    opacity: 1,
-                }}
-                exit={{
-                    x: 200,
-                    opacity: 0,
-                }}
-                transition={{
-                    duration: 0.3,
-                }}
-                onClick={(e) =>
-                    e.stopPropagation()
-                }
+                initial={{ x: 200, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: 200, opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                onClick={(e) => e.stopPropagation()}
                 className="bg-[#0B0B0B] sm:w-[540px] w-full h-full rounded-tl-2xl rounded-bl-2xl p-5 sm:p-6 overflow-y-auto flex flex-col"
-
             >
-
-                {/* Header */}
+                {/* header */}
                 <div className="mb-6">
-
                     <h2 className="text-2xl font-semibold flex items-center justify-between">
-
                         Create Tournament
 
                         <Button variant="secondary" onClick={onClose} disabled={creating}>
@@ -117,35 +54,25 @@ function TournamentForm({
                     </p>
                 </div>
 
-                {/* Basic Info */}
+                {/* basic info */}
                 <div className="space-y-4 mb-6">
-
                     <Input
                         label="Tournament Name"
                         placeholder="e.g. UNEC Football League"
                         value={name}
-                        onChange={(e) =>
-                            setName(
-                                e.target.value
-                            )
-                        }
+                        onChange={(e) => setName(e.target.value)}
                     />
 
                     <Input
                         label="Location"
                         placeholder="e.g. Enugu Campus Field"
                         value={location}
-                        onChange={(e) =>
-                            setLocation(
-                                e.target.value
-                            )
-                        }
+                        onChange={(e) => setLocation(e.target.value)}
                     />
                 </div>
 
-                {/* Category */}
+                {/* category */}
                 <div className="mb-6">
-
                     <label className="text-sm text-gray-300 mb-1 block">
                         Tournament Category
                     </label>
@@ -154,147 +81,89 @@ function TournamentForm({
                         value={category}
                         onChange={(e) =>
                             setCategory(
-                                e.target.value as
-                                | "football"
-                                | "basketball"
-                                | "volleyball"
-                                | "tennis"
-                                | "chess"
+                                e.target.value as | "football" | "basketball" | "volleyball" | "tennis" | "chess"
                             )
                         }
                         className="w-full bg-black border border-gray-700 rounded-lg p-2 text-sm"
                     >
-                        <option value="football">
-                            Football
-                        </option>
-
-                        <option value="basketball">
-                            Basketball
-                        </option>
-
-                        <option value="volleyball">
-                            Volleyball
-                        </option>
+                        <option value="football">Football</option>
+                        <option value="basketball">Basketball</option>
+                        <option value="volleyball">Volleyball</option>
                         <option value="tennis">Tennis</option>
                         <option value="chess">Chess</option>
                     </select>
-
                 </div>
-                {/* Dates */}
-                <div className="grid grid-cols-2 gap-4 mb-6">
 
+                {/* dates */}
+                <div className="grid grid-cols-2 gap-4 mb-6">
                     <Input
                         label="Start Date"
                         type="date"
                         value={startDate}
-                        onChange={(e) =>
-                            setStartDate(
-                                e.target.value
-                            )
-                        }
+                        onChange={(e) => setStartDate(e.target.value)}
                     />
 
                     <Input
                         label="End Date"
                         type="date"
                         value={endDate}
-                        onChange={(e) =>
-                            setEndDate(
-                                e.target.value
-                            )
-                        }
+                        onChange={(e) => setEndDate(e.target.value)}
                     />
                 </div>
 
-                {/* Format & Teams */}
+                {/* format & teams */}
                 <div className="mb-6 space-y-4">
-
                     <div>
-
                         <label className="text-sm text-gray-300 mb-1 block">
                             Tournament Format
                         </label>
 
                         <select
                             value={format}
-                            onChange={(e) =>
-                                setFormat(
-                                    e.target.value
-                                )
-                            }
+                            onChange={(e) => setFormat(e.target.value)}
                             className="w-full bg-black border border-gray-700 rounded-lg p-2 text-sm"
                         >
-                            <option value="knockout">
-                                Knockout
-                            </option>
-
-                            <option value="league">
-                                League
-                            </option>
-
-                            <option value="group">
-                                Group + Knockout
-                            </option>
+                            <option value="knockout">Knockout</option>
+                            <option value="league">League</option>
+                            <option value="group">Group + Knockout</option>
                         </select>
                     </div>
 
                     <div>
-
                         <label className="text-sm text-gray-300 mb-1 block">
                             Number of Teams
                         </label>
 
                         <select
                             value={teamCount}
-                            onChange={(e) =>
-                                setTeamCount(
-                                    Number(
-                                        e.target
-                                            .value
-                                    )
-                                )
-                            }
+                            onChange={(e) => setTeamCount(Number(e.target.value))}
                             className="w-full bg-black border border-gray-700 rounded-lg p-2 text-sm"
                         >
-                            {[4, 8, 16, 32].map(
-                                (num) => (
-                                    <option
-                                        key={num}
-                                        value={num}
-                                    >
-                                        {num} Teams
-                                    </option>
-                                )
-                            )}
+                            {[4, 8, 16, 32].map((num) => (
+                                <option key={num} value={num}>
+                                    {num} Teams
+                                </option>
+                            ))}
                         </select>
                     </div>
                 </div>
 
-                {/* Match Setup */}
+                {/* match setup */}
                 <div className="mb-6">
-
                     <label className="text-sm text-gray-300 mb-2 block">
                         Match Setup
                     </label>
 
                     <div className="flex gap-3">
-
                         <button
                             type="button"
-                            onClick={() =>
-                                setAutoMatchups(
-                                    true
-                                )
-                            }
+                            onClick={() => setAutoMatchups(true)}
                             className={`flex-1 p-3 rounded-lg border transition ${autoMatchups
                                 ? "border-[#FB831C] bg-[#FB831C]/10"
                                 : "border-gray-700"
                                 }`}
                         >
-
-                            <p className="text-sm font-medium">
-                                Auto Generate
-                            </p>
+                            <p className="text-sm font-medium">Auto Generate</p>
 
                             <p className="text-xs text-gray-400">
                                 System creates fixtures automatically
@@ -303,20 +172,13 @@ function TournamentForm({
 
                         <button
                             type="button"
-                            onClick={() =>
-                                setAutoMatchups(
-                                    false
-                                )
-                            }
+                            onClick={() => setAutoMatchups(false)}
                             className={`flex-1 p-3 rounded-lg border transition ${!autoMatchups
                                 ? "border-[#FB831C] bg-[#FB831C]/10"
                                 : "border-gray-700"
                                 }`}
                         >
-
-                            <p className="text-sm font-medium">
-                                Manual Setup
-                            </p>
+                            <p className="text-sm font-medium">Manual Setup</p>
 
                             <p className="text-xs text-gray-400">
                                 You control all match pairings
@@ -325,12 +187,12 @@ function TournamentForm({
                     </div>
                 </div>
 
-                {/* Teams */}
+                {/* teams */}
                 <div className="mb-6">
-
                     <h3 className="mb-2 text-sm text-gray-300">
                         Teams
                     </h3>
+
                     <TeamForm
                         teams={teams}
                         addTeam={addTeam}
@@ -339,9 +201,8 @@ function TournamentForm({
                     />
                 </div>
 
-                {/* Footer */}
+                {/* footer */}
                 <div className="mt-auto flex gap-3 pt-4 border-t border-gray-800">
-
                     <Button
                         type="button"
                         variant="secondary"
@@ -354,18 +215,9 @@ function TournamentForm({
                     <Button
                         type="submit"
                         variant="primary"
-                        disabled={
-                            creating ||
-                            !name ||
-                            !location ||
-                            teams.length === 0
-                        }
+                        disabled={creating || !name || !location || teams.length === 0}
                     >
-                        {
-                            creating
-                                ? "Creating..."
-                                : "Create "
-                        }
+                        {creating ? "Creating..." : "Create "}
                     </Button>
                 </div>
             </motion.aside>
