@@ -44,15 +44,6 @@ function page() {
     const pastMatches = tournamentMatches.filter((m) => m.status === "finished");
 
     // tournament-dependent data
-
-    // const sortedPlayers = [
-    //     ...(tournament?.topScorers || []),
-    // ].filter(
-    //     (player) => (player[statView] ?? 0) > 0
-    // ).sort(
-    //     (a, b) => (b[statView] ?? 0) - (a[statView] ?? 0)
-    // );
-
     const statLabels = {
         goals: "Goals",
         assists: "Assists",
@@ -136,7 +127,25 @@ function page() {
     }, [tournament?.teams, tournament?.topScorers]);
 
     const sortedPlayers = React.useMemo(() => {
-        return [...allTournamentPlayers].sort((a, b) => b[statView] - a[statView]);
+        return [...allTournamentPlayers].sort((a, b) => {
+            // Primary: highest selected stat first
+            if (b[statView] !== a[statView]) {
+                return b[statView] - a[statView];
+            }
+
+            // Tiebreaker: highest assists first
+            if (b.assists !== a.assists) {
+                return b.assists - a.assists;
+            }
+
+            // Optional second tiebreaker: fewer red cards first
+            if (b.redCards !== a.redCards) {
+                return a.redCards - b.redCards;
+            }
+
+            // Final tiebreaker: alphabetical name
+            return a.playerName.localeCompare(b.playerName);
+        });
     }, [allTournamentPlayers, statView]);
 
     // conditional returns

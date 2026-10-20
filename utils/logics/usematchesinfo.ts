@@ -1231,6 +1231,7 @@ const useMatchesInfo = (
                 status: "live",
                 isLive: true,
                 isHalftime: false,
+                currentHalf: 2,
                 timerStartedAt: now,
             });
 
@@ -1241,15 +1242,16 @@ const useMatchesInfo = (
                         status: "live",
                         isLive: true,
                         isHalftime: false,
+                        currentHalf: 2,
                         timerStartedAt: now,
                     }
                     : prev
             );
 
-            toast.success("Match continued");
+            toast.success("Second half started");
         } catch (error) {
             console.error(error);
-            toast.error("Failed to continue match");
+            toast.error("Failed to start second half");
         } finally {
             setLoading(false);
         }
