@@ -1,10 +1,19 @@
 "use client";
 
 
+import { auth } from "@/lib/firebase";
 import { useRouter } from "next/navigation";
 
 function Header() {
     const router = useRouter()
+    const user = auth.currentUser;
+
+    const handleNavigate = () => {
+        if (user) {
+            router.push("/")
+        }
+        router.push("/get-started")
+    }
 
     return (
         <div className="fixed top-0 left-0 w-full h-fit z-50 bg-[var(--background)] py-[12px]">
@@ -27,7 +36,7 @@ function Header() {
                     </span>
                     <input type="text" placeholder="Search" className="bg-transparent text-[var(--foreground)] placeholder:text-[var(--muted)] outline-none w-full" />
                 </div>
-                <span className="bg-[#141414] p-[14px] rounded-full cursor-pointer" onClick={() => router.push("/profile")}>
+                <span className="bg-[#141414] p-[14px] rounded-full cursor-pointer" onClick={handleNavigate}>
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke="white" />
                         <path d="M12 14C7 14 4 16.5 4 19C4 20.1046 4.89543 21 6 21H18C19.1046 21 20 20.1046 20 19C20 16.5 17 14 12 14Z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke="white" />
