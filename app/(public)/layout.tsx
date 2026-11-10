@@ -8,8 +8,8 @@ function Publiclayout({ children }: { children: React.ReactNode; }) {
     const pathname = usePathname()
     return (
         <>
-            {pathname === '/tournaments' ? null : <Header />}
-            <main className="bg-[#0B0B0B] text-white min-h-screen ">{children}</main>
+            <Header />
+            <main className="bg-[#0B0B0B] text-white min-h-screen pt-20">{children}</main>
         </>
     )
 }

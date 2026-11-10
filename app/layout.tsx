@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { DM_Sans, Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
 import ScrollToTop from "./ScrollToTop";
+import { ThemeProvider } from "@/components/providers/theme-provider";
+import { ColorThemeProvider } from "@/components/providers/color-theme-provider";
+import MobileOnlyGuard from "@/components/providers/mobile-only-guard";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -101,7 +104,11 @@ export const metadata: Metadata = {
 
   category: "Sports",
 };
-
+const dmSans = DM_Sans({
+  subsets: ["latin"],
+  variable: "--font-dm-sans",
+  display: "swap",
+});
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -110,35 +117,59 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      suppressHydrationWarning
+      className={`${geistSans.variable} ${geistMono.variable} ${dmSans.variable} h-full antialiased`}
     >
-      <Toaster
-        position="top-right"
-        reverseOrder={false}
-        toastOptions={{
-          style: {
-            background: "#0A0F1C",
-            color: "#FB831C",
-            border: "1px solid #FB831C",
-            borderRadius: "12px",
-          },
-          success: {
-            iconTheme: {
-              primary: "#FB831C",
-              secondary: "#0A0F1C",
-            },
-          },
-          error: {
-            iconTheme: {
-              primary: "#FB831C",
-              secondary: "#0A0F1C",
-            },
-          },
-        }}
-      />
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              try {
+                const savedTheme = localStorage.getItem("color-theme");
+                document.documentElement.dataset.colorTheme = savedTheme || "orange";
+              } catch {
+                document.documentElement.dataset.colorTheme = "orange";
+              }
+            `,
+          }}
+        />
+      </head>
+
       <body className="min-h-full flex flex-col">
-        <ScrollToTop />
-        {children}</body>
+        <MobileOnlyGuard>
+          <ThemeProvider>
+            <ColorThemeProvider>
+              <Toaster
+                position="top-right"
+                reverseOrder={false}
+                toastOptions={{
+                  style: {
+                    background: "var(--card)",
+                    color: "var(--foreground)",
+                    border: "1px solid var(--border)",
+                    borderRadius: "12px",
+                  },
+                  success: {
+                    iconTheme: {
+                      primary: "var(--primary)",
+                      secondary: "var(--card)",
+                    },
+                  },
+                  error: {
+                    iconTheme: {
+                      primary: "#DC2626",
+                      secondary: "var(--card)",
+                    },
+                  },
+                }}
+              />
+
+              <ScrollToTop />
+              {children}
+            </ColorThemeProvider>
+          </ThemeProvider>
+        </MobileOnlyGuard>
+      </body>
     </html>
   );
 }

@@ -1,147 +1,230 @@
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import {
-    signInWithEmailAndPassword,
-    createUserWithEmailAndPassword,
-    updateProfile,
-} from "firebase/auth";
-import { setDoc, doc, getDoc } from "firebase/firestore";
+import toast from "react-hot-toast";
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, sendEmailVerification, signOut } from "firebase/auth";
+import { setDoc, doc, getDoc, updateDoc, serverTimestamp } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
 
 export const useAuth = () => {
     const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
     const router = useRouter();
 
-    //  SECRET CODE 
-    const generateSecretCode = () => {
-        const random = Math.random().toString(36).substring(2, 7).toUpperCase();
-        return `SC-2026`;
-    };
-
-    // LOGIN
+    // login
     const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setIsLoading(true);
-        setError(null);
-
         const formData = new FormData(e.currentTarget);
-
-        const email = formData.get("email") as string;
+        const email = (formData.get("email") as string)?.trim();
         const password = formData.get("password") as string;
-        const secretCode = formData.get("secretCode") as string;
 
         try {
-            // 1. SIGN IN USER
-            const userCredential = await signInWithEmailAndPassword(
-                auth,
-                email,
-                password
-            );
-
+            // 1. sign in
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
 
-            // 2. FETCH USER DATA FROM FIRESTORE
+            // 2. fetch user document
             const userRef = doc(db, "users", user.uid);
             const userSnap = await getDoc(userRef);
 
             if (!userSnap.exists()) {
-                throw new Error("User data not found");
+                await signOut(auth);
+                throw new Error("User account data not found.");
             }
 
             const userData = userSnap.data();
 
-            // 3. VERIFY SECRET CODE
-            if (userData.secretCode !== secretCode) {
-                setError("Invalid secret code.");
-                setIsLoading(false);
+            // 3. check email verification
+            if (!user.emailVerified) {
+                await signOut(auth);
+                toast.error("Please verify your email before signing in.");
+                router.push("/verify");
                 return;
             }
 
-            router.push("/admin");
-        } catch (err: any) {
-            console.error("Login Error:", err);
+            // 4. check account status
+            if (userData.status === "suspended" || userData.status === "rejected") {
+                await signOut(auth);
 
-            if (err.code === "auth/invalid-credential") {
-                setError("Invalid email or password.");
-            } else {
-                setError(err.message || "Login failed. Please try again.");
+                if (userData.status === "suspended") {
+                    throw new Error("Your account has been suspended. Please contact your administrator.");
+                }
+
+                throw new Error("Your account registration was rejected. Please contact your administrator.");
             }
 
+            // 5. update login information
+            await updateDoc(userRef, { emailVerified: user.emailVerified, lastLoginAt: serverTimestamp(), updatedAt: serverTimestamp() });
+
+            // 6. success
+            toast.success(`Welcome back, ${userData.fullName}!`);
+
+            // 7. redirect
+            router.push("/admin");
+        } catch (err: unknown) {
+            console.error("Login Error:", err);
+            const error = err as { code?: string; message?: string };
+
+            if (error.code === "auth/invalid-credential") {
+                toast.error("Invalid email or password.");
+            } else if (error.code === "auth/too-many-requests") {
+                toast.error("Too many attempts. Please try again later.");
+            } else if (error.code === "auth/invalid-email") {
+                toast.error("Please enter a valid email address.");
+            } else {
+                toast.error(error.message || "Login failed. Please try again.");
+            }
+        } finally {
             setIsLoading(false);
         }
     };
 
-    // SIGNUP
+    // sign up
     const handleSignup = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setIsLoading(true);
-        setError(null);
-
         const formData = new FormData(e.currentTarget);
-        const fullName = formData.get("fullName") as string;
-        const email = formData.get("email") as string;
+        const fullName = (formData.get("fullName") as string)?.trim();
+        const email = (formData.get("email") as string)?.trim();
         const password = formData.get("password") as string;
-        const confirmPassword = formData.get("password") as string; // fallback safe
 
-        if (password !== confirmPassword) {
-            setError("Passwords do not match");
+        // validation
+        if (!fullName || !email || !password) {
+            toast.error("Please fill in all fields.");
             setIsLoading(false);
             return;
         }
 
+        if (password.length < 8) {
+            toast.error("Password must be at least 8 characters.");
+            setIsLoading(false);
+            return;
+        }
+
+        let createdUser = null;
+
         try {
-            const userCredential = await createUserWithEmailAndPassword(
-                auth,
-                email,
-                password
-            );
-
+            // 1. create firebase account
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
+            createdUser = user;
 
-            await updateProfile(user, {
-                displayName: fullName,
-            });
+            // 2. update firebase profile
+            await updateProfile(user, { displayName: fullName });
 
-            // SECRET CODE
-            const secretCode = generateSecretCode();
-
+            // 3. create user document
             await setDoc(doc(db, "users", user.uid), {
                 uid: user.uid,
-                email: user.email,
                 fullName,
-                createdAt: new Date().toISOString(),
-                secretCode,
-                role: "admin",
+                userName: "",
+                email: user.email,
+                phone: "",
+                profileImage: null,
+                coverImage: null,
+                gender: null,
+                emailVerified: false,
+                phoneVerified: false,
+                role: "player",
+                status: "pending",
+                universityId: null,
+                facultyId: null,
+                departmentId: null,
+                classId: null,
+                playerId: null,
+                registrationType: "player",
+                bio: null,
+                createdAt: serverTimestamp(),
+                updatedAt: serverTimestamp(),
+                lastLoginAt: null,
             });
 
-            router.push("/admin");
-        } catch (err: any) {
-            console.error("Sign Up Error:", err);
+            // 4. send email verification
+            await sendEmailVerification(user);
 
-            if (err.code === "auth/email-already-in-use") {
-                setError("Email is already in use.");
-            } else if (err.code === "auth/weak-password") {
-                setError("Password should be at least 6 characters.");
-            } else {
-                setError("Failed to create account. Please try again.");
+            // 5. sign out
+            await signOut(auth);
+
+            // 6. success toast
+            toast.success("Account created! Please check your email to verify your account.");
+
+            // 7. redirect
+            router.push("/verify");
+        } catch (err: unknown) {
+            console.error("Sign Up Error:", err);
+            const error = err as { code?: string; message?: string };
+
+            if (createdUser && auth.currentUser?.uid === createdUser.uid) {
+                try {
+                    await signOut(auth);
+                } catch (signOutError) {
+                    console.error("Sign out error:", signOutError);
+                }
             }
 
+            if (error.code === "auth/email-already-in-use") {
+                toast.error("An account with this email already exists.");
+            } else if (error.code === "auth/weak-password") {
+                toast.error("Password must be at least 8 characters.");
+            } else if (error.code === "auth/invalid-email") {
+                toast.error("Please enter a valid email address.");
+            } else {
+                toast.error(error.message || "Failed to create account. Please try again.");
+            }
+        } finally {
             setIsLoading(false);
         }
     };
 
+    // resend verification email
+    const handleResendVerification = async () => {
+        setIsLoading(true);
+
+        try {
+            const user = auth.currentUser;
+
+            if (!user) {
+                toast.error("Please sign in again to resend your verification email.");
+                return;
+            }
+
+            await user.reload();
+
+            if (auth.currentUser?.emailVerified) {
+                toast.success("Your email is already verified!");
+                return;
+            }
+
+            await sendEmailVerification(user);
+            toast.success("Verification email sent! Please check your inbox.");
+        } catch (err: unknown) {
+            console.error("Resend Verification Error:", err);
+            const error = err as { code?: string };
+
+            if (error.code === "auth/too-many-requests") {
+                toast.error("Too many requests. Please try again later.");
+            } else {
+                toast.error("Failed to send verification email. Please try again.");
+            }
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    // open email client in a new tab
+    const handleOpenEmail = () => {
+        window.open("https://mail.google.com/mail/u/0/#inbox", "_blank");
+    };
+
     return {
         isLoading,
-        error,
         showPassword,
         setShowPassword,
         showConfirmPassword,
         setShowConfirmPassword,
         handleLogin,
         handleSignup,
+        handleResendVerification,
+        handleOpenEmail
     };
 };

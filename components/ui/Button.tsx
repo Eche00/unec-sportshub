@@ -11,27 +11,31 @@ function Button({
     variant = "primary",
     type = "button",
     className = "",
+    disabled,
     ...props
 }: ButtonProps) {
     const base =
-        "px-5 py-1.5 rounded-md text-sm font-semibold transition w-fit cursor-pointer text-nowrap";
+        "w-full px-5 py-3 rounded-xl text-[16px] font-medium transition-all duration-200 w-fit cursor-pointer text-nowrap";
 
     const variants = {
         primary:
-            "bg-[#FB831C] text-white hover:opacity-90",
+            "bg-[var(--primary)] text-white border border-[var(--primary)] hover:opacity-90",
+
         secondary:
-            "border border-gray-600 text-white hover:border-white",
+            "bg-transparent border border-[var(--primary)] text-[var(--primary)] hover:bg-[var(--primary)] hover:text-white",
+
         secondaryRed:
-            "border border-gray-600 bg-red-600 text-white hover:bg-red-500",
+            "bg-red-600 border border-red-600 text-white hover:bg-red-700 hover:border-red-700",
     };
 
-    const disabledStyles = props.disabled
-        ? "opacity-50 cursor-not-allowed hover:opacity-50"
+    const disabledStyles = disabled
+        ? "opacity-50 cursor-not-allowed pointer-events-none"
         : "";
 
     return (
         <button
             type={type}
+            disabled={disabled}
             {...props}
             className={`${base} ${variants[variant]} ${disabledStyles} ${className}`}
         >
