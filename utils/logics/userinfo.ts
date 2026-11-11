@@ -14,6 +14,7 @@ import {
 import { auth, db } from '@/lib/firebase'
 import { useRouter } from 'next/navigation'
 
+// user information interface
 export interface UserInfo {
     uid: string
     fullName: string
@@ -36,49 +37,64 @@ export interface UserInfo {
     lastLoginAt?: Date | null
 }
 
-const convertTimestamp = (
-    value: unknown
-): Date | undefined => {
-    if (value instanceof Timestamp) {
-        return value.toDate()
-    }
+// user information loading state
+export interface UserInfoState {
+    userInfo: UserInfo | null
+    isLoading: boolean
+}
 
-    if (value instanceof Date) {
-        return value
-    }
-
+// convert firebase timestamps to dates
+const convertTimestamp = (value: unknown): Date | undefined => {
+    if (value instanceof Timestamp) return value.toDate()
+    if (value instanceof Date) return value
     return undefined
 }
 
-// Hook to get the current authenticated user's info
-export function useUserInfo(): UserInfo | null {
+// hook to get the current authenticated user's info
+export function useUserInfo(): UserInfoState {
     const [userInfo, setUserInfo] = useState<UserInfo | null>(null)
+    const [isLoading, setIsLoading] = useState(true)
 
     useEffect(() => {
         let unsubscribeUserSnapshot: (() => void) | undefined
+        let isMounted = true
 
+        // listen for authentication changes
         const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
-            // Clean up previous user's Firestore listener
+            // clean up previous user's firestore listener
             if (unsubscribeUserSnapshot) {
                 unsubscribeUserSnapshot()
                 unsubscribeUserSnapshot = undefined
             }
 
-            if (!user) {
+            // reset user information when authentication changes
+            if (isMounted) {
                 setUserInfo(null)
+                setIsLoading(true)
+            }
+
+            // handle unauthenticated users
+            if (!user) {
+                if (isMounted) setIsLoading(false)
                 return
             }
 
+            // listen for the authenticated user's firestore document
             const userRef = doc(db, 'users', user.uid)
 
             unsubscribeUserSnapshot = onSnapshot(
                 userRef,
                 (docSnap) => {
+                    if (!isMounted) return
+
+                    // handle missing user document
                     if (!docSnap.exists()) {
                         setUserInfo(null)
+                        setIsLoading(false)
                         return
                     }
 
+                    // map firestore data to user information
                     const data = docSnap.data()
 
                     setUserInfo({
@@ -103,30 +119,34 @@ export function useUserInfo(): UserInfo | null {
 
                         createdAt: convertTimestamp(data.createdAt),
                         updatedAt: convertTimestamp(data.updatedAt),
-                        lastLoginAt:
-                            convertTimestamp(data.lastLoginAt) ?? null,
+                        lastLoginAt: convertTimestamp(data.lastLoginAt) ?? null,
                     })
+
+                    setIsLoading(false)
                 },
                 (error) => {
                     console.error('User Info Error:', error)
+
+                    if (!isMounted) return
+
                     setUserInfo(null)
+                    setIsLoading(false)
                 }
             )
         })
 
+        // clean up listeners when the component unmounts
         return () => {
+            isMounted = false
             unsubscribeAuth()
-
-            if (unsubscribeUserSnapshot) {
-                unsubscribeUserSnapshot()
-            }
+            unsubscribeUserSnapshot?.()
         }
     }, [])
 
-    return userInfo
+    return { userInfo, isLoading }
 }
 
-// Separate function for sign-out
+// separate function for sign-out
 export const handleSignOut = async (
     router: ReturnType<typeof useRouter>
 ) => {
