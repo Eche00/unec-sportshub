@@ -5,6 +5,7 @@ import Button from '@/components/ui/Button'
 import Loader from '@/components/ui/Loader'
 import NoTeam from '@/components/ui/NoTeam'
 import { useUserInfo } from '@/utils/logics/userinfo'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
 function page() {
@@ -22,10 +23,10 @@ function page() {
                 <div className="absolute inset-0 bg-linear-to-b from-transparent via-transparent backdrop-blur-xs to-[var(--background)] [mask-image:linear-gradient(to_bottom,transparent,var(--background)_40%)]" />
 
                 {/* navigation */}
-                <div className="relative w-[90%] h-[130px] mx-auto flex items-center justify-between overflow-hidden">
+                <div className="relative w-[90%] h-[130px] mx-auto flex items-center justify-between overflow-hidden z-20">
 
                     {/* Back Button */}
-                    <button onClick={() => router.push('/')}>
+                    <Link href="/">
                         <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <foreignObject x="-50" y="-50" width="140" height="140"><div style={{ backdropFilter: "blur(25px)", clipPath: "url(#bgblur_0_480_69723_clip_path)", height: "100%", width: "100%" }}></div></foreignObject>
                             <g data-figma-bg-blur-radius="50">
@@ -39,10 +40,10 @@ function page() {
                                 </clipPath>
                             </defs>
                         </svg>
-                    </button>
+                    </Link>
 
                     {/* Settings Button */}
-                    <button>
+                    <Link href="">
                         <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <foreignObject x="-50" y="-50" width="140" height="140"><div style={{ backdropFilter: "blur(25px)", clipPath: "url(#bgblur_0_480_69723_clip_path)", height: "100%", width: "100%" }}></div></foreignObject>
                             <g data-figma-bg-blur-radius="50">
@@ -56,7 +57,7 @@ function page() {
                                 </clipPath>
                             </defs>
                         </svg>
-                    </button>
+                    </Link>
                 </div>
 
                 {/*  profile information  */}
