@@ -3,7 +3,7 @@ import React from 'react'
 function NoTeam() {
     return (
         <div>
-            <div className="relative w-full h-[80px] flex items-center justify-between overflow-hidden">
+            <div className="relative w-full max-w-[296px] w-full mx-auto h-[80px] flex items-center justify-between overflow-hidden">
 
                 {/* Curved dashed connection */}
                 <svg className='absolute top-1/4 -translate-y-1/2 left-1/2 -translate-x-1/2' width="216" height="24" viewBox="0 0 216 24" fill="none" xmlns="http://www.w3.org/2000/svg">
