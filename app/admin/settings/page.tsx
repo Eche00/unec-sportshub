@@ -13,7 +13,7 @@ type AdminTab = "users" | "tournaments" | "matches";
 
 export default function AdminPage() {
     const [activeTab, setActiveTab] = useState<AdminTab>("users");
-    const userInfo = useUserInfo();
+    const { userInfo } = useUserInfo();
     const router = useRouter();
     const [loading, setLoading] = useState(true);
 

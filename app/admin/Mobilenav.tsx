@@ -47,7 +47,7 @@ export const adminSecondary: SideBarItem[] = [{ name: "Home", link: "/", icon: <
 function Mobilenav({ setOpenMenu }: mobileNavProps) {
     const pathname = usePathname();
     const menuRef = useRef<HTMLDivElement>(null);
-    const userInfo = useUserInfo();
+    const { userInfo } = useUserInfo();
 
     // effect to handle closing nav on page
     useEffect(() => {

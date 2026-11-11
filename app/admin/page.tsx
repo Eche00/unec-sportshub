@@ -16,7 +16,7 @@ import MatchCard from "@/components/match/MatchCard";
 
 export default function Page() {
     const router = useRouter();
-    const userInfo = useUserInfo();
+    const { userInfo } = useUserInfo();
     const { tournaments } = useTournamentInfo();
     const { filteredMatches, getMatchTime } = useMatchesInfo();
 

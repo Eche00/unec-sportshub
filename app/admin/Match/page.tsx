@@ -16,7 +16,7 @@ import { SportsSoccer } from "@mui/icons-material";
 
 export default function Page() {
     const { filteredMatches, loading, createMatch, setCreateMatch, isEmpty, search, setSearch, getMatchTime } = useMatchesInfo();
-    const userInfo = useUserInfo();
+    const { userInfo } = useUserInfo();
 
     const isSearching = search.trim().length > 0;
     const filteredMatchess = useMemo(() => {

@@ -24,7 +24,7 @@ export default function Page() {
     const { filteredTournaments, tournaments, loading, search, setSearch } = useTournamentInfo();
     const { statusStyles } = useMatchesInfo();
     const [createTournament, setCreateTournament] = useState(false);
-    const userInfo = useUserInfo();
+    const { userInfo } = useUserInfo();
     const [manageTournament, setManageTournament] = useState(false);
     const [selectedTournamentId, setSelectedTournamentId] = useState<string | null>(null);
     const selectedTournament = tournaments.find(t => t.id === selectedTournamentId) ?? null;
