@@ -178,7 +178,7 @@ type CreateTournamentPayload = {
 /* HOOK */
 
 const useTournamentInfo = () => {
-    const userInfo = useUserInfo();
+    const { userInfo } = useUserInfo();
 
     const [loading, setLoading] = useState(false);
     const [creating, setCreating] = useState(false);

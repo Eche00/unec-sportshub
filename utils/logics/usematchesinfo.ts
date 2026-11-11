@@ -134,7 +134,7 @@ const useMatchesInfo = (
     matchId?: string
 ) => {
     const { tournaments } = useTournamentInfo();
-    const userInfo = useUserInfo();
+    const { userInfo } = useUserInfo();
     const router = useRouter();
 
     const pathname = usePathname();
