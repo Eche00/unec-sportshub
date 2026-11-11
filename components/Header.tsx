@@ -10,9 +10,10 @@ function Header() {
 
     const handleNavigate = () => {
         if (user) {
-            router.push("/")
+            router.push("/profile")
+        } else {
+            router.push("/get-started")
         }
-        router.push("/get-started")
     }
 
     return (

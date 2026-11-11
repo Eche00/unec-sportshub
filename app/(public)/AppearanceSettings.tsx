@@ -28,9 +28,9 @@ export function AppearanceSettings() {
                     value={theme ?? "system"}
                     onChange={(e) => setTheme(e.target.value)}
                 >
-                    <option value="light">Light Mode</option>
+                    {/* <option value="light">Light Mode</option> */}
                     <option value="dark">Dark Mode</option>
-                    <option value="system">System Default</option>
+                    {/* <option value="system">System Default</option> */}
                 </select>
             </section>
 

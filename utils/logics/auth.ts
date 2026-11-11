@@ -2,8 +2,22 @@ import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, sendEmailVerification, signOut } from "firebase/auth";
-import { setDoc, doc, getDoc, updateDoc, serverTimestamp } from "firebase/firestore";
+import { setDoc, doc, getDoc, updateDoc, serverTimestamp, writeBatch } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
+import { COLLECTIONS, DEFAULT_PLAYER_STATISTICS, PreferredFoot, UserGender } from "@/types/auth.types";
+
+interface ProfileSetupData {
+    name: string;
+    phone: string;
+    gender: UserGender;
+    facultyId: string;
+    departmentId: string;
+    classId: string;
+    sports: string;
+    position: string;
+    shirtNumber: string;
+    preferredFoot?: PreferredFoot;
+}
 
 export const useAuth = () => {
     const [isLoading, setIsLoading] = useState(false);
@@ -273,6 +287,169 @@ export const useAuth = () => {
         window.open("https://mail.google.com/mail/u/0/#inbox", "_blank");
     };
 
+    // University ID
+    const universityId = "unec";
+
+    // Profile setup
+    const handleProfileSetup = async (data: ProfileSetupData) => {
+        setIsLoading(true);
+
+        try {
+            // 1. Check authenticated user
+            const user = auth.currentUser;
+
+            if (!user) {
+                toast.error("Please sign in to complete your profile.");
+                router.push("/login");
+                return;
+            }
+
+            await user.reload();
+
+            if (!user.emailVerified) {
+                toast.error("Please verify your email before continuing.");
+                await signOut(auth);
+                router.push("/verify");
+                return;
+            }
+
+            // 2. Validate fields
+            const {
+                name,
+                phone,
+                gender,
+                facultyId,
+                departmentId,
+                classId,
+                sports,
+                position,
+                shirtNumber,
+            } = data;
+
+            if (
+                !name?.trim() ||
+                !phone?.trim() ||
+                !gender ||
+                !facultyId ||
+                !departmentId ||
+                !classId ||
+                !sports ||
+                !position ||
+                !shirtNumber
+            ) {
+                toast.error("Please complete all profile fields.");
+                return;
+            }
+
+            const shirtNumberValue = Number(shirtNumber);
+
+            if (
+                !Number.isInteger(shirtNumberValue) ||
+                shirtNumberValue < 1 ||
+                shirtNumberValue > 22
+            ) {
+                toast.error("Please select a valid shirt number.");
+                return;
+            }
+
+            // 3. Get existing user document
+            const userRef = doc(db, COLLECTIONS.USERS, user.uid);
+            const userSnap = await getDoc(userRef);
+
+            if (!userSnap.exists()) {
+                throw new Error("User account data not found.");
+            }
+
+            const userData = userSnap.data();
+
+            if (userData.role !== "player") {
+                throw new Error(
+                    "Only player accounts can complete this profile."
+                );
+            }
+
+            // 4. Prepare player document
+            const playerRef = doc(db, COLLECTIONS.PLAYERS, user.uid);
+
+            const now = serverTimestamp();
+
+            const playerData = {
+                userId: user.uid,
+                fullName: userData.fullName,
+
+                // Organizational information
+                universityId,
+                facultyId,
+                departmentId,
+                classId,
+
+                // Sports information
+                sports,
+                position,
+                shirtNumber: shirtNumberValue,
+                preferredFoot: data.preferredFoot ?? "right",
+
+                // Statistics
+                statistics: DEFAULT_PLAYER_STATISTICS,
+
+                // Status
+                status: "pending" as const,
+
+                createdAt: now,
+                updatedAt: now,
+            };
+
+            // 5. Save player and update user atomically
+            const batch = writeBatch(db);
+
+            batch.set(playerRef, playerData);
+
+            batch.update(userRef, {
+                userName: name.trim(),
+                phone: phone.trim(),
+                gender,
+
+                universityId,
+                facultyId,
+                departmentId,
+                classId,
+
+                playerId: user.uid,
+                updatedAt: serverTimestamp(),
+            });
+
+            await batch.commit();
+
+            // 6. Success
+            toast.success("Profile completed successfully!");
+
+            // 7. Redirect
+            router.push("/");
+
+        } catch (err: unknown) {
+            console.error("Profile Setup Error:", err);
+
+            const error = err as {
+                code?: string;
+                message?: string;
+            };
+
+            if (error.code === "permission-denied") {
+                toast.error(
+                    "You don't have permission to update this profile."
+                );
+            } else {
+                toast.error(
+                    error.message || "Failed to complete your profile."
+                );
+            }
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+
+
     return {
         isLoading,
         showPassword,
@@ -281,7 +458,8 @@ export const useAuth = () => {
         setShowConfirmPassword,
         handleLogin,
         handleSignup,
+        handleProfileSetup,
         handleResendVerification,
-        handleOpenEmail
+        handleOpenEmail,
     };
 };

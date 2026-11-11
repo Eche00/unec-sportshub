@@ -6,6 +6,8 @@ import Select from '@/components/ui/Select'
 import Link from 'next/link'
 import React, { useState } from 'react'
 import { departmentOptionsByFaculty } from './departmentOptionsByFaculty'
+import { UserGender } from '@/types/auth.types'
+import { useAuth } from '@/utils/logics/auth'
 
 const facultyOptions = [
     { label: "Faculty of Agriculture", value: "agriculture" },
@@ -37,10 +39,36 @@ export const classOptions = [
     { label: "600 Level", value: "600" },
 ];
 function page() {
-    const [step, setStep] = useState(0)
-    const [selectedFaculty, setSelectedFaculty] = useState("");
+    const [step, setStep] = useState(0);
+    const { handleProfileSetup, isLoading } = useAuth();
+
+    const [profileData, setProfileData] = useState({
+        name: "",
+        phone: "",
+        gender: "" as UserGender,
+        facultyId: "",
+        departmentId: "",
+        classId: "",
+        sports: "football",
+        position: "",
+        shirtNumber: "",
+    });
+
+    // Derive departments after profileData has been declared
     const departmentOptions =
-        departmentOptionsByFaculty[selectedFaculty] || [];
+        departmentOptionsByFaculty[profileData.facultyId] || [];
+
+    const handleChange = (
+        e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    ) => {
+        const { name, value } = e.target;
+
+        setProfileData((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+    };
+
     return (
         <div className=' bg-linear-to-b from-[var(--primary)] via-[var(--background)] via-15% to-[var(--background)] py-10'>
             {/* header */}
@@ -93,32 +121,37 @@ function page() {
 
                             </span>
                         </div>
-                        {/* username */}
-                        <div className="flex flex-col items-start gap-2">
-                            <label className="text-white text-[14px] font-medium">Username</label>
-                            <Input type="text" name="name" placeholder="@john_doe" required />
+                        <Input
+                            label='Username'
+                            type="text"
+                            name="name"
+                            placeholder="@john_doe"
+                            value={profileData.name}
+                            onChange={handleChange}
+                            required
+                        />
 
-                        </div>
-                        {/* phone */}
-                        <div className="flex flex-col items-start gap-2">
-                            <label className="text-white text-[14px] font-medium">Phone</label>
-                            <Input type="number" name="phone" placeholder="09123456789" required />
+                        <Input
+                            label='Phone'
+                            type="tel"
+                            name="phone"
+                            placeholder="09123456789"
+                            value={profileData.phone}
+                            onChange={handleChange}
+                            required
+                        />
 
-                        </div>
-                        {/* gender */}
-                        <div className="flex flex-col items-start gap-2">
-                            <Select
-                                label="Gender"
-                                name="gender"
-                                // value={formData.gender}
-                                // onChange={handleChange}
-                                placeholder="Select your gender"
-                                options={[
-                                    { label: "Male", value: "male" },
-                                    { label: "Female", value: "female" },
-                                ]}
-                            />
-                        </div>
+                        <Select
+                            label="Gender"
+                            name="gender"
+                            value={profileData.gender}
+                            onChange={handleChange}
+                            placeholder="Select your gender"
+                            options={[
+                                { label: "Male", value: "male" },
+                                { label: "Female", value: "female" },
+                            ]}
+                        />
                     </section>
 
 
@@ -128,36 +161,39 @@ function page() {
             {step === 1 && (
                 <section className="w-[90%] mx-auto">
                     <section className=" space-y-5 pt-5">
-                        {/* faculty */}
-                        <div className="flex flex-col items-start gap-2">
-                            <Select
-                                label="Faculty"
-                                name="facultyId"
-                                placeholder="Select your faculty"
-                                options={facultyOptions}
-                                value={selectedFaculty}
-                                onChange={(e) => setSelectedFaculty(e.target.value)}
-                            />
-                        </div>
-                        {/* departments */}
+                        <Select
+                            label="Faculty"
+                            name="facultyId"
+                            placeholder="Select your faculty"
+                            options={facultyOptions}
+                            value={profileData.facultyId}
+                            onChange={(e) => {
+                                setProfileData((prev) => ({
+                                    ...prev,
+                                    facultyId: e.target.value,
+                                    departmentId: "",
+                                }));
+                            }}
+                        />
+
                         <Select
                             label="Department"
                             name="departmentId"
                             placeholder="Select your department"
                             options={departmentOptions}
-                            disabled={!selectedFaculty}
+                            value={profileData.departmentId}
+                            onChange={handleChange}
+                            disabled={!profileData.facultyId}
                         />
-                        {/* password */}
-                        <div className="flex flex-col items-start gap-2">
-                            <Select
-                                label="Current Level"
-                                name="classId"
-                                placeholder="Select your level"
-                                options={classOptions}
-                            />
-                        </div>
 
-
+                        <Select
+                            label="Current Level"
+                            name="classId"
+                            placeholder="Select your level"
+                            options={classOptions}
+                            value={profileData.classId}
+                            onChange={handleChange}
+                        />
                     </section>
 
 
@@ -167,83 +203,81 @@ function page() {
             {step === 2 && (
                 <section className="w-[90%] mx-auto">
                     <section className=" space-y-5 pt-5">
-                        {/* sports */}
-                        <div className="flex flex-col items-start gap-2">
-                            <Select
-                                label="Sports"
-                                name="sports"
-                                // value={formData.gender}
-                                // onChange={handleChange}
-                                placeholder="Pick a sports"
-                                options={[
-                                    { label: "Football", value: "football" },
-                                ]}
-                            />
+                        <Select
+                            label="Sports"
+                            name="sports"
+                            value={profileData.sports}
+                            onChange={handleChange}
+                            placeholder="Pick a sport"
+                            options={[
+                                { label: "Football", value: "football" },
+                            ]}
+                        />
 
-                        </div>
-                        {/* position */}
-                        <div className="flex flex-col items-start gap-2">
-                            <div className="relative w-full">
-                                <Select
-                                    label="Position"
-                                    name="position"
-                                    // value={formData.gender}
-                                    // onChange={handleChange}
-                                    placeholder="Pick a sports"
-                                    options={[
-                                        { label: "Goalkeeper (GK)", value: "GK" },
-                                        { label: "Right Back (RB)", value: "RB" },
-                                        { label: "Left Back (LB)", value: "LB" },
-                                        { label: "Centre Back (CB)", value: "CB" },
-                                        { label: "Sweeper (SW)", value: "SW" },
-                                        { label: "Right Wing Back (RWB)", value: "RWB" },
-                                        { label: "Left Wing Back (LWB)", value: "LWB" },
-                                        { label: "Defensive Midfielder (CDM)", value: "CDM" },
-                                        { label: "Central Midfielder (CM)", value: "CM" },
-                                        { label: "Attacking Midfielder (CAM)", value: "CAM" },
-                                        { label: "Right Midfielder (RM)", value: "RM" },
-                                        { label: "Left Midfielder (LM)", value: "LM" },
-                                        { label: "Right Winger (RW)", value: "RW" },
-                                        { label: "Left Winger (LW)", value: "LW" },
-                                        { label: "Centre Forward (CF)", value: "CF" },
-                                        { label: "Striker (ST)", value: "ST" },
-                                        { label: "Second Striker (SS)", value: "SS" },
-                                    ]}
-                                />
-                            </div>
-                        </div>
+                        <Select
+                            label="Position"
+                            name="position"
+                            value={profileData.position}
+                            onChange={handleChange}
+                            placeholder="Pick a position"
+                            options={[
+                                { label: "Goalkeeper (GK)", value: "GK" },
+                                { label: "Right Back (RB)", value: "RB" },
+                                { label: "Left Back (LB)", value: "LB" },
+                                { label: "Centre Back (CB)", value: "CB" },
+                                { label: "Sweeper (SW)", value: "SW" },
+                                { label: "Right Wing Back (RWB)", value: "RWB" },
+                                { label: "Left Wing Back (LWB)", value: "LWB" },
+                                { label: "Defensive Midfielder (CDM)", value: "CDM" },
+                                { label: "Central Midfielder (CM)", value: "CM" },
+                                { label: "Attacking Midfielder (CAM)", value: "CAM" },
+                                { label: "Right Midfielder (RM)", value: "RM" },
+                                { label: "Left Midfielder (LM)", value: "LM" },
+                                { label: "Right Winger (RW)", value: "RW" },
+                                { label: "Left Winger (LW)", value: "LW" },
+                                { label: "Centre Forward (CF)", value: "CF" },
+                                { label: "Striker (ST)", value: "ST" },
+                                { label: "Second Striker (SS)", value: "SS" },
+                            ]}
+                        />
 
-                        {/* password */}
-                        <div className="flex flex-col items-start gap-2">
-                            <Select
-                                label="Shirt Number"
-                                name="shirtNumber"
-                                placeholder="Select your shirt number"
-                                options={Array.from({ length: 22 }, (_, i) => ({
-                                    label: `Number ${i + 1}`,
-                                    value: String(i + 1),
-                                }))}
-                            />
-                        </div>
-
-
+                        <Select
+                            label="Shirt Number"
+                            name="shirtNumber"
+                            value={profileData.shirtNumber}
+                            onChange={handleChange}
+                            placeholder="Select your shirt number"
+                            options={Array.from({ length: 22 }, (_, i) => ({
+                                label: `Number ${i + 1}`,
+                                value: String(i + 1),
+                            }))}
+                        />
                     </section>
 
 
                 </section>
             )}
 
-            {/* submit */}
-            {step >= 2 ? <Button type="submit" variant="primary" onClick={() => setStep(step + 1)} className=" fixed bottom-4 left-1/2 -translate-x-1/2 !w-[90%] mx-auto py-3 flex items-center justify-center gap-2 disabled:opacity-60 cursor-pointer">
-                {/* {loading ? ( */}
-                {/* <div className="w-5 h-5 border-t-2 border-[var(--primary-foreground)] rounded-full animate-spin" /> */}
-                {/* ) : ( */}
-                <span className="flex items-center gap-2">Save</span>
-                {/* )} */}
-            </Button>
-                : <Button type="submit" variant="primary" onClick={() => setStep(step + 1)} className=" fixed bottom-4 left-1/2 -translate-x-1/2 !w-[90%] mx-auto py-3 flex items-center justify-center gap-2 disabled:opacity-60 cursor-pointer">
+            {step < 2 ? (
+                <Button
+                    type="button"
+                    variant="primary"
+                    onClick={() => setStep((prev) => prev + 1)}
+                    className="fixed bottom-4 left-1/2 -translate-x-1/2 !w-[90%] mx-auto py-3 flex items-center justify-center gap-2"
+                >
                     Continue
-                </Button>}
+                </Button>
+            ) : (
+                <Button
+                    type="button"
+                    variant="primary"
+                    onClick={() => handleProfileSetup(profileData)}
+                    disabled={isLoading}
+                    className="fixed bottom-4 left-1/2 -translate-x-1/2 !w-[90%] mx-auto py-3 flex items-center justify-center gap-2 disabled:opacity-60"
+                >
+                    {isLoading ? <div className="w-5 h-5 border-t-2 border-[var(--primary-foreground)] rounded-full animate-spin" /> : "Save"}
+                </Button>
+            )}
         </div>
     )
 }
