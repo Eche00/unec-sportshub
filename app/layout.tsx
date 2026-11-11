@@ -6,6 +6,7 @@ import ScrollToTop from "./ScrollToTop";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { ColorThemeProvider } from "@/components/providers/color-theme-provider";
 import MobileOnlyGuard from "@/components/providers/mobile-only-guard";
+import UserGuardProvider from "@/components/providers/UserGuardProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -135,40 +136,42 @@ export default function RootLayout({
         />
       </head>
 
-      <body className="min-h-full flex flex-col">
-        <MobileOnlyGuard>
-          <ThemeProvider>
-            <ColorThemeProvider>
-              <Toaster
-                position="top-right"
-                reverseOrder={false}
-                toastOptions={{
-                  style: {
-                    background: "var(--card)",
-                    color: "var(--foreground)",
-                    border: "1px solid var(--border)",
-                    borderRadius: "12px",
-                  },
-                  success: {
-                    iconTheme: {
-                      primary: "var(--primary)",
-                      secondary: "var(--card)",
+      <body className="min-h-full flex flex-col bg-[var(--background)]">
+        <UserGuardProvider>
+          <MobileOnlyGuard>
+            <ThemeProvider>
+              <ColorThemeProvider>
+                <Toaster
+                  position="top-right"
+                  reverseOrder={false}
+                  toastOptions={{
+                    style: {
+                      background: "var(--card)",
+                      color: "var(--foreground)",
+                      border: "1px solid var(--border)",
+                      borderRadius: "12px",
                     },
-                  },
-                  error: {
-                    iconTheme: {
-                      primary: "#DC2626",
-                      secondary: "var(--card)",
+                    success: {
+                      iconTheme: {
+                        primary: "var(--primary)",
+                        secondary: "var(--card)",
+                      },
                     },
-                  },
-                }}
-              />
+                    error: {
+                      iconTheme: {
+                        primary: "#DC2626",
+                        secondary: "var(--card)",
+                      },
+                    },
+                  }}
+                />
 
-              <ScrollToTop />
-              {children}
-            </ColorThemeProvider>
-          </ThemeProvider>
-        </MobileOnlyGuard>
+                <ScrollToTop />
+                {children}
+              </ColorThemeProvider>
+            </ThemeProvider>
+          </MobileOnlyGuard>
+        </UserGuardProvider>
       </body>
     </html>
   );

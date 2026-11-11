@@ -1,11 +1,9 @@
 "use client"
 
 import Header from '@/components/Header';
-import { usePathname } from 'next/navigation';
 import React from 'react'
 
 function Publiclayout({ children }: { children: React.ReactNode; }) {
-    const pathname = usePathname()
     return (
         <>
             <Header />

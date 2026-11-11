@@ -15,16 +15,22 @@ export const useAuth = () => {
     const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setIsLoading(true);
+
         const formData = new FormData(e.currentTarget);
         const email = (formData.get("email") as string)?.trim();
         const password = formData.get("password") as string;
 
         try {
-            // 1. sign in
-            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            // 1. Sign in
+            const userCredential = await signInWithEmailAndPassword(
+                auth,
+                email,
+                password
+            );
+
             const user = userCredential.user;
 
-            // 2. fetch user document
+            // 2. Fetch user document
             const userRef = doc(db, "users", user.uid);
             const userSnap = await getDoc(userRef);
 
@@ -35,35 +41,85 @@ export const useAuth = () => {
 
             const userData = userSnap.data();
 
-            // 3. check email verification
+            // 3. Check email verification
             if (!user.emailVerified) {
+                try {
+                    // Automatically resend verification email
+                    await sendEmailVerification(user);
+
+                    toast.success(
+                        "Verification email sent! Please check your inbox."
+                    );
+                } catch (verificationError: unknown) {
+                    console.error(
+                        "Verification Email Error:",
+                        verificationError
+                    );
+
+                    const error = verificationError as { code?: string };
+
+                    if (error.code === "auth/too-many-requests") {
+                        toast.error(
+                            "Too many requests. Please check your inbox or try again later."
+                        );
+                    } else {
+                        toast.error(
+                            "Your email is not verified. Failed to resend verification email."
+                        );
+                    }
+                }
+
                 await signOut(auth);
-                toast.error("Please verify your email before signing in.");
                 router.push("/verify");
                 return;
             }
 
-            // 4. check account status
-            if (userData.status === "suspended" || userData.status === "rejected") {
+            // 4. Check account status
+            if (
+                userData.status === "suspended" ||
+                userData.status === "rejected"
+            ) {
                 await signOut(auth);
 
                 if (userData.status === "suspended") {
-                    throw new Error("Your account has been suspended. Please contact your administrator.");
+                    throw new Error(
+                        "Your account has been suspended. Please contact your administrator."
+                    );
                 }
 
-                throw new Error("Your account registration was rejected. Please contact your administrator.");
+                throw new Error(
+                    "Your account registration was rejected. Please contact your administrator."
+                );
             }
 
-            // 5. update login information
-            await updateDoc(userRef, { emailVerified: user.emailVerified, lastLoginAt: serverTimestamp(), updatedAt: serverTimestamp() });
+            // 5. Update login information
+            await updateDoc(userRef, {
+                emailVerified: user.emailVerified,
+                lastLoginAt: serverTimestamp(),
+                updatedAt: serverTimestamp(),
+            });
 
-            // 6. success
+            // 6. Success
             toast.success(`Welcome back, ${userData.fullName}!`);
 
-            // 7. redirect
-            router.push("/admin");
+            // 7. Redirect based on profile completion
+            if (
+                !userData.userName ||
+                !userData.phone ||
+                !userData.gender ||
+                !userData.universityId ||
+                !userData.facultyId ||
+                !userData.departmentId ||
+                !userData.classId
+            ) {
+                router.push("/profile-setup");
+            } else {
+                router.push("/");
+            }
+
         } catch (err: unknown) {
             console.error("Login Error:", err);
+
             const error = err as { code?: string; message?: string };
 
             if (error.code === "auth/invalid-credential") {
@@ -79,6 +135,7 @@ export const useAuth = () => {
             setIsLoading(false);
         }
     };
+
 
     // sign up
     const handleSignup = async (e: FormEvent<HTMLFormElement>) => {
