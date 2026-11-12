@@ -4,7 +4,11 @@
 import { auth } from "@/lib/firebase";
 import { useRouter } from "next/navigation";
 
-function Header() {
+interface SidebarProps {
+    openSideBar: boolean;
+    setOpenSideBar: React.Dispatch<React.SetStateAction<boolean>>;
+}
+function Header({ openSideBar, setOpenSideBar }: SidebarProps) {
     const router = useRouter()
     const user = auth.currentUser;
 
@@ -19,7 +23,7 @@ function Header() {
     return (
         <div className="fixed top-0 left-0 w-full h-fit z-50 bg-[var(--background)] py-[12px]">
             <section className="flex items-center gap-[12px] w-[90%] mx-auto">
-                <span>
+                <button onClick={() => setOpenSideBar(!openSideBar)}>
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M2.99609 5H20.9961" stroke-width="1.5" stroke-linecap="round" stroke="white" />
                         <path d="M2.99609 11.9951H20.9961" stroke-width="1.5" stroke-linecap="round" stroke="white" />
@@ -27,7 +31,7 @@ function Header() {
                         <path d="M20.9961 18.9902H14.9961" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke="white" />
                     </svg>
 
-                </span>
+                </button>
                 <div className="bg-[#141414] flex flex-1 items-center gap-2 px-[16px] py-[12px] rounded-[24px]">
                     <span>
                         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
