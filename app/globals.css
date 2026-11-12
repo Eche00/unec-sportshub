@@ -4,9 +4,12 @@
   --font-sans: var(--font-dm-sans);
 }
 
-/* DEFAULT THEME — DARK MODE */
-:root {
-  color-scheme: dark;
+/* force dark mode */
+:root,
+html,
+html.dark,
+html:not(.dark) {
+  color-scheme: dark !important;
 
   --background: #0B0B0B;
   --foreground: #fafafa;
@@ -14,65 +17,43 @@
   --muted: #B5B5B5;
   --border: #27272a;
 
-  /* Default accent: Orange */
+  /* default accent: orange */
   --primary: #ea580c;
   --primary-hover: #c2410c;
   --primary-foreground: #ffffff;
 }
 
-/* LIGHT MODE */
-html:not(.dark) {
-  color-scheme: light;
-
-  --background: #ffffff;
-  --foreground: #171717;
-  --card: #f8fafc;
-  --muted: #64748b;
-  --border: #e2e8f0;
-}
-
-/* DARK MODE */
-html.dark {
-  color-scheme: dark;
-
-  --background: #0B0B0B;
-  --foreground: #fafafa;
-  --card: #18181b;
-  --muted: #B5B5B5;
-  --border: #27272a;
-}
-
-/* ORANGE */
+/* orange */
 [data-color-theme="orange"] {
   --primary: #ea580c;
   --primary-hover: #c2410c;
 }
 
-/* BLUE */
+/* blue */
 [data-color-theme="blue"] {
   --primary: #2563eb;
   --primary-hover: #1d4ed8;
 }
 
-/* GREEN */
+/* green */
 [data-color-theme="green"] {
   --primary: #16a34a;
   --primary-hover: #15803d;
 }
 
-/* PURPLE */
+/* purple */
 [data-color-theme="purple"] {
   --primary: #9333ea;
   --primary-hover: #7e22ce;
 }
 
-/* RED */
+/* red */
 [data-color-theme="red"] {
   --primary: #dc2626;
   --primary-hover: #b91c1c;
 }
 
-/* GLOBAL STYLES */
+/* global styles */
 html,
 body {
   background: var(--background);
@@ -84,17 +65,13 @@ body {
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-/* THEME-AWARE SELECTION */
+/* theme-aware selection */
 ::selection {
   background: var(--primary);
   color: var(--primary-foreground);
 }
 
-body {
-  font-family: var(--font-dm-sans), sans-serif;
-}
-
-/* FLOAT ANIMATION */
+/* float animation */
 @keyframes float {
   0% {
     transform: translateY(0px) translateX(0px);
