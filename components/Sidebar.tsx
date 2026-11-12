@@ -106,7 +106,7 @@ function Sidebar({ setOpenSideBar }: SidebarProps) {
 
                 <hr className='h-[1px] w-full bg-[#141414] border-none' />
                 {/*  profile information  */}
-                {currentUser && <section className=' flex flex-col gap-[12px]'>
+                {currentUser ? <section className=' flex flex-col gap-[12px]'>
 
                     {/* profile image */}
                     <img src={userInfo?.profileImage || "/logo.png"} alt="" className='w-[56px] h-[56px] rounded-full object-cover bg-[var(--background)]' />
@@ -137,6 +137,29 @@ function Sidebar({ setOpenSideBar }: SidebarProps) {
                         )}
                     </p>
                 </section>
+                    :
+                    <div className='flex items-center justify-between'>
+                        <span className="bg-[#141414] p-[14px] rounded-full cursor-pointer">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke="white" />
+                                <path d="M12 14C7 14 4 16.5 4 19C4 20.1046 4.89543 21 6 21H18C19.1046 21 20 20.1046 20 19C20 16.5 17 14 12 14Z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke="white" />
+                            </svg>
+
+                        </span>
+
+                        <button className="w-fit px-5 py-3 rounded-[18px] flex items-center justify-center bg-white text-black text-[12px] font-medium cursor-pointer flex items-center gap-[8px]" onClick={() => router.push("/get-started")}>
+                            Create Profile
+                            <span>
+                                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M10.7918 7H2.91675" stroke-linecap="round" stroke-linejoin="round" stroke="#0B0B0B" />
+                                    <path d="M7.58325 10.5C7.58325 10.5 11.0833 7.92231 11.0833 7C11.0833 6.07763 7.58325 3.5 7.58325 3.5" stroke-linecap="round" stroke-linejoin="round" stroke="#0B0B0B" />
+                                </svg>
+                            </span>
+                        </button>
+
+
+                    </div>
+
                 }
                 <hr className='h-[1px] w-full bg-[#141414] border-none' />
 
