@@ -3,14 +3,18 @@
 import Header from '@/components/Header';
 import Sidebar from '@/components/Sidebar';
 import { AnimatePresence, motion } from 'framer-motion';
+import { usePathname } from 'next/navigation';
 import React, { useState } from 'react'
 
 function Publiclayout({ children }: { children: React.ReactNode; }) {
+    const pathname = usePathname()
     const [openSideBar, setOpenSideBar] = useState<boolean>(false)
 
+
+    const hideHeader = pathname === "/players/all"
     return (
         <main>
-            <Header openSideBar={openSideBar} setOpenSideBar={setOpenSideBar} />
+            {!hideHeader && <Header openSideBar={openSideBar} setOpenSideBar={setOpenSideBar} />}
 
             <AnimatePresence>
                 {openSideBar && (
@@ -38,7 +42,7 @@ function Publiclayout({ children }: { children: React.ReactNode; }) {
                 )}
             </AnimatePresence>
 
-            <main className="bg-[var(--background)] min-h-screen pt-20">
+            <main className={`bg-[var(--background)] min-h-screen ${!hideHeader && 'pt-20'}`}>
                 {children}
             </main>
         </main>

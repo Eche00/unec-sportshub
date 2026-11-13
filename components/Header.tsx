@@ -25,7 +25,8 @@ function Header({ openSideBar, setOpenSideBar }: SidebarProps) {
                     </svg>
 
                 </button>
-                <div className="bg-[#141414] flex flex-1 items-center gap-2 px-[16px] py-[12px] rounded-[24px]">
+                {/* search  */}
+                <div className="bg-[#141414] flex flex-1 items-center gap-2 px-[16px] h-[42px] rounded-[24px]">
                     <span>
                         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M11.3333 11.3333L13.9999 14" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke="#8C8C8C" />

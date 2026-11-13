@@ -1,4 +1,5 @@
 'use client'
+import { useRouter } from 'next/navigation';
 import React, { useState } from 'react'
 
 
@@ -686,6 +687,7 @@ export const dummyPlayers = [
 ];
 
 function page() {
+    const router = useRouter()
     const [showTeamMates, setShowTeamMates] = useState(true)
     return (
         <div className='overflow-x-visible font-medium'>
@@ -718,9 +720,9 @@ function page() {
             </section>
             {/* players  */}
             <section className="w-[90%] mx-auto pb-5">
-                <div className='sticky top-[70px] bg-[var(--background)] flex items-center justify-between py-5'>
+                <div className='sticky top-[60px] bg-[var(--background)] flex items-center justify-between py-5'>
                     <p className='text-[var(--muted)] text-[14px] uppercase'>All players</p>
-                    <span className='flex items-center gap-[8px] text-[12px] text-[var(--muted)]'>
+                    <span className='flex items-center gap-[8px] text-[12px] text-[var(--muted)]' onClick={() => router.push('/players/all')}>
                         See more
                         <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M10.7915 7H2.9165" stroke-linecap="round" stroke-linejoin="round" stroke="#B5B5B5" />
