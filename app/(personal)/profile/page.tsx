@@ -64,7 +64,7 @@ function page() {
                 <section className='absolute -bottom-5 left-1/2 -translate-x-1/2 flex flex-col items-center justify-center text-center border-b border-[#141414] w-[90%] mx-auto py-[24px]'>
 
                     {/* profile image */}
-                    <img src={userInfo?.profileImage || "/logo.png"} alt="" className='w-[80px] h-[80px] rounded-full object-cover bg-[var(--background)] mb-[8px]' />
+                    <img src={userInfo?.profileImage || userInfo?.gender === "male" ? '/male.png' : '/female.png'} alt="" className='w-[80px] h-[80px] rounded-full object-cover bg-[var(--background)] mb-[8px]' />
 
                     {/* full name and verification status */}
                     <p className='flex items-center justify-center gap-[8px] text-[18px] text-nowrap'>

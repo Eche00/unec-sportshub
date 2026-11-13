@@ -109,7 +109,7 @@ function Sidebar({ setOpenSideBar }: SidebarProps) {
                 {currentUser ? <section className=' flex flex-col gap-[12px]'>
 
                     {/* profile image */}
-                    <img src={userInfo?.profileImage || "/logo.png"} alt="" className='w-[56px] h-[56px] rounded-full object-cover bg-[var(--background)]' />
+                    <img src={userInfo?.profileImage || userInfo?.gender === "male" ? '/male.png' : '/female.png'} alt="" className='w-[56px] h-[56px] rounded-full object-cover bg-[var(--background)]' />
 
                     {/* full name and verification status */}
                     <p className='flex items-center  gap-[8px] text-[18px] text-nowrap'>
