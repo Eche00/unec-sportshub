@@ -34,7 +34,7 @@ function page() {
                             <img src={player?.profileImage || player?.gender === "male" ? '/male.png' : '/female.png'} alt="" className="w-[32px] h-[32px] object-cover rounded-full" />
                             <p className='text-white text-[18px] '>{player.shirtNumber}</p>
                             <p className='text-white text-[12px] flex flex-col'>{player.fullName}
-                                <span className='text-[var(--muted)] text-[10px] '>{player.position}</span>22
+                                <span className='text-[var(--muted)] text-[10px] '>{player.position}</span>
                             </p>
                         </div>
                         <div>
