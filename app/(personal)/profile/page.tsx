@@ -4,7 +4,7 @@
 import Button from '@/components/ui/Button'
 import Loader from '@/components/ui/Loader'
 import NoTeam from '@/components/ui/NoTeam'
-import TeamStats from '@/components/ui/TeamStats'
+import PlayerStats from '@/components/ui/PlayerStats'
 import { useUserInfo } from '@/utils/logics/userinfo'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -142,7 +142,7 @@ function page() {
             </section>
 
             {/* team details section  */}
-            {userInfo?.status === "pendin" ? <section className='w-[90%] mx-auto flex-1 h-full flex items-center justify-center'><NoTeam /></section> : <TeamStats />}
+            {userInfo?.status === "pending" ? <section className='w-[90%] mx-auto flex-1 h-full flex items-center justify-center'><NoTeam /></section> : <PlayerStats/>}
 
             {/*  home button  */}
             <Button type="button" variant="primary" onClick={() => router.push('/')} className="fixed bottom-4 left-1/2 -translate-x-1/2 !w-[90%] mx-auto py-3 flex items-center justify-center gap-2">
