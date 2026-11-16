@@ -20,7 +20,7 @@ function Page() {
                 </div>
 
                 {/* form */}
-                <div className="relative z-10 w-full max-w-md">
+                <div className="fixed bottom-0 left-0 z-10 w-full max-w-md">
                     <div className="fixed left-0 w-full bottom-0 group bg-[var(--background)] sm:rounded-t-xl rounded-t-[24px] overflow-hidden shadow-2xl">
                         <div className="relative z-10 px-3 pt-3 pb-12">
                             {/* header */}

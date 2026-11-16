@@ -4,7 +4,7 @@ import Link from "next/link";
 
 function Page() {
     return (
-        <main className="relative min-h-screen min-h-[100dvh] bg-[var(--background)] text-[var(--foreground)] overflow-hidden">
+        <main className="min-h-screen min-h-[100dvh] bg-[var(--background)] text-[var(--foreground)] overflow-hidden">
             {/* background image */}
             <div className="fixed z-10 inset-0 h-[75%]">
                 <img src="/auth-img.jpg" alt="Versity Sports Auth Img" className="w-full h-full object-cover object-center" />
