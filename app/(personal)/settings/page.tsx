@@ -4,20 +4,19 @@ import { useColorTheme } from "@/components/providers/color-theme-provider";
 import Loader from "@/components/ui/Loader";
 import { usePlayerProfile, useUserInfo } from "@/utils/logics/userinfo";
 import { useTheme } from "next-themes";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 
 function page() {
   const router = useRouter();
   const [step, setStep] = useState(0);
-  const { userInfo, isLoading: userLoading } = useUserInfo();
-  const { theme, setTheme } = useTheme();
 
-  const { colorTheme, setColorTheme } = useColorTheme();
+  const { userInfo, isLoading: userLoading } = useUserInfo();
   const { player, isLoading: playerLoading } = usePlayerProfile(
     userInfo?.userName || "",
   );
+  const { colorTheme, setColorTheme } = useColorTheme();
+
   const themes = [
     { name: "Orange", value: "orange", color: "#ea580c" },
     { name: "Blue", value: "blue", color: "#2563eb" },
@@ -25,12 +24,10 @@ function page() {
     { name: "Green", value: "green", color: "#16a34a" },
     { name: "Purple", value: "purple", color: "#7e22ce" },
   ] as const;
+
   const handleBack = () => {
-    if (step <= 0) {
-      router.push("/profile");
-    } else {
-      setStep(step - 1);
-    }
+    if (step <= 0) router.push("/profile");
+    else setStep(step - 1);
   };
 
   if (userLoading || (userInfo?.userName && playerLoading)) return <Loader />;

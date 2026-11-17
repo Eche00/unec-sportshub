@@ -5,16 +5,13 @@
 }
 
 /* force dark mode */
-:root,
-html,
-html.dark,
-html:not(.dark) {
+:root {
   color-scheme: dark !important;
 
-  --background: #0B0B0B;
+  --background: #0b0b0b;
   --foreground: #fafafa;
   --card: #18181b;
-  --muted: #B5B5B5;
+  --muted: #b5b5b5;
   --border: #27272a;
 
   /* default accent: orange */
@@ -62,7 +59,9 @@ body {
 }
 
 body {
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
 }
 
 /* theme-aware selection */
