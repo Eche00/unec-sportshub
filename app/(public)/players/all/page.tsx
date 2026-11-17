@@ -1,11 +1,22 @@
 'use client'
 
 import React from 'react'
-import { dummyPlayers } from '../page'
 import { useRouter } from 'next/navigation'
+import { usePlayerInfo } from '@/utils/logics/playerinfo'
+import Loader from '@/components/ui/Loader'
 
 function page() {
     const router = useRouter()
+     const {
+        filteredPlayers,
+        isLoading,
+        error,
+        filters,
+        setFilters,
+    } = usePlayerInfo();
+    
+        if (isLoading) return <Loader />;
+        if (error) return <p>{error}</p>;
     return (
         <section className="w-[90%] mx-auto pb-5">
             {/* search  */}
@@ -23,15 +34,21 @@ function page() {
                             <path d="M12.6667 7.33333C12.6667 4.38781 10.2789 2 7.33333 2C4.38781 2 2 4.38781 2 7.33333C2 10.2789 4.38781 12.6667 7.33333 12.6667C10.2789 12.6667 12.6667 10.2789 12.6667 7.33333Z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke="#8C8C8C" />
                         </svg>
                     </span>
-                    <input type="text" placeholder="Search for a player ...." className="bg-transparent text-[var(--foreground)] placeholder:text-[var(--muted)] outline-none w-full" />
+                    <input value={filters.search || ""}
+                onChange={(e) =>
+                    setFilters((prev) => ({
+                        ...prev,
+                        search: e.target.value,
+                    }))
+                } type="text" placeholder="Search for a player ...." className="bg-transparent text-[var(--foreground)] placeholder:text-[var(--muted)] outline-none w-full" />
                 </div>
             </section>
             {/* players  */}
             <div className='flex flex-col gap-[8px] w-full'>
-                {dummyPlayers.map((player) => (
-                    <div key={player.uid} className='p-[12px] bg-[#141414] rounded-xl flex items-center justify-between'>
+                {filteredPlayers.map((player) => (
+                    <div onClick={() => router.push(`/profile/${player.userName}`)} key={player.uid} className='p-[12px] bg-[#141414] rounded-xl flex items-center justify-between'>
                         <div className=' flex items-center  gap-[8px]'>
-                            <img src={player?.profileImage || player?.gender === "male" ? '/male.png' : '/female.png'} alt="" className="w-[32px] h-[32px] object-cover rounded-full" />
+                            <img src={player?.profileImage || (player?.gender === "male" ? '/male.png' : '/female.png')} alt="" className="w-[32px] h-[32px] object-cover rounded-full" />
                             <p className='text-white text-[18px] '>{player.shirtNumber}</p>
                             <p className='text-white text-[12px] flex flex-col'>{player.fullName}
                                 <span className='text-[var(--muted)] text-[10px] '>{player.position}</span>

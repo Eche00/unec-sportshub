@@ -5,16 +5,18 @@ import Button from '@/components/ui/Button'
 import Loader from '@/components/ui/Loader'
 import NoTeam from '@/components/ui/NoTeam'
 import PlayerStats from '@/components/ui/PlayerStats'
-import { useUserInfo } from '@/utils/logics/userinfo'
+import { usePlayerProfile, useUserInfo } from '@/utils/logics/userinfo'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
 function page() {
-    const router = useRouter()
-    const { userInfo, isLoading } = useUserInfo()
+   const router = useRouter()
+    const { userInfo, isLoading: userLoading } = useUserInfo()
 
-    if (isLoading) return <Loader />
+    const { player, isLoading: playerLoading } = usePlayerProfile(userInfo?.userName || '')
 
+    if (userLoading || (userInfo?.userName && playerLoading)) return <Loader />
+    if (!userInfo) return <div>Profile not found.</div>
     return (
         <div className='min-h-screen flex flex-col font-medium'>
 
@@ -65,7 +67,7 @@ function page() {
                 <section className='absolute -bottom-5 left-1/2 -translate-x-1/2 flex flex-col items-center justify-center text-center border-b border-[#141414] w-[90%] mx-auto py-[24px]'>
 
                     {/* profile image */}
-                    <img src={userInfo?.profileImage || userInfo?.gender === "male" ? '/male.png' : '/female.png'} alt="" className='w-[80px] h-[80px] rounded-full object-cover bg-[var(--background)] mb-[8px]' />
+                   <img src={userInfo.profileImage || (userInfo.gender === "male" ? '/male.png' : '/female.png')} alt="" className='w-[80px] h-[80px] rounded-full object-cover bg-[var(--background)] mb-[8px]' />
 
                     {/* full name and verification status */}
                     <p className='flex items-center justify-center gap-[8px] text-[18px] text-nowrap'>
@@ -142,12 +144,21 @@ function page() {
             </section>
 
             {/* team details section  */}
-            {userInfo?.status === "pending" ? <section className='w-[90%] mx-auto flex-1 h-full flex items-center justify-center'><NoTeam /></section> : <PlayerStats/>}
-
+            {userInfo.status === "pending" ? (
+    <section className='w-[90%] mx-auto flex-1 h-full flex items-center justify-center'>
+        <NoTeam />
+    </section>
+) : player ? (
+    <PlayerStats player={player} />
+) : (
+    <section className='w-[90%] mx-auto flex-1 h-full flex items-center justify-center'>
+        <NoTeam />
+    </section>
+)}
             {/*  home button  */}
-            <Button type="button" variant="primary" onClick={() => router.push('/')} className="fixed bottom-4 left-1/2 -translate-x-1/2 !w-[90%] mx-auto py-3 flex items-center justify-center gap-2">
+         {player?.status === "pending"  &&  <Button type="button" variant="primary" onClick={() => router.push('/')} className="fixed bottom-4 left-1/2 -translate-x-1/2 !w-[90%] mx-auto py-3 flex items-center justify-center gap-2">
                 Go Back to Homescreen
-            </Button>
+            </Button>}
 
         </div>
     )
