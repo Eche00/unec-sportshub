@@ -438,8 +438,8 @@ function Sidebar({ setOpenSideBar }: SidebarProps) {
               onClick={() => setOpenSideBar(false)}
               className={
                 pathname === item.link
-                  ? "text-[var(--primary)] font-bold bg-[var(--primary-hover)] p-[12px] rounded-lg flex items-center gap-2"
-                  : "text-gray-400 p-[12px] rounded-lg hover:bg-[#FF62011A]/10 flex items-center gap-2"
+                  ? "text-[var(--primary)] font-bold bg-[var(--primary-hover)]/30 p-[12px] rounded-lg flex items-center gap-2"
+                  : "text-gray-400 p-[12px] rounded-lg hover:bg-[var(--primary-hover)]/10 flex items-center gap-2"
               }>
               {item.icon} {item.name}
             </Link>
