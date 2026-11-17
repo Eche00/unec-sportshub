@@ -46,7 +46,7 @@ function page() {
                     </Link>
 
                     {/* Settings Button */}
-                    <Link href="">
+                    <Link href="/settings">
                         <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <foreignObject x="-50" y="-50" width="140" height="140"><div style={{ backdropFilter: "blur(25px)", clipPath: "url(#bgblur_0_480_69723_clip_path)", height: "100%", width: "100%" }}></div></foreignObject>
                             <g data-figma-bg-blur-radius="50">

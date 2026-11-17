@@ -9,6 +9,22 @@ interface PlayerStatsProps {
 }
 
 function PlayerStats({ player }: PlayerStatsProps) {
+
+    const calculateRating = () => {
+    const appearances = player.statistics?.appearances ?? 0;
+    const goals = player.statistics?.goalsScored ?? 0;
+    const assists = player.statistics?.assists ?? 0;
+
+    const appearanceScore = Math.min(appearances / 100, 1) * 2;
+    const goalsScore = Math.min(goals / 100, 1) * 4;
+    const assistsScore = Math.min(assists / 100, 1) * 3;
+
+    return (appearances === 0
+        ? 0
+        : Math.min(appearanceScore + goalsScore + assistsScore, 9)
+    ).toFixed(1);
+};
+
     return (
         <main className='font-medium'>
             <div className='pt-6' key={player.uid}>
@@ -21,12 +37,12 @@ function PlayerStats({ player }: PlayerStatsProps) {
                     <hr className='h-[50px] w-[1px] bg-[#3C3C3C] border-none' />
                     <div className='w-[88px] flex flex-col items-center gap-[4px]'>
                         <p className='text-[14px] text-[var(--muted)]'>Goals</p>
-                        <span className='text-[24px] text-white'>{player.statistics?.goalsScored ?? 0}</span>
+                        <span className='text-[24px] text-white'>{player.statistics?.goalsScored}</span>
                     </div>
                     <hr className='h-[50px] w-[1px] bg-[#3C3C3C] border-none' />
                     <div className='w-[88px] flex flex-col items-center gap-[4px]'>
                         <p className='text-[14px] text-[var(--muted)]'>Assist</p>
-                        <span className='text-[24px] text-white'>{player.statistics?.assists ?? 0}</span>
+                        <span className='text-[24px] text-white'>{player.statistics?.assists}</span>
                     </div>
                 </section>
 
@@ -71,7 +87,7 @@ function PlayerStats({ player }: PlayerStatsProps) {
                                 <path d="M9.773 1.20348L11.2395 4.16073C11.4395 4.57239 11.9727 4.96725 12.4227 5.04286L15.0808 5.48812C16.7806 5.77377 17.1806 7.01716 15.9557 8.24375L13.8893 10.3272C13.5393 10.6801 13.3477 11.3606 13.4559 11.8479L14.0476 14.4271C14.5142 16.4686 13.4392 17.2583 11.6478 16.1913L9.15642 14.7043C8.7065 14.4355 7.96492 14.4355 7.50658 14.7043L5.01522 16.1913C3.23208 17.2583 2.14887 16.4602 2.61549 14.4271L3.20709 11.8479C3.31541 11.3606 3.12377 10.6801 2.7738 10.3272L0.707366 8.24375C-0.509167 7.01716 -0.117542 5.77377 1.58227 5.48812L4.24031 5.04286C4.68192 4.96725 5.2152 4.57239 5.41517 4.16073L6.88167 1.20348C7.68158 -0.40116 8.98142 -0.40116 9.773 1.20348Z" fill="#FFC400" />
                             </svg>
                         </span>
-                        <span className='text-[18px] text-white'>{player.statistics?.rating ?? 'N/A'}</span>
+                        <span className='text-[18px] text-white'>{calculateRating()}</span>
                     </div>
                 </section>
 
@@ -91,7 +107,9 @@ function PlayerStats({ player }: PlayerStatsProps) {
                                 </div>
                             ))
                         ) : (
-                            <p className='text-[var(--muted)] text-[12px] py-4'>No achievements yet.</p>
+                            [1,2,3].map((i)=>(
+                                  <div key={i} className='bg-[#141414] w-[154px] h-[160px] shrink-0 flex flex-col items-center justify-center border border-[#18191B] gap-[12px] rounded-xl animate-pulse'/>
+                            ))
                         )}
                     </div>
                 </div>

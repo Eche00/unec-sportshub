@@ -272,7 +272,7 @@ export function usePlayerProfile(username: string) {
                             statistics: {
                                 goalsScored: data.statistics?.goalsScored ?? 0,
                                 assists: data.statistics?.assists ?? 0,
-                                appearances: data.statistics?.appearances ?? 0,
+                                appearances: data.statistics?.matchesPlayed ?? 0,
                             },
                             achievements: Array.isArray(data.achievements)
                                 ? data.achievements
