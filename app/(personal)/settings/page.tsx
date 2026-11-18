@@ -4,6 +4,7 @@ import { useColorTheme } from "@/components/providers/color-theme-provider";
 import DeleteAccount from "@/components/ui/DeleteAccount";
 import Loader from "@/components/ui/Loader";
 import Logout from "@/components/ui/Logout";
+import ToggleSwitch from "@/components/ui/ToggleSwitch";
 import { usePlayerProfile, useUserInfo } from "@/utils/logics/userinfo";
 import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
@@ -103,9 +104,7 @@ function page() {
               </span>
               <p>Push notifications</p>
             </div>
-            <span>
-              <input type="radio" name="" id="" />
-            </span>
+            <ToggleSwitch />
           </div>
 
           {/* 2 */}
@@ -123,12 +122,7 @@ function page() {
               </span>
               <p>Player discoverability </p>
             </div>
-            <span>
-              <svg width="46" height="24" viewBox="0 0 46 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect width="46" height="24" rx="12" fill="#FF6201" />
-                <rect x="24" y="2" width="20" height="20" rx="10" fill="white" />
-              </svg>
-            </span>
+            <ToggleSwitch />
           </div>
 
           {/* 3 */}
